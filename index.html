@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LinkedIn Analytics</title>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="text/javascript" src="./jszip.js"></script>
+  <script type="text/javascript" src="./data.js"></script>
+  <style type="text/css">
+    #chart { display: none; height:80% !important; width:80% !important; margin:auto; }
+  </style>
+</head>
+<body>
+
+  <form>
+    <input id="filesInput" type="file" onchange="onFileSelected()" />
+  </form>
+
+  <div>
+    <canvas id="chart"></canvas>
+  </div>
+
+  <script type="text/javascript">
+    const setChart = (data) => {
+      const chartData = { 
+        datasets: [
+          {
+            label: "Sent Messages",
+            data: Object.keys(data.SentMessages).map(x => ({ x, y:data.SentMessages[x].length }))
+          },
+          {
+            label: "Comments",
+            data: Object.keys(data.Comments).map(x => ({ x, y:data.Comments[x].length }))
+          },
+          {
+            label: "Shares",
+            data: Object.keys(data.Shares).map(x => ({ x, y:data.Shares[x].length }))
+          },
+          {
+            label: "Reactions",
+            data: Object.keys(data.Reactions).map(x => ({ x, y:data.Reactions[x].length }))
+          }
+        ]
+      };
+      console.log({ data });
+      const ctx = document.getElementById('chart');
+      new Chart(ctx, {
+        type: 'line',
+        data: chartData
+      });
+      ctx.style.display = 'block';
+    };
+  </script>
+
+</body>
+</html>

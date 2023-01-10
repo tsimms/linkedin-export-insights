@@ -3,12 +3,12 @@
 
 
 
-    const csvToJson = (rawCsv, firstField) => {
+    const csvToJson = (rawCsv, labelRow, firstField) => {
 
       const lines = rawCsv.split(/\r?\n/);
       const re = new RegExp(`\\\\r(${firstField}),`, "g");
-      const csv = lines[0].toLowerCase().replace(/[ ]+/g, "_") + '\n' + lines
-        .slice(1)
+      const csv = lines[labelRow].toLowerCase().replace(/[ ]+/g, "_") + '\n' + lines
+        .slice(labelRow + 1)
         .join('\\r')
         .replace(re, "\n$1,");
 
@@ -90,6 +90,7 @@
         {
           name: "Profile",
           file: "Profile.csv",
+          labelRow: 0,
           firstField: "[^,]+",
           transformFn: (data) => {
             FULLNAME = `${data[0].first_name} ${data[0].last_name}`;
@@ -99,6 +100,7 @@
         {
           name: "Comments",
           file: "Comments.csv",
+          labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
@@ -108,6 +110,7 @@
         {
           name: "Shares",
           file: "Shares.csv",
+          labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
@@ -117,6 +120,7 @@
         {
           name: "Reactions",
           file: "Reactions.csv",
+          labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
@@ -129,9 +133,31 @@
         {
           name: "SentMessages",
           file: "messages.csv",
+          labelRow: 0,
           firstField: ".*?==",
           transformFn: (data) => {
             data.filter(d => d.from === FULLNAME);
+            const dataByYear = indexData(data, "year");
+            return dataByYear;
+          }
+        },
+        {
+          name: "Connections",
+          file: "Connections.csv",
+          labelRow: 3,
+          firstField: "[^,]+",
+          transformFn: (data) => {
+            const dataWithYear = data.map(row => ({ ...row, year: row.connected_on.split(' ')[2].replace(/[^\d]/g,"") }));
+            const dataByYear = indexData(dataWithYear, "year");
+            return dataByYear;
+          }
+        },
+        {
+          name: "Votes",
+          file: "Votes.csv",
+          labelRow: 0,
+          firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
+          transformFn: (data) => {
             const dataByYear = indexData(data, "year");
             return dataByYear;
           }
@@ -142,7 +168,7 @@
         name: dataFile.name,
         data: await zipFile.loadAsync(file)
           .then((zipObj) => (zipObj.file(dataFile.file).async("text")))
-          .then(data => csvToJson(data, dataFile.firstField))  
+          .then(data => csvToJson(data, dataFile.labelRow, dataFile.firstField))  
           .then(rows => rows.map(row => ({...row, year: (new Date(row.date)).getFullYear()})))
           .then(dataFile.transformFn)
       }));

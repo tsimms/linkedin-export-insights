@@ -17,18 +17,20 @@ Okay, so that's all you need to worry about for now. That will get you the zip a
 
 Now the data is fine for nerds like me, but you're probably wondering what you can do with it.. Glad you asked!
 
-This project will give you your annual engagement across four main categories:
-1. Messages. That is, the number of individual messages you _sent_. While people usually start here on LinkedIn, it's not the only way (and in fact, it's not my preferred way) to build strong connections with other. Keep reading...
-2. Reactions. Better known as _likes_, but you know, LinkedIn decided to get all fancy like the cool kids, and now allow you to react with like, celebrate, support, funny, love, insightful, and curious. Fun fact: in LinkedIn data land, they call these: LIKE, PRAISE, EMPATHY, ENTERTAINMENT, APPRECIATION, INTEREST, and MAYBE, respectively... 👈🏽 I find it amusing that they use "MAYBE" to describe "curious"! 😁 Apparently, I've only used it once in the past 5 years. lol
-3. Comments. THIS, right here! the bread-and-butter of your ability to begin interacting with folks... _not_ in DMs!
-4. Shares. These are your posts; the place you're able to create true value for your network (and in turn for yourself). This is most often the area where people spend the least time. For most with a little time to invest, I'd say this is a great place to begin your new LinkedIn strategy.
+This project will give you your annual engagement across six main categories:
+1. Connections. How engaged were you in establishing connections with others? This is a good place to apply some LinkedIn strategy, for determining how and with whom you connect.
+2. Messages. That is, the number of individual messages you _sent_. While people usually start here on LinkedIn, it's not the only way (and in fact, it's not my preferred way) to build strong connections with other. Keep reading...
+3. Reactions. Better known as _likes_, but you know, LinkedIn decided to get all fancy like the cool kids, and now allow you to react with like, celebrate, support, funny, love, insightful, and curious. Fun fact: in LinkedIn data land, they call these: LIKE, PRAISE, EMPATHY, ENTERTAINMENT, APPRECIATION, INTEREST, and MAYBE, respectively... 👈🏽 I find it amusing that they use "MAYBE" to describe "curious"! 😁 Apparently, I've only used it once in the past 5 years. lol
+4. Comments. THIS, right here! the bread-and-butter of your ability to begin interacting with folks... _not_ in DMs!
+5. Votes. Are you engaging in polls? It can be an easy (however cheezy) way to continue building into the relationship of those with whom you're intending to connect.
+6. Posts. These are your posts; the place you're able to create true value for your network (and in turn for yourself). This is most often the area where people spend the least time. For most with a little time to invest, I'd say this is a great place to begin your new LinkedIn strategy.
 
 So let's get to it!
 
-Download the files in this project to a folder on your computer (yeah, I know, that sounds sketch, but I promise it's legit.. and I'll give you some alternative methods to running the project here!
+Download the files in this project to a folder on your computer (yeah, I know, that sounds sketch, but I promise it's legit.. and...); I'll also give you some alternative methods for not downloading files to run on your computer below.
 
 Methods you can use to get the report on your data:
-1.  Download the files to your computer. this includes using `git clone ...`, but most aren't familiar with how to do that. Once you have all the files in a folder (let's say you just downloaded them to the Downloads folder), you'd go to Chrome (or another modern browser) and navigate to [file:///Users/myname/Downloads/index.html](file:///Users/myname/Downloads/index.html) (...replacing myname with your username on your computer). Happy to help you with that if you have trouble deciphering what to use.. hit me up.
+1.  Download the files to your computer. You could use `git clone ...`, but most aren't familiar with how to do that.. Alternatively, you could download [a zip file of the project](https://github.com/tsimms/linkedin-export-insights/archive/refs/heads/main.zip) and unzip it. Once you have all the files in a folder (let's say you just downloaded them to the Downloads folder), you'd go to Chrome (or another modern browser) and navigate to [file:///Users/myname/Downloads/index.html](file:///Users/myname/Downloads/index.html) (...replacing myname with your username on your computer). Happy to help you with that if you have trouble deciphering what to use.. hit me up.
 2.  I've hosted this project on [one of my sites](https://influentmetrics.com/projects/linkedin-export-insights/) (I've got a project on the books to revamp a personal site where this stuff will go in the future).
 
 It's important to know that your data should remain private to you. In both of the two methods above, the app works without sending any of your data over the Internet. It's completely self-contained (and open source, so you can verify if you so choose). In fact, once you have the files downloaded to your computer, there's really no requirement to be connected to the Internet at all (hehehe -- I'm just realizing most won't know the concept of a computer that doesn't have Internet access, but that's a fun lil history lesson for another day)! 🤦🏽

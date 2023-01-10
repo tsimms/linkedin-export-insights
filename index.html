@@ -23,8 +23,16 @@
 
   <script type="text/javascript">
     const setChart = (data) => {
+      let labels = [];
+      Object.keys(data).forEach(key => Object.keys(data[key]).forEach(year => { if (!labels.includes(year)) labels.push(year); }));
+      labels = labels.filter(year => year >= 2000).sort();
       const chartData = { 
+        labels,
         datasets: [
+          {
+            label: "Connections",
+            data: Object.keys(data.Connections).map(x => ({ x, y:data.Connections[x].length }))
+          },
           {
             label: "Sent Messages",
             data: Object.keys(data.SentMessages).map(x => ({ x, y:data.SentMessages[x].length }))
@@ -34,12 +42,16 @@
             data: Object.keys(data.Comments).map(x => ({ x, y:data.Comments[x].length }))
           },
           {
-            label: "Shares",
+            label: "Posts",
             data: Object.keys(data.Shares).map(x => ({ x, y:data.Shares[x].length }))
           },
           {
             label: "Reactions",
             data: Object.keys(data.Reactions).map(x => ({ x, y:data.Reactions[x].length }))
+          },
+          {
+            label: "Votes",
+            data: Object.keys(data.Votes).map(x => ({ x, y:data.Votes[x].length }))
           }
         ]
       };

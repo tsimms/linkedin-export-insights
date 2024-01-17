@@ -39,11 +39,11 @@
           },
           {
             label: "Comments",
-            data: Object.keys(data.Comments).map(x => ({ x, y:data.Comments[x].length }))
+            data: data.Comments ? Object.keys(data.Comments).map(x => ({ x, y:data.Comments[x].length })) : null
           },
           {
             label: "Posts",
-            data: Object.keys(data.Shares).map(x => ({ x, y:data.Shares[x].length }))
+            data: data.Shares ? Object.keys(data.Shares).map(x => ({ x, y:data.Shares[x].length })) : null
           },
           {
             label: "Reactions",
@@ -56,6 +56,7 @@
         ]
       };
       console.log({ data });
+      DATA = data;
       const ctx = document.getElementById('chart');
       new Chart(ctx, {
         type: 'line',

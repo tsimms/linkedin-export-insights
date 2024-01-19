@@ -14,7 +14,22 @@
 <body>
 
   <form>
-    <input id="filesInput" type="file" onchange="onFileSelected()" />
+    <div>
+      What granularity do you want to inspect? <select id="granularity">
+        <option>yearly</option>
+        <option selected>monthly</option>
+      </select>  
+    </div>
+    <div>
+      Do you want to ignore group posts? <select id="ignoreGroupPosts">
+        <option>yes</option>
+        <option>no</option>
+      </select>
+    </div>
+    <div>
+      <input id="filesInput" type="file" onchange="onFileSelected()" />
+    </div>
+
   </form>
 
   <div>
@@ -22,47 +37,102 @@
   </div>
 
   <script type="text/javascript">
+    let granularity, ignoreGroupPosts;
+    const getMonthCutoff = () => {
+      const monthCutoff = new Date();
+      monthCutoff.setMonth(monthCutoff.getMonth() - 13);
+      const cutoffKey = `${monthCutoff.getFullYear()}-${String(monthCutoff.getMonth() + 1).padStart(2, '0')}`;
+      return cutoffKey;
+    }
     const setChart = (data) => {
       let labels = [];
-      Object.keys(data).forEach(key => Object.keys(data[key]).forEach(year => { if (!labels.includes(year)) labels.push(year); }));
-      labels = labels.filter(year => year >= 2000).sort();
+      const monthFilterCutoff = getMonthCutoff();
+      Object.keys(data).forEach(key => Object.keys(data[key])
+        // TODO: probably just want to iterate to set labels whether there's data or not
+        .filter(d => (granularity === "yearly" || (d.length === 7 && d >= monthFilterCutoff)))
+        .forEach(key => {
+          if (!labels.includes(key)) labels.push(key); })
+      );
+      if (granularity === "yearly")
+        labels = labels.filter(year => year >= 2000).sort()
+      const chartOptions = {
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      };
       const chartData = { 
         labels,
         datasets: [
           {
-            label: "Connections",
-            data: Object.keys(data.Connections).map(x => ({ x, y:data.Connections[x].length }))
+            label: "Sent Messages",
+            data: Object.keys(data.SentMessages)
+              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .sort((a, b) => b.localeCompare(a))
+              .map(x => ({ x, y:data.SentMessages[x].length }))
           },
           {
-            label: "Sent Messages",
-            data: Object.keys(data.SentMessages).map(x => ({ x, y:data.SentMessages[x].length }))
+            label: "Connections",
+            data: Object.keys(data.Connections)
+              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .map(x => ({ x, y:data.Connections[x].length }))
           },
           {
             label: "Comments",
-            data: data.Comments ? Object.keys(data.Comments).map(x => ({ x, y:data.Comments[x].length })) : null
+            data: data.Comments ? Object.keys(data.Comments)
+              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .map(x => ({ x, y:data.Comments[x].length })) : null
           },
           {
             label: "Posts",
-            data: data.Shares ? Object.keys(data.Shares).map(x => ({ x, y:data.Shares[x].length })) : null
+            data: data.Shares ? Object.keys(data.Shares)
+              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .map(x => ({ x, y:data.Shares[x]
+                .filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/)))
+                .length })) : null
           },
           {
             label: "Reactions",
-            data: Object.keys(data.Reactions).map(x => ({ x, y:data.Reactions[x].length }))
+            data: Object.keys(data.Reactions)
+              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .map(x => ({
+                x,
+                y:data.Reactions[x].length-1,
+                meta:{
+                  types: Object.keys(data.Reactions[x].types).map(
+                    type => ({ [type]: data.Reactions[x].types[type].length })
+                  )
+                }
+              }))
           },
           {
             label: "Votes",
-            data: Object.keys(data.Votes).map(x => ({ x, y:data.Votes[x].length }))
+            data: Object.keys(data.Votes)
+              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .map(x => ({ x, y:data.Votes[x].length }))
           }
         ]
       };
-      console.log({ data });
+      console.log({ data, chartData });
       DATA = data;
       const ctx = document.getElementById('chart');
       new Chart(ctx, {
         type: 'line',
-        data: chartData
+        data: chartData,
+        options: chartOptions
       });
       ctx.style.display = 'block';
+    };
+
+    const onFileSelected = () => {
+      granularity = document.getElementById('granularity').value;
+      ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value === "yes";
+      const files = filesInput.files;
+      if (files.length) {
+        readZip(files[0], granularity)
+          .then(transformFinal)
+          .then(setChart);
+      }
     };
   </script>
 

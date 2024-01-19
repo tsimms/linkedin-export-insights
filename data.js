@@ -73,6 +73,10 @@
 
     };
 
+    const formatMonthKey = (date) => {
+      return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+    }
+
     const indexData = (data, key) => {
       const indexes = {};
       data.forEach(row => {
@@ -84,7 +88,7 @@
       return indexes;
     };
 
-    const readZip = async (file) => {
+    const readZip = async (file, granularity) => {
       const zipFile = new JSZip();
       const dataFiles = [
         {
@@ -104,7 +108,8 @@
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
-            return dataByYear;
+            const dataByMonth = indexData(data, "month");
+            return granularity === "yearly" ? dataByYear : dataByMonth;
           }
         },
         {
@@ -114,7 +119,8 @@
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
-            return dataByYear;
+            const dataByMonth = indexData(data, "month");
+            return granularity === "yearly" ? dataByYear : dataByMonth;
           }
         },
         {
@@ -124,10 +130,10 @@
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
-            const dataByType = {};
-            Object.keys(dataByYear).forEach(k => { dataByType[k] = indexData(dataByYear[k], "type")});
-	    //return dataByType;
-            return dataByYear;
+            const dataByMonth = indexData(data, "month");
+            Object.keys(dataByYear).forEach(k => { dataByYear[k].types = indexData(dataByYear[k], "type")});
+            Object.keys(dataByMonth).forEach(k => { dataByMonth[k].types = indexData(dataByMonth[k], "type")});
+            return granularity === "yearly" ? dataByYear : dataByMonth;
           }
         },
         {
@@ -138,7 +144,8 @@
           transformFn: (data) => {
             data.filter(d => d.from === FULLNAME);
             const dataByYear = indexData(data, "year");
-            return dataByYear;
+            const dataByMonth = indexData(data, "month");
+            return granularity === "yearly" ? dataByYear : dataByMonth;
           }
         },
         {
@@ -147,9 +154,14 @@
           labelRow: 3,
           firstField: "[^,]+",
           transformFn: (data) => {
-            const dataWithYear = data.map(row => ({ ...row, year: row.connected_on.split(' ')[2].replace(/[^\d]/g,"") }));
-            const dataByYear = indexData(dataWithYear, "year");
-            return dataByYear;
+            const dataWithYearAndMonth = data.map(row => ({ 
+              ...row,
+              year: row.connected_on.split(' ')[2].replace(/[^\d]/g,""),
+              month: formatMonthKey(new Date(row.connected_on.replace(/\\r/,"")))
+            }));
+            const dataByYear = indexData(dataWithYearAndMonth, "year");
+            const dataByMonth = indexData(dataWithYearAndMonth, "month");
+            return granularity === "yearly" ? dataByYear : dataByMonth;
           }
         },
         {
@@ -159,7 +171,8 @@
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
             const dataByYear = indexData(data, "year");
-            return dataByYear;
+            const dataByMonth = indexData(data, "month");
+            return granularity === "yearly" ? dataByYear : dataByMonth;
           }
         }
       ];
@@ -169,7 +182,11 @@
         data: await zipFile.loadAsync(file)
           .then((zipObj) => (zipObj.file(dataFile.file).async("text")))
           .then(data => csvToJson(data, dataFile.labelRow, dataFile.firstField))  
-          .then(rows => rows.map(row => ({...row, year: (new Date(row.date)).getFullYear()})))
+          .then(rows => rows.map(row => ({
+            ...row,
+            year: (new Date(row.date)).getFullYear(),
+            month: formatMonthKey(new Date(row.date))
+          })))
           .then(dataFile.transformFn)
       }));
 
@@ -184,12 +201,4 @@
       return datasets;
     }
 
-    const onFileSelected = () => {
-      const files = filesInput.files;
-      if (files.length) {
-        readZip(files[0])
-          .then(transformFinal)
-          .then(setChart);
-      }
-    };
 

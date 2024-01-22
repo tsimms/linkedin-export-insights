@@ -18,6 +18,7 @@
       What granularity do you want to inspect? <select id="granularity">
         <option>yearly</option>
         <option selected>monthly</option>
+        <option>weekly</option>
       </select>  
     </div>
     <div>
@@ -44,15 +45,36 @@
       const cutoffKey = `${monthCutoff.getFullYear()}-${String(monthCutoff.getMonth() + 1).padStart(2, '0')}`;
       return cutoffKey;
     }
+    const getWeekCutoff = () => {
+      const weekCutoff = new Date();
+      weekCutoff.setDate(weekCutoff.getDate() - 7*16);
+      const cutoffKey = `${weekCutoff.getFullYear()}W${String(Math.ceil((weekCutoff - new Date(weekCutoff.getFullYear(), 0, 1)) / 86400000 / 7)).padStart(2,'0')}`;
+      return cutoffKey;
+    }
+    const filterKeys = (granularity, data) => {
+      let dataset = data;
+      switch (granularity) {
+        case "yearly":
+          break;
+        case "monthly":
+          dataset = data.filter(d => (d.length === 7 && d >= getMonthCutoff()))
+          break;
+        case "weekly":
+          dataset = data.filter(d => (d.length === 7 && d >= getWeekCutoff()))
+          break;
+      }
+      return dataset;
+    }
     const setChart = (data) => {
       let labels = [];
-      const monthFilterCutoff = getMonthCutoff();
+
       Object.keys(data).forEach(key => Object.keys(data[key])
         // TODO: probably just want to iterate to set labels whether there's data or not
-        .filter(d => (granularity === "yearly" || (d.length === 7 && d >= monthFilterCutoff)))
+        //.filter(d => (granularity === "yearly" || (d.length === 7 && d >= monthFilterCutoff)))
         .forEach(key => {
           if (!labels.includes(key)) labels.push(key); })
       );
+      labels = filterKeys(granularity, labels);
       if (granularity === "yearly")
         labels = labels.filter(year => year >= 2000).sort()
       const chartOptions = {
@@ -66,35 +88,35 @@
         datasets: [
           {
             label: "Sent Messages",
-            data: Object.keys(data.SentMessages)
-              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+            data: filterKeys(granularity, Object.keys(data.SentMessages))
+              //.filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
               .sort((a, b) => b.localeCompare(a))
               .map(x => ({ x, y:data.SentMessages[x].length }))
           },
           {
             label: "Connections",
-            data: Object.keys(data.Connections)
-              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+            data: filterKeys(granularity, Object.keys(data.Connections))
+              //.filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
               .map(x => ({ x, y:data.Connections[x].length }))
           },
           {
             label: "Comments",
-            data: data.Comments ? Object.keys(data.Comments)
-              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
-              .map(x => ({ x, y:data.Comments[x].length })) : null
+            data: filterKeys(granularity, data.Comments ? Object.keys(data.Comments) : [])
+              //.filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+              .map(x => ({ x, y:data.Comments[x].length }))
           },
           {
             label: "Posts",
-            data: data.Shares ? Object.keys(data.Shares)
-              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+            data: filterKeys(granularity, data.Shares ? Object.keys(data.Shares) : [])
+              //.filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
               .map(x => ({ x, y:data.Shares[x]
                 .filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/)))
-                .length })) : null
+                .length }))
           },
           {
             label: "Reactions",
-            data: Object.keys(data.Reactions)
-              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+            data: filterKeys(granularity, Object.keys(data.Reactions))
+              //.filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
               .map(x => ({
                 x,
                 y:data.Reactions[x].length-1,
@@ -107,8 +129,8 @@
           },
           {
             label: "Votes",
-            data: Object.keys(data.Votes)
-              .filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
+            data: filterKeys(granularity, Object.keys(data.Votes))
+              //.filter(k => (granularity==="yearly" || granularity==="monthly" && k >= monthFilterCutoff))
               .map(x => ({ x, y:data.Votes[x].length }))
           }
         ]

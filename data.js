@@ -73,8 +73,18 @@
 
     };
 
+    const getWeekNumber = (date) => {
+      const d = new Date(date)
+      const week = Math.ceil((d - new Date(d.getFullYear(), 0, 1)) / 86400000 / 7);
+      return week;
+    }
+
     const formatMonthKey = (date) => {
       return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}`;
+    }
+
+    const formatWeekKey = (date) => {
+      return `${date.getFullYear()}W${String(getWeekNumber(date)).padStart(2,'0')}`;
     }
 
     const indexData = (data, key) => {
@@ -107,9 +117,12 @@
           labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
-            const dataByYear = indexData(data, "year");
-            const dataByMonth = indexData(data, "month");
-            return granularity === "yearly" ? dataByYear : dataByMonth;
+            const dataset = {
+              yearly: indexData(data, "year"),
+              monthly: indexData(data, "month"),
+              weekly: indexData(data, "week")
+            };
+            return dataset[granularity];
           }
         },
         {
@@ -118,9 +131,12 @@
           labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
-            const dataByYear = indexData(data, "year");
-            const dataByMonth = indexData(data, "month");
-            return granularity === "yearly" ? dataByYear : dataByMonth;
+            const dataset = {
+              yearly: indexData(data, "year"),
+              monthly: indexData(data, "month"),
+              weekly: indexData(data, "week")
+            };
+            return dataset[granularity];
           }
         },
         {
@@ -129,11 +145,15 @@
           labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
-            const dataByYear = indexData(data, "year");
-            const dataByMonth = indexData(data, "month");
-            Object.keys(dataByYear).forEach(k => { dataByYear[k].types = indexData(dataByYear[k], "type")});
-            Object.keys(dataByMonth).forEach(k => { dataByMonth[k].types = indexData(dataByMonth[k], "type")});
-            return granularity === "yearly" ? dataByYear : dataByMonth;
+            const dataset = {
+              yearly: indexData(data, "year"),
+              monthly: indexData(data, "month"),
+              weekly: indexData(data, "week")
+            };
+            Object.keys(dataset.yearly).forEach(k => { dataset.yearly[k].types = indexData(dataset.yearly[k], "type")});
+            Object.keys(dataset.monthly).forEach(k => { dataset.monthly[k].types = indexData(dataset.monthly[k], "type")});
+            Object.keys(dataset.weekly).forEach(k => { dataset.weekly[k].types = indexData(dataset.weekly[k], "type")});
+            return dataset[granularity];
           }
         },
         {
@@ -143,9 +163,12 @@
           firstField: ".*?==",
           transformFn: (data) => {
             data.filter(d => d.from === FULLNAME);
-            const dataByYear = indexData(data, "year");
-            const dataByMonth = indexData(data, "month");
-            return granularity === "yearly" ? dataByYear : dataByMonth;
+            const dataset = {
+              yearly: indexData(data, "year"),
+              monthly: indexData(data, "month"),
+              weekly: indexData(data, "week")
+            };
+            return dataset[granularity];
           }
         },
         {
@@ -154,14 +177,18 @@
           labelRow: 3,
           firstField: "[^,]+",
           transformFn: (data) => {
-            const dataWithYearAndMonth = data.map(row => ({ 
+            const dataWithYearMonthAndWeek = data.map(row => ({ 
               ...row,
               year: row.connected_on.split(' ')[2].replace(/[^\d]/g,""),
-              month: formatMonthKey(new Date(row.connected_on.replace(/\\r/,"")))
+              month: formatMonthKey(new Date(row.connected_on.replace(/\\r/,""))),
+              week: formatWeekKey(new Date(row.connected_on.replace(/\\r/,"")))
             }));
-            const dataByYear = indexData(dataWithYearAndMonth, "year");
-            const dataByMonth = indexData(dataWithYearAndMonth, "month");
-            return granularity === "yearly" ? dataByYear : dataByMonth;
+            const dataset = {
+              yearly: indexData(dataWithYearMonthAndWeek, "year"),
+              monthly: indexData(dataWithYearMonthAndWeek, "month"),
+              weekly: indexData(dataWithYearMonthAndWeek, "week")
+            };
+            return dataset[granularity];
           }
         },
         {
@@ -170,9 +197,12 @@
           labelRow: 0,
           firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
           transformFn: (data) => {
-            const dataByYear = indexData(data, "year");
-            const dataByMonth = indexData(data, "month");
-            return granularity === "yearly" ? dataByYear : dataByMonth;
+            const dataset = {
+              yearly: indexData(data, "year"),
+              monthly: indexData(data, "month"),
+              weekly: indexData(data, "week")
+            };
+            return dataset[granularity];
           }
         }
       ];
@@ -185,7 +215,8 @@
           .then(rows => rows.map(row => ({
             ...row,
             year: (new Date(row.date)).getFullYear(),
-            month: formatMonthKey(new Date(row.date))
+            month: formatMonthKey(new Date(row.date)),
+            week: formatWeekKey(new Date(row.date))
           })))
           .then(dataFile.transformFn)
       }));

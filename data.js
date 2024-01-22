@@ -95,6 +95,7 @@
           indexes[index] = [];
         indexes[index].push(row);
       })
+      Object.keys(indexes).forEach(d => indexes[d].sort((a,b) => (new Date(b.date).getTime() - new Date(a.date).getTime())));
       return indexes;
     };
 
@@ -179,6 +180,7 @@
           transformFn: (data) => {
             const dataWithYearMonthAndWeek = data.map(row => ({ 
               ...row,
+              date: new Date(row.connected_on.replace(/\\r/,"")),
               year: row.connected_on.split(' ')[2].replace(/[^\d]/g,""),
               month: formatMonthKey(new Date(row.connected_on.replace(/\\r/,""))),
               week: formatWeekKey(new Date(row.connected_on.replace(/\\r/,"")))

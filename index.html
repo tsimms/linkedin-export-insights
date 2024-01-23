@@ -103,7 +103,8 @@
 
     const setChart = (data) => {
       let labels = [];
-      const { granularity, ignoreGroupPosts } = _settings.options;
+      const { granularity } = _settings.options;
+      const ignoreGroupPosts = _settings.options.ignoreGroupPosts === "yes";
 
       Object.keys(data).forEach(key => Object.keys(data[key])
         // TODO: probably just want to iterate to set labels whether there's data or not
@@ -125,45 +126,45 @@
         datasets: [
           {
             label: "Sent Messages",
-            data: filterKeys(granularity, Object.keys(data.SentMessages))
+            data: filterKeys(granularity, labels)
               .sort((a, b) => b.localeCompare(a))
-              .map(x => ({ 
+              .map(x => (data.SentMessages[x] ? { 
                 x,
                 y:data.SentMessages[x].length,
                 span:(new Date(data.SentMessages[x][0].date) - new Date(data.SentMessages[x][data.SentMessages[x].length-1].date)),
                 first:new Date(data.SentMessages[x][0].date),
                 last:new Date(data.SentMessages[x][data.SentMessages[x].length-1].date)
-             }))
+              } : { x, y:0, span:0 }))
           },
           {
             label: "Connections",
-            data: filterKeys(granularity, Object.keys(data.Connections))
+            data: filterKeys(granularity, labels)
               .sort((a, b) => b.localeCompare(a))
-              .map(x => ({
+              .map(x => (data.Connections[x] ? {
                 x,
                 y:data.Connections[x].length,
                 span:(new Date(data.Connections[x][0].date) - new Date(data.Connections[x][data.Connections[x].length-1].date)),
                 first:new Date(data.Connections[x][0].date),
                 last:new Date(data.Connections[x][data.Connections[x].length-1].date)
-              }))
+              } : { x, y:0, span:0 }))
           },
           {
             label: "Comments",
-            data: filterKeys(granularity, data.Comments ? Object.keys(data.Comments) : [])
+            data: filterKeys(granularity, labels)
               .sort((a, b) => b.localeCompare(a))
-              .map(x => ({
+              .map(x => (data.Comments[x] ? {
                 x,
                 y:data.Comments[x].length,
                 span:(new Date(data.Comments[x][0].date) - new Date(data.Comments[x][data.Comments[x].length-1].date)),
                 first:new Date(data.Comments[x][0].date),
                 last:new Date(data.Comments[x][data.Comments[x].length-1].date)
-              }))
+              } : { x, y:0, span:0 }))
           },
           {
             label: "Posts",
-            data: filterKeys(granularity, data.Shares ? Object.keys(data.Shares) : [])
+            data: filterKeys(granularity, labels)
               .sort((a, b) => b.localeCompare(a))
-              .map(x => ({
+              .map(x => (data.Shares[x] ? {
                 x,
                 y:data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/))).length,
                 span: data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/))).length ? (
@@ -173,13 +174,13 @@
                 ) : 0,
                 first:new Date(data.Shares[x][0].date),
                 last:new Date(data.Shares[x][data.Shares[x].length-1].date)
-              }))
+              } : { x, y:0, span:0 }))
           },
           {
             label: "Reactions",
-            data: filterKeys(granularity, Object.keys(data.Reactions))
+            data: filterKeys(granularity, labels)
               .sort((a, b) => b.localeCompare(a))
-              .map(x => ({
+              .map(x => (data.Reactions[x] ? {
                 x,
                 y:data.Reactions[x].length-1,
                 span:(new Date(data.Reactions[x][0].date) - new Date(data.Reactions[x][data.Reactions[x].length-1].date)),
@@ -190,19 +191,19 @@
                     type => ({ [type]: data.Reactions[x].types[type].length })
                   )
                 }
-              }))
+              } : { x, y:0, span:0 }))
           },
           {
             label: "Votes",
-            data: filterKeys(granularity, Object.keys(data.Votes))
+            data: filterKeys(granularity, labels)
               .sort((a, b) => b.localeCompare(a))
-              .map(x => ({
+              .map(x => (data.Votes[x] ? {
                 x,
                 y:data.Votes[x].length,
                 span:(new Date(data.Votes[x][0].date) - new Date(data.Votes[x][data.Votes[x].length-1].date)),
                 first:new Date(data.Votes[x][0].date),
                 last:new Date(data.Votes[x][data.Votes[x].length-1].date)
-              }))
+              } : { x, y:0, span:0 }))
           }
         ]
       };
@@ -282,10 +283,10 @@
 
     const uxOptions = () => {
       const granularity = document.getElementById('granularity').value;
-      const ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value === "yes";
+      const ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value;
       if (!_settings.options) _settings.options = {};
       _settings.options.granularity = granularity;
-      _settings.ignoreGroupPosts = ignoreGroupPosts;
+      _settings.options.ignoreGroupPosts = ignoreGroupPosts;
       setConfig();
       processFile();
     }
@@ -321,8 +322,8 @@
       const currentAboveAvg = (parseFloat(current) >= parseFloat(mean)); // light green
       let goal = 0;
       try {
-        if (_settings.goals[granularity][label]) {
-          goal = _settings.goals[granularity][label];
+        if (_settings.goals[_settings.options.granularity][label]) {
+          goal = _settings.goals[_settings.options.granularity][label];
         }
       } catch (e) {};
       const projectionAboveGoal = goal && (parseFloat(projected) >= parseFloat(goal)); // light green

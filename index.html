@@ -7,8 +7,11 @@
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="text/javascript" src="./jszip.js"></script>
   <script type="text/javascript" src="./data.js"></script>
+  <script type="text/javascript">
+  </script>
   <style type="text/css">
     #chart { display: none; height:80% !important; width:80% !important; margin:auto; }
+    #range { float: right; font-family:Arial, Helvetica, sans-serif; margin-right: 12%; color: #777; }
     #analytics {
       margin: 0 auto;
       display: flex;
@@ -16,14 +19,23 @@
     }
     .hcard {
       margin: 20px;
-      border: 1px solid #ccc;
+      border: 1px solid #bbb;
       padding: 10px;
       font-family: monospace;
       border-radius: 5px;
-      background-color: #bbb;
+      background-color: #ccc;
     }
-    .hcard.projection-above-avg {
-      background-color: #bdb
+    .hcard.projection-above-avg { background-color: #eec }
+    .hcard.current-above-avg { background-color: #cfc }
+    .hcard.projection-above-goal { background-color: #cfc }
+    .hcard.current-above-goal { background-color: #287128; color: #fff; }
+    .hcard .label {
+      margin: 5px 0;
+      font-size: 1.2em;
+    }
+    .hcard label {
+      font-size: 0.7em;
+      margin: 0 5px 0 0;
     }
   </style>
 </head>
@@ -50,6 +62,7 @@
   </form>
 
   <div>
+    <div id="range"></div>
     <canvas id="chart"></canvas>
   </div>
   <div id="analytics">
@@ -59,6 +72,8 @@
   <script type="text/javascript">
     let granularity, ignoreGroupPosts;
     let chart, chartData, uploadedFile;
+    let SETTINGS;
+
     const getMonthCutoff = () => {
       const monthCutoff = new Date();
       monthCutoff.setMonth(monthCutoff.getMonth() - 13);
@@ -85,13 +100,16 @@
       }
       return dataset;
     }
+
+
     const setChart = (data) => {
       let labels = [];
 
       Object.keys(data).forEach(key => Object.keys(data[key])
         // TODO: probably just want to iterate to set labels whether there's data or not
-        .forEach(key => {
-          if (!labels.includes(key)) labels.push(key); })
+        .forEach(labelKey => {
+          if (!labels.includes(labelKey)) labels.push(labelKey);
+        })
       );
       labels = filterKeys(granularity, labels);
       if (granularity === "yearly")
@@ -112,7 +130,9 @@
               .map(x => ({ 
                 x,
                 y:data.SentMessages[x].length,
-                span:(new Date(data.SentMessages[x][0].date) - new Date(data.SentMessages[x][data.SentMessages[x].length-1].date))
+                span:(new Date(data.SentMessages[x][0].date) - new Date(data.SentMessages[x][data.SentMessages[x].length-1].date)),
+                first:new Date(data.SentMessages[x][0].date),
+                last:new Date(data.SentMessages[x][data.SentMessages[x].length-1].date)
              }))
           },
           {
@@ -122,7 +142,9 @@
               .map(x => ({
                 x,
                 y:data.Connections[x].length,
-                span:(new Date(data.Connections[x][0].date) - new Date(data.Connections[x][data.Connections[x].length-1].date))
+                span:(new Date(data.Connections[x][0].date) - new Date(data.Connections[x][data.Connections[x].length-1].date)),
+                first:new Date(data.Connections[x][0].date),
+                last:new Date(data.Connections[x][data.Connections[x].length-1].date)
               }))
           },
           {
@@ -132,7 +154,9 @@
               .map(x => ({
                 x,
                 y:data.Comments[x].length,
-                span:(new Date(data.Comments[x][0].date) - new Date(data.Comments[x][data.Comments[x].length-1].date))
+                span:(new Date(data.Comments[x][0].date) - new Date(data.Comments[x][data.Comments[x].length-1].date)),
+                first:new Date(data.Comments[x][0].date),
+                last:new Date(data.Comments[x][data.Comments[x].length-1].date)
               }))
           },
           {
@@ -146,7 +170,9 @@
                   new Date(data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/)))[0].date)
                     - new Date(data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/)))
                       [data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/))).length-1].date)
-                ) : 0
+                ) : 0,
+                first:new Date(data.Shares[x][0].date),
+                last:new Date(data.Shares[x][data.Shares[x].length-1].date)
               }))
           },
           {
@@ -157,6 +183,8 @@
                 x,
                 y:data.Reactions[x].length-1,
                 span:(new Date(data.Reactions[x][0].date) - new Date(data.Reactions[x][data.Reactions[x].length-1].date)),
+                first:new Date(data.Reactions[x][0].date),
+                last:new Date(data.Reactions[x][data.Reactions[x].length-1].date),
                 meta:{
                   types: Object.keys(data.Reactions[x].types).map(
                     type => ({ [type]: data.Reactions[x].types[type].length })
@@ -171,7 +199,9 @@
               .map(x => ({
                 x,
                 y:data.Votes[x].length,
-                span:(new Date(data.Votes[x][0].date) - new Date(data.Votes[x][data.Votes[x].length-1].date))
+                span:(new Date(data.Votes[x][0].date) - new Date(data.Votes[x][data.Votes[x].length-1].date)),
+                first:new Date(data.Votes[x][0].date),
+                last:new Date(data.Votes[x][data.Votes[x].length-1].date)
               }))
           }
         ]
@@ -189,7 +219,36 @@
       //document.getElementById('recalculate').style.display = 'block';
     };
 
-    const analyticsCalc = (dataset) => {
+    const getConfig = () => {
+      const config = localStorage.getItem("config");
+      let settingsJson;
+      if (config) {
+        settingsJson = JSON.parse(config);
+        return settingsJson;
+      } else {
+        SETTINGS = {};
+        setConfig();
+      }
+      return SETTINGS;
+    }
+
+    const setConfig = () => {
+      localStorage.setItem("config", JSON.stringify(SETTINGS));
+    }
+
+    SETTINGS = getConfig();
+
+
+    const setGoal = (granularity, label) => {
+      const goal = window.prompt(`To what value should we set ${granularity} target for ${label}?`);
+      if (!SETTINGS.goals) SETTINGS.goals = {};
+      if (!SETTINGS.goals[granularity]) SETTINGS.goals[granularity] = {};
+      SETTINGS.goals[granularity][label] = goal;
+      setConfig();
+      showAnalytics();
+    }
+
+    const analyticsCalc = (label, dataset) => {
       const mean = (dataset.reduce((a,b)=>(a+b.y),0)/dataset.length).toFixed(1);
       const current = dataset[0].y;
       const dataset_past = dataset.slice(1);
@@ -198,24 +257,82 @@
       const current_span = (dataset_now.span / 86400000).toFixed(1);
       const elapsed = (current_span / past_span_avg).toFixed(3);
       const projected = elapsed !== '0.000' ? (current / elapsed).toFixed(1) : "0";
-      const projectionAboveAvg = (parseFloat(projected) >= parseFloat(mean));
-      return { mean, current, elapsed, projected, projectionAboveAvg };
+      const projectionAboveAvg = (parseFloat(projected) >= parseFloat(mean)); // yellow
+      const currentAboveAvg = (parseFloat(current) >= parseFloat(mean)); // light green
+      let goal = 0;
+      try {
+        if (SETTINGS.goals[granularity][label]) {
+          goal = SETTINGS.goals[granularity][label];
+        }
+      } catch (e) {};
+      const projectionAboveGoal = goal && (parseFloat(projected) >= parseFloat(goal)); // light green
+      const currentAboveGoal = goal && (parseFloat(current) >= parseFloat(goal)); // dark green
+      let progressColor = false;
+      if (projectionAboveAvg) progressColor = 'projection-above-avg';
+      if (currentAboveAvg) progressColor = 'current-above-avg'
+      if (projectionAboveGoal) progressColor = 'projection-above-goal';
+      if (currentAboveGoal) progressColor = 'current-above-goal';
+      return { mean, current, elapsed, projected, progressColor, goal };
     };
+
+    const getRange = (dataset) => {
+      const range = { start: null, end: null };
+      dataset.forEach(k => {
+        const start = k.data[k.data.length-1].last;
+        const end = k.data[0].first;
+        if (! range.start || new Date(start).getTime() < range.start)
+            range.start = new Date(start).getTime();
+        if (! range.end || new Date(end).getTime() > range.end)
+          range.end = new Date(end).getTime();
+      })
+      return range;
+    }
 
     const showAnalytics = () => {
       document.getElementById('analytics').innerHTML =
         chartData.datasets.map(ds => ({
-        ...analyticsCalc(ds.data),
+        ...analyticsCalc(ds.label, ds.data),
         label:ds.label
       }))
         .map(d => (`
-        <div class="hcard${d.projectionAboveAvg ? ' projection-above-avg':''}">
+        <div class="hcard${d.progressColor ? ` ${d.progressColor}`:''}">
         <div class="label">${d.label}</div>
         <div class="mean"><label>Avg:</label><span class="value">${d.mean}</span></div>
+        <div class="mean"><label>Current:</label><span class="value">${d.current}</span></div>
         <div class="projected"><label>Proj:</label><span class="value">${d.projected}</span></div>
+        <div class="goal">${d.goal 
+          ? `<label>Goal:</label><span class="value">${d.goal}</span>` 
+          : `<a href="#" onClick="setGoal('${granularity}','${d.label}');">Set Goal</a>`
+        }</div>
         </div>
         `))
         .join(" ")
+      const range = getRange(chartData.datasets);
+      showRange(range);
+    }
+
+    const clearAnalytics = () => {
+      document.getElementById('analytics').innerHTML = '';
+    }
+
+    const getFormattedDateTime = (timestamp) => {
+      const date = new Date(timestamp);
+      const formattedDate = date.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      });
+      return formattedDate;
+    }
+
+    const showRange = range => {
+      const { start, end } = range;
+      const rangeString = `${getFormattedDateTime(start)} - ${getFormattedDateTime(end)}`;
+      document.getElementById('range').innerHTML = rangeString;
+      console.log({range});
     }
 
     const onFileSelected = () => {
@@ -229,6 +346,7 @@
     const processFile = () => {
       granularity = document.getElementById('granularity').value;
       ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value === "yes";
+      clearAnalytics();
       if (chart) {
         chart.destroy();
       }

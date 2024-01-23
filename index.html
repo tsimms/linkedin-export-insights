@@ -30,14 +30,10 @@
     .hcard.current-above-avg { background-color: #cfc }
     .hcard.projection-above-goal { background-color: #cfc }
     .hcard.current-above-goal { background-color: #287128; color: #fff; }
-    .hcard .label {
-      margin: 5px 0;
-      font-size: 1.2em;
-    }
-    .hcard label {
-      font-size: 0.7em;
-      margin: 0 5px 0 0;
-    }
+    .hcard .label { margin: 5px 0; font-size: 1.2em; }
+    .hcard label { font-size: 0.7em; margin: 0 5px 0 0; }
+    .goal .value { cursor: pointer; }
+    .goal .value:hover { background-color: #ffa; font-size: 1.1em; }
   </style>
 </head>
 <body>
@@ -297,17 +293,28 @@
       if (_settings.options?.ignoreGroupPosts)
        document.getElementById('ignoreGroupPosts').value = _settings.options.ignoreGroupPosts;
     }
-    ///////////
-    // Analytics routines
-    ///////////
-    const setGoal = (granularity, label) => {
-      const goal = window.prompt(`To what value should we set ${granularity} target for ${label}?`);
+
+    const setGoal = (granularity, label, currentGoal) => {
+      let prompt = `To what value should we set ${granularity} target for ${label}?`;
+      if (currentGoal)
+        prompt += `
+Current goal set to ${currentGoal}`;
+      const goal = window.prompt(prompt);
       if (!_settings.goals) _settings.goals = {};
       if (!_settings.goals[granularity]) _settings.goals[granularity] = {};
-      _settings.goals[granularity][label] = goal;
+      if (goal !== null) {
+        if (parseInt(goal))
+          _settings.goals[granularity][label] = parseInt(goal);
+        else 
+          delete _settings.goals[granularity][label];
+      }
       setConfig();
       showAnalytics();
     }
+
+    ///////////
+    // Analytics routines
+    ///////////
 
     const analyticsCalc = (label, dataset) => {
       const mean = (dataset.reduce((a,b)=>(a+b.y),0)/dataset.length).toFixed(1);
@@ -337,6 +344,7 @@
     };
 
     const showAnalytics = () => {
+      const { granularity } = _settings.options;
       document.getElementById('analytics').innerHTML =
         _chartData.datasets.map(ds => ({
         ...analyticsCalc(ds.label, ds.data),
@@ -349,7 +357,7 @@
         <div class="mean"><label>Current:</label><span class="value">${d.current}</span></div>
         <div class="projected"><label>Proj:</label><span class="value">${d.projected}</span></div>
         <div class="goal">${d.goal 
-          ? `<label>Goal:</label><span class="value">${d.goal}</span>` 
+          ? `<label>Goal:</label><span class="value" onClick="setGoal('${granularity}','${d.label}','${d.goal}');">${d.goal}</span>` 
           : `<a href="#" onClick="setGoal('${granularity}','${d.label}');">Set Goal</a>`
         }</div>
         </div>

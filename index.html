@@ -10,6 +10,7 @@
   <script type="text/javascript">
   </script>
   <style type="text/css">
+    body { font-family: "Real Text Pro", "Helvetica Neue", Arial, sans-serif; color: #222; }
     #chart { display: none; height:80% !important; width:80% !important; margin:auto; }
     #range { float: right; font-family:Arial, Helvetica, sans-serif; margin-right: 12%; color: #777; }
     #analytics {
@@ -43,14 +44,14 @@
 
   <form>
     <div>
-      What granularity do you want to inspect? <select id="granularity" onchange="processFile();">
+      What granularity do you want to inspect? <select id="granularity" onchange="uxOptions();">
         <option>yearly</option>
         <option selected>monthly</option>
         <option>weekly</option>
       </select>  
     </div>
     <div>
-      Do you want to ignore group posts? <select id="ignoreGroupPosts" onchange="processFile();">
+      Do you want to ignore group posts? <select id="ignoreGroupPosts" onchange="uxOptions();">
         <option>yes</option>
         <option>no</option>
       </select>
@@ -58,7 +59,6 @@
     <div>
       <input id="filesInput" type="file" onchange="onFileSelected()" />
     </div>
-
   </form>
 
   <div>
@@ -66,14 +66,14 @@
     <canvas id="chart"></canvas>
   </div>
   <div id="analytics">
-
   </div>
 
   <script type="text/javascript">
-    let granularity, ignoreGroupPosts;
-    let chart, chartData, uploadedFile;
-    let SETTINGS;
+    let _data, _chart, _chartData, _settings, _uploadedFile;
 
+    ////////
+    // Data preparation routines
+    ////////
     const getMonthCutoff = () => {
       const monthCutoff = new Date();
       monthCutoff.setMonth(monthCutoff.getMonth() - 13);
@@ -101,9 +101,9 @@
       return dataset;
     }
 
-
     const setChart = (data) => {
       let labels = [];
+      const { granularity, ignoreGroupPosts } = _settings.options;
 
       Object.keys(data).forEach(key => Object.keys(data[key])
         // TODO: probably just want to iterate to set labels whether there's data or not
@@ -120,7 +120,7 @@
           mode: 'index'
         }
       };
-      chartData = { 
+      _chartData = { 
         labels,
         datasets: [
           {
@@ -206,19 +206,20 @@
           }
         ]
       };
-      console.log({ data, chartData });
-      DATA = data;
+      _data = data;
       const ctx = document.getElementById('chart');
-      chart = new Chart(ctx, {
+      _chart = new Chart(ctx, {
         type: 'line',
-        data: chartData,
+        data: _chartData,
         options: chartOptions
       });
       ctx.style.display = 'block';
       showAnalytics();
-      //document.getElementById('recalculate').style.display = 'block';
     };
 
+    //////////
+    // Storage
+    //////////
     const getConfig = () => {
       const config = localStorage.getItem("config");
       let settingsJson;
@@ -226,55 +227,19 @@
         settingsJson = JSON.parse(config);
         return settingsJson;
       } else {
-        SETTINGS = {};
+        _settings = {};
         setConfig();
       }
-      return SETTINGS;
+      return _settings;
     }
 
     const setConfig = () => {
-      localStorage.setItem("config", JSON.stringify(SETTINGS));
+      localStorage.setItem("config", JSON.stringify(_settings));
     }
 
-    SETTINGS = getConfig();
-
-
-    const setGoal = (granularity, label) => {
-      const goal = window.prompt(`To what value should we set ${granularity} target for ${label}?`);
-      if (!SETTINGS.goals) SETTINGS.goals = {};
-      if (!SETTINGS.goals[granularity]) SETTINGS.goals[granularity] = {};
-      SETTINGS.goals[granularity][label] = goal;
-      setConfig();
-      showAnalytics();
-    }
-
-    const analyticsCalc = (label, dataset) => {
-      const mean = (dataset.reduce((a,b)=>(a+b.y),0)/dataset.length).toFixed(1);
-      const current = dataset[0].y;
-      const dataset_past = dataset.slice(1);
-      const dataset_now = dataset[0];
-      const past_span_avg = (dataset_past.reduce((a,b)=>(a+b.span),0)/dataset_past.length / 86400000).toFixed(1);
-      const current_span = (dataset_now.span / 86400000).toFixed(1);
-      const elapsed = (current_span / past_span_avg).toFixed(3);
-      const projected = elapsed !== '0.000' ? (current / elapsed).toFixed(1) : "0";
-      const projectionAboveAvg = (parseFloat(projected) >= parseFloat(mean)); // yellow
-      const currentAboveAvg = (parseFloat(current) >= parseFloat(mean)); // light green
-      let goal = 0;
-      try {
-        if (SETTINGS.goals[granularity][label]) {
-          goal = SETTINGS.goals[granularity][label];
-        }
-      } catch (e) {};
-      const projectionAboveGoal = goal && (parseFloat(projected) >= parseFloat(goal)); // light green
-      const currentAboveGoal = goal && (parseFloat(current) >= parseFloat(goal)); // dark green
-      let progressColor = false;
-      if (projectionAboveAvg) progressColor = 'projection-above-avg';
-      if (currentAboveAvg) progressColor = 'current-above-avg'
-      if (projectionAboveGoal) progressColor = 'projection-above-goal';
-      if (currentAboveGoal) progressColor = 'current-above-goal';
-      return { mean, current, elapsed, projected, progressColor, goal };
-    };
-
+    //////////
+    // General UI/UX
+    //////////
     const getRange = (dataset) => {
       const range = { start: null, end: null };
       dataset.forEach(k => {
@@ -286,33 +251,6 @@
           range.end = new Date(end).getTime();
       })
       return range;
-    }
-
-    const showAnalytics = () => {
-      document.getElementById('analytics').innerHTML =
-        chartData.datasets.map(ds => ({
-        ...analyticsCalc(ds.label, ds.data),
-        label:ds.label
-      }))
-        .map(d => (`
-        <div class="hcard${d.progressColor ? ` ${d.progressColor}`:''}">
-        <div class="label">${d.label}</div>
-        <div class="mean"><label>Avg:</label><span class="value">${d.mean}</span></div>
-        <div class="mean"><label>Current:</label><span class="value">${d.current}</span></div>
-        <div class="projected"><label>Proj:</label><span class="value">${d.projected}</span></div>
-        <div class="goal">${d.goal 
-          ? `<label>Goal:</label><span class="value">${d.goal}</span>` 
-          : `<a href="#" onClick="setGoal('${granularity}','${d.label}');">Set Goal</a>`
-        }</div>
-        </div>
-        `))
-        .join(" ")
-      const range = getRange(chartData.datasets);
-      showRange(range);
-    }
-
-    const clearAnalytics = () => {
-      document.getElementById('analytics').innerHTML = '';
     }
 
     const getFormattedDateTime = (timestamp) => {
@@ -332,30 +270,122 @@
       const { start, end } = range;
       const rangeString = `${getFormattedDateTime(start)} - ${getFormattedDateTime(end)}`;
       document.getElementById('range').innerHTML = rangeString;
-      console.log({range});
     }
 
     const onFileSelected = () => {
       const files = filesInput.files;
       if (files.length) {
-        uploadedFile = files[0];
+        _uploadedFile = files[0];
         processFile();
       }
     };
 
+    const uxOptions = () => {
+      const granularity = document.getElementById('granularity').value;
+      const ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value === "yes";
+      if (!_settings.options) _settings.options = {};
+      _settings.options.granularity = granularity;
+      _settings.ignoreGroupPosts = ignoreGroupPosts;
+      setConfig();
+      processFile();
+    }
+
+    const setUx = () => {
+      if (_settings.options?.granularity)
+        document.getElementById('granularity').value = _settings.options.granularity;
+      if (_settings.options?.ignoreGroupPosts)
+       document.getElementById('ignoreGroupPosts').value = _settings.options.ignoreGroupPosts;
+    }
+    ///////////
+    // Analytics routines
+    ///////////
+    const setGoal = (granularity, label) => {
+      const goal = window.prompt(`To what value should we set ${granularity} target for ${label}?`);
+      if (!_settings.goals) _settings.goals = {};
+      if (!_settings.goals[granularity]) _settings.goals[granularity] = {};
+      _settings.goals[granularity][label] = goal;
+      setConfig();
+      showAnalytics();
+    }
+
+    const analyticsCalc = (label, dataset) => {
+      const mean = (dataset.reduce((a,b)=>(a+b.y),0)/dataset.length).toFixed(1);
+      const current = dataset[0].y;
+      const dataset_past = dataset.slice(1);
+      const dataset_now = dataset[0];
+      const past_span_avg = (dataset_past.reduce((a,b)=>(a+b.span),0)/dataset_past.length / 86400000).toFixed(1);
+      const current_span = (dataset_now.span / 86400000).toFixed(1);
+      const elapsed = (current_span / past_span_avg).toFixed(3);
+      const projected = elapsed !== '0.000' ? (current / elapsed).toFixed(1) : "0";
+      const projectionAboveAvg = (parseFloat(projected) >= parseFloat(mean)); // yellow
+      const currentAboveAvg = (parseFloat(current) >= parseFloat(mean)); // light green
+      let goal = 0;
+      try {
+        if (_settings.goals[granularity][label]) {
+          goal = _settings.goals[granularity][label];
+        }
+      } catch (e) {};
+      const projectionAboveGoal = goal && (parseFloat(projected) >= parseFloat(goal)); // light green
+      const currentAboveGoal = goal && (parseFloat(current) >= parseFloat(goal)); // dark green
+      let progressColor = false;
+      if (projectionAboveAvg) progressColor = 'projection-above-avg';
+      if (currentAboveAvg) progressColor = 'current-above-avg'
+      if (projectionAboveGoal) progressColor = 'projection-above-goal';
+      if (currentAboveGoal) progressColor = 'current-above-goal';
+      return { mean, current, elapsed, projected, progressColor, goal };
+    };
+
+    const showAnalytics = () => {
+      document.getElementById('analytics').innerHTML =
+        _chartData.datasets.map(ds => ({
+        ...analyticsCalc(ds.label, ds.data),
+        label:ds.label
+      }))
+        .map(d => (`
+        <div class="hcard${d.progressColor ? ` ${d.progressColor}`:''}">
+        <div class="label">${d.label}</div>
+        <div class="mean"><label>Avg:</label><span class="value">${d.mean}</span></div>
+        <div class="mean"><label>Current:</label><span class="value">${d.current}</span></div>
+        <div class="projected"><label>Proj:</label><span class="value">${d.projected}</span></div>
+        <div class="goal">${d.goal 
+          ? `<label>Goal:</label><span class="value">${d.goal}</span>` 
+          : `<a href="#" onClick="setGoal('${granularity}','${d.label}');">Set Goal</a>`
+        }</div>
+        </div>
+        `))
+        .join(" ")
+      const range = getRange(_chartData.datasets);
+      showRange(range);
+    }
+
+    const clearAnalytics = () => {
+      document.getElementById('analytics').innerHTML = '';
+    }
+
+
+    ////////
+    // Main
+    ////////
+
+    // Kicks off data processing
     const processFile = () => {
-      granularity = document.getElementById('granularity').value;
-      ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value === "yes";
       clearAnalytics();
-      if (chart) {
-        chart.destroy();
+      if (_chart) {
+        _chart.destroy();
       }
-      if (uploadedFile) {
-        readZip(uploadedFile, granularity)
+      if (_uploadedFile) {
+        readZip(_uploadedFile, _settings.options.granularity)
           .then(transformFinal)
           .then(setChart);
       }
     };
+
+    // Init
+    (() => {
+      _settings = getConfig();
+      setUx();
+    })()
+
   </script>
 
 </body>

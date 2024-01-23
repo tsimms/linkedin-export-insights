@@ -11,6 +11,12 @@
   </script>
   <style type="text/css">
     body { font-family: "Real Text Pro", "Helvetica Neue", Arial, sans-serif; color: #222; }
+    hr { margin: 20px 0; }
+    #page-container { max-width:920px; margin:0 auto; }
+    .float-container { height:40px; }
+    #form-toggle { float:right; cursor:pointer; color:#777; }
+    #form { display: none; }
+    #form > div { margin:10px; color: #777; }
     #chart { display: none; height:80% !important; width:80% !important; margin:auto; }
     #range { float: right; font-family:Arial, Helvetica, sans-serif; margin-right: 12%; color: #777; }
     #analytics {
@@ -37,8 +43,14 @@
   </style>
 </head>
 <body>
-
-  <form>
+  <div id="page-container">
+  <header>
+    <img src="linkedinsight-logo.png" height="60" />
+  </header>
+  <div class="float-container">
+    <div id="form-toggle" onClick="toggleSettings();">Show Settings</div>
+  </div>
+  <form id="form">
     <div>
       What granularity do you want to inspect? <select id="granularity" onchange="uxOptions();">
         <option>yearly</option>
@@ -55,6 +67,7 @@
     <div>
       <input id="filesInput" type="file" onchange="onFileSelected()" />
     </div>
+    <hr />
   </form>
 
   <div>
@@ -294,6 +307,18 @@
        document.getElementById('ignoreGroupPosts').value = _settings.options.ignoreGroupPosts;
     }
 
+    const toggleSettings = () => {
+      const form = document.getElementById('form');
+      const element = document.getElementById('form-toggle');
+      if (element.innerHTML === "Hide Settings") {
+        form.style.display = "none";
+        element.innerHTML = "Show Settings";
+      } else {
+        form.style.display = "block";
+        element.innerHTML = "Hide Settings"
+      }
+    }
+
     const setGoal = (granularity, label, currentGoal) => {
       let prompt = `To what value should we set ${granularity} target for ${label}?`;
       if (currentGoal)
@@ -396,6 +421,6 @@ Current goal set to ${currentGoal}`;
     })()
 
   </script>
-
+  </div>
 </body>
 </html>

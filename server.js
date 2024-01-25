@@ -1,6 +1,9 @@
 import { promises as fs } from 'fs';
-import { ApolloServer, gql } from 'apollo-server';
 import JSZip from 'jszip';
+import { ApolloServer, gql } from 'apollo-server';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { addResolversToSchema } from '@graphql-tools/schema';
+import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
 import { ingest } from './data.js';
 
 const loadData = async (filename) => {
@@ -17,7 +20,11 @@ const loadData = async (filename) => {
   ["message", "connection", "comment", "share", "reaction", "vote"]
     .forEach(type => { console.log(dataModel.filter(d => d.type === type)[0]); })
 */
-    const server = new ApolloServer(getModelDefinitions(dataModel));
+    const { typeDefs, resolvers } = getModelDefinitions(dataModel)
+    const schema = makeExecutableSchema({ typeDefs, resolvers });
+    const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
+    const server = new ApolloServer({ schema: schemaWithResolvers });
+
     server.listen().then(({ url }) => {
       console.log(`Server running at ${url}`);
     });
@@ -26,11 +33,14 @@ const loadData = async (filename) => {
 const getModelDefinitions = (data) => {
   const typeDefs = gql`
 
+  ${DateTimeTypeDefinition}
+
   type Query {
+    allActivities: [Activity]
     activitiesByType(type: String!): [Activity]
     reactionsByType(reactionType: String!): [Reaction]
     messagesByConversation(from: String!, to: String!): [Message]
-    activitiesByDate(date: String!): [Activity]
+    activitiesByDate(date: DateTime): [Activity]
     connectionsByFilter(filter: String!): [Connection]
   }
 
@@ -42,7 +52,7 @@ const getModelDefinitions = (data) => {
     sender_profile_url: String!
     to: String!
     recipient_profile_urls: String!
-    date: String!
+    date: DateTime!
     subject: String!
     content: String!
     folder: String!
@@ -66,12 +76,12 @@ const getModelDefinitions = (data) => {
     year: String!
     month: String!
     week: String!
-    date: String!
+    date: DateTime!
   }
   
   type Comment {
     id: ID!
-    date: String!
+    date: DateTime!
     link: String!
     message: String!
     type: String!
@@ -82,7 +92,7 @@ const getModelDefinitions = (data) => {
   
   type Share {
     id: ID!
-    date: String!
+    date: DateTime!
     sharelink: String!
     sharecommentary: String!
     sharedurl: String!
@@ -96,7 +106,7 @@ const getModelDefinitions = (data) => {
   
   type Reaction {
     id: ID!
-    date: String!
+    date: DateTime!
     link: String!
     reactionType: String!
     type: String!
@@ -107,7 +117,7 @@ const getModelDefinitions = (data) => {
   
   type Vote {
     id: ID!
-    date: String!
+    date: DateTime!
     link: String!
     optiontext: String!
     type: String!
@@ -122,6 +132,11 @@ const getModelDefinitions = (data) => {
   
   const resolvers = {
     Query: {
+      allActivities: (parent, args, context, info) => {
+        // Return the entire data set without filtering
+        // Replace this with your actual data fetching logic
+        return data;
+      },
       activitiesByType: (parent, { type }, context, info) => {
         // Logic to fetch activities by type
         // Replace this with your actual data fetching logic
@@ -138,10 +153,17 @@ const getModelDefinitions = (data) => {
         return data.filter(item => item.type === 'message' && item.from === from && item.to.includes(to));
       },
       activitiesByDate: (parent, { date }, context, info) => {
-        // Logic to fetch activities by date
+        // Parse the input date string to a Date object
+        const targetDate = new Date(date);
+      
+        // Logic to fetch activities by date (using a date range comparison)
         // Replace this with your actual data fetching logic
-        return data.filter(item => item.date === date);
-      },
+        return data.filter(item => {
+          const itemDate = new Date(item.date);
+          // Adjust the condition based on your desired date range comparison
+          return itemDate.getTime() === targetDate.getTime();
+        });
+      },      
       connectionsByFilter: (parent, { filter }, context, info) => {
         // Logic to fetch connections by name, email, company, or position
         // Replace this with your actual data fetching logic
@@ -151,6 +173,25 @@ const getModelDefinitions = (data) => {
            item.position.includes(filter)));
       }
     },
+    DateTime: DateTimeResolver,
+    Activity: {
+      __resolveType: (obj, context, info) => {
+        if (obj.type === 'message') {
+          return 'Message';
+        } else if (obj.type === 'connection') {
+          return 'Connection';
+        } else if (obj.type === 'comment') {
+          return 'Comment';
+        } else if (obj.type === 'share') {
+          return 'Share';
+        } else if (obj.type === 'reaction') {
+          return 'Reaction';
+        } else if (obj.type === 'vote') {
+          return 'Vote';
+        }
+        return null; // Default fallback
+      }
+    }
   };
   return { typeDefs, resolvers };
 }

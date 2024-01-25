@@ -99,8 +99,8 @@ const indexData = (data, key) => {
 };
 
 
-const ingest = async (file, granularity) => {
-  const zipFile = new JSZip();
+const ingest = async (file, granularity, JSZipLib) => {
+  const zipFile = new (JSZipLib || JSZip)();
   const dataFiles = [
     {
       name: "Profile",
@@ -119,6 +119,7 @@ const ingest = async (file, granularity) => {
       firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
       transformFn: (data) => {
         const dataset = {
+          all: data,
           yearly: indexData(data, "year"),
           monthly: indexData(data, "month"),
           weekly: indexData(data, "week")
@@ -133,6 +134,7 @@ const ingest = async (file, granularity) => {
       firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
       transformFn: (data) => {
         const dataset = {
+          all: data,
           yearly: indexData(data, "year"),
           monthly: indexData(data, "month"),
           weekly: indexData(data, "week")
@@ -147,6 +149,7 @@ const ingest = async (file, granularity) => {
       firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
       transformFn: (data) => {
         const dataset = {
+          all: data,
           yearly: indexData(data, "year"),
           monthly: indexData(data, "month"),
           weekly: indexData(data, "week")
@@ -163,11 +166,21 @@ const ingest = async (file, granularity) => {
       labelRow: 0,
       firstField: ".*?==",
       transformFn: (data) => {
-        data.filter(d => d.from === FULLNAME);
+        let messages = data.map(d => ({ 
+          ...d,
+          direction: (d.from === FULLNAME) ? 'from' : 'to',
+          type: 'message'
+        }));
+        if (granularity !== "all") {
+          messages = messages
+            .filter(m => m.direction === 'from')
+            .map(m => ({ ...m, type:'sentmessage'}));
+        }
         const dataset = {
-          yearly: indexData(data, "year"),
-          monthly: indexData(data, "month"),
-          weekly: indexData(data, "week")
+          all: messages,
+          yearly: indexData(messages, "year"),
+          monthly: indexData(messages, "month"),
+          weekly: indexData(messages, "week")
         };
         return dataset[granularity];
       }
@@ -180,12 +193,13 @@ const ingest = async (file, granularity) => {
       transformFn: (data) => {
         const dataWithYearMonthAndWeek = data.map(row => ({ 
           ...row,
-          date: new Date(row.connected_on.replace(/\\r/,"")),
+          date: new Date(row.connected_on.replace(/\\r/,"")).toISOString(),
           year: row.connected_on.split(' ')[2].replace(/[^\d]/g,""),
           month: formatMonthKey(new Date(row.connected_on.replace(/\\r/,""))),
           week: formatWeekKey(new Date(row.connected_on.replace(/\\r/,"")))
         }));
         const dataset = {
+          all: dataWithYearMonthAndWeek,
           yearly: indexData(dataWithYearMonthAndWeek, "year"),
           monthly: indexData(dataWithYearMonthAndWeek, "month"),
           weekly: indexData(dataWithYearMonthAndWeek, "week")
@@ -200,6 +214,7 @@ const ingest = async (file, granularity) => {
       firstField: "\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}",
       transformFn: (data) => {
         const dataset = {
+          all: data,
           yearly: indexData(data, "year"),
           monthly: indexData(data, "month"),
           weekly: indexData(data, "week")
@@ -216,6 +231,8 @@ const ingest = async (file, granularity) => {
       .then(data => csvToJson(data, dataFile.labelRow, dataFile.firstField))  
       .then(rows => rows.map(row => ({
         ...row,
+        ...(dataFile.name === 'Reactions' ? { reactionType : row.type } : {}),
+        type: dataFile.name.replace(/ |(s$)/g, "").toLowerCase(),
         year: (new Date(row.date)).getFullYear(),
         month: formatMonthKey(new Date(row.date)),
         week: formatWeekKey(new Date(row.date))
@@ -227,9 +244,12 @@ const ingest = async (file, granularity) => {
   //console.log(processedData);
   const datasets = {};
   processedData.forEach(obj => {datasets[obj.name] = obj.data });
-  return datasets;
+  return (granularity === "all" 
+    ? [].concat(...Object.values(datasets)).sort((a, b) => new Date(b.date) - new Date(a.date))
+    : datasets
+  );
+  //return datasets;
 };
 
 
 export { ingest };
-

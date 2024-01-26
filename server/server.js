@@ -1,7 +1,7 @@
 import express from 'express';
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
-import { ApolloServer, gql } from 'apollo-server-express';  // Change the import
+import { ApolloServer, gql } from 'apollo-server-express';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
@@ -19,6 +19,10 @@ const loadData = async (filename) => {
   const { typeDefs, resolvers } = getModelDefinitions(dataModel);
 
   const app = express();
+  
+  const server = new ApolloServer({ typeDefs, resolvers });
+
+  await server.start(); // Make sure to await the server start
 
   // CORS middleware
   app.use((req, res, next) => {
@@ -29,11 +33,6 @@ const loadData = async (filename) => {
     next();
   });
 
-  const schema = makeExecutableSchema({ typeDefs, resolvers });
-  const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
-  const server = new ApolloServer({ schema: schemaWithResolvers });
-
-  // Apply middleware to Express server
   server.applyMiddleware({ app, path: '/graphql' });
 
   const PORT = process.env.PORT || 4000;
@@ -41,6 +40,7 @@ const loadData = async (filename) => {
     console.log(`Server running at http://localhost:${PORT}/graphql`);
   });
 })();
+
 
 const getModelDefinitions = (data) => {
   const typeDefs = gql`

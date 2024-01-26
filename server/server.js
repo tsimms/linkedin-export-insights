@@ -1,7 +1,7 @@
 import express from 'express';
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
-import { ApolloServer, gql } from 'apollo-server';
+import { ApolloServer, gql } from 'apollo-server-express';  // Change the import
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
@@ -10,7 +10,7 @@ import { ingest } from './data.js';
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);
   const dataModel = (await ingest(dataStream, "all", JSZip))
-    .map((d,index) => ({ id: index, ...d }));
+    .map((d, index) => ({ id: index, ...d }));
   return dataModel;
 };
 
@@ -32,6 +32,8 @@ const loadData = async (filename) => {
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
   const server = new ApolloServer({ schema: schemaWithResolvers });
+
+  // Apply middleware to Express server
   server.applyMiddleware({ app, path: '/graphql' });
 
   const PORT = process.env.PORT || 4000;
@@ -72,7 +74,7 @@ const getModelDefinitions = (data) => {
     week: String!
     direction: String!
   }
-  
+
   type Connection {
     id: ID!
     first_name: String!
@@ -88,7 +90,7 @@ const getModelDefinitions = (data) => {
     week: String!
     date: DateTime!
   }
-  
+
   type Comment {
     id: ID!
     date: DateTime!
@@ -99,7 +101,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   type Share {
     id: ID!
     date: DateTime!
@@ -113,7 +115,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   type Reaction {
     id: ID!
     date: DateTime!
@@ -124,7 +126,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   type Vote {
     id: ID!
     date: DateTime!
@@ -135,9 +137,9 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   union Activity = Message | Connection | Comment | Share | Reaction | Vote
-  
+
   `;
 
   // Filter routines
@@ -149,17 +151,10 @@ const getModelDefinitions = (data) => {
   }
 
   const responseObject = (results) => {
-    // This doesn't seem to work for our sandbox
-/*
-    const response = {
-      count: results ? results.length : 0,
-      results: results || []
-    };
-*/
     console.log(`Returned response of ${results.length} results`);
     return results;
   };
-  
+
   const resolvers = {
     Query: {
       allActivities: (parent, args, context, info) => {
@@ -177,19 +172,19 @@ const getModelDefinitions = (data) => {
       },
       messagesByConversation: (parent, { from, to, startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_userFilter =  data_dateFilter.filter(item => item.type === 'message' && (item.from.includes(from) || item.to.includes(to)));
+        const data_userFilter = data_dateFilter.filter(item => item.type === 'message' && (item.from.includes(from) || item.to.includes(to)));
         return responseObject(data_userFilter);
       },
       activitiesByDate: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         return responseObject(data_dateFilter);
-      },      
+      },
       connectionsByFilter: (parent, { filter, startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' && 
+        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' &&
           (item.first_name.includes(filter) || item.last_name.includes(filter) ||
-           item.email_address.includes(filter) || item.company.includes(filter) ||
-           item.position.includes(filter)));
+            item.email_address.includes(filter) || item.company.includes(filter) ||
+            item.position.includes(filter)));
 
         return responseObject(data_keywordFilter);
       }

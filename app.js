@@ -261,15 +261,19 @@ const bootstrapServer = async () => {
       console.log(data);
     }
   }));
+  await installProcess.exit;
   const runtimeProcess = await webcontainerInstance.spawn('node', ['server.js']);
   runtimeProcess.output.pipeTo(new WritableStream({
     write(data) {
       console.log(data);
     }
-  }));
-  webcontainerInstance.on('server-ready', (port, url) => {
-    _graphqlUrl = url;
-  });
+  }))
+  _graphqlUrl = await (() => new Promise((resolve, reject) => {
+    webcontainerInstance.on('server-ready', (port, url) => {
+      resolve(url);
+    });
+  }))();
+  console.log(`GOT ${_graphqlUrl}!`);
   new window.EmbeddedSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _graphqlUrl,

@@ -1,14 +1,9 @@
 {
   "dependencies": {
-    "@graphql-tools/schema": "^10.0.2",
-    "@webcontainer/api": "^1.1.8",
-    "apollo-server": "^3.13.0",
-    "graphql": "^16.8.1",
-    "graphql-scalars": "^1.22.4",
-    "jszip": "^3.10.1"
+    "@webcontainer/api": "^1.1.8"
   },
   "scripts": {
-    "__dev": "vite",
+    "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },

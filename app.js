@@ -1,8 +1,5 @@
-
-import { ProvidedRequiredArgumentsOnDirectivesRule } from 'graphql/validation/rules/ProvidedRequiredArgumentsRule.js';
-import { ingest } from './data.js';
+import { ingest } from './server/data.js';
 import { WebContainer } from '@webcontainer/api';
-
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
 let webcontainerInstance, _graphqlUrl;
@@ -233,9 +230,9 @@ const bootstrapServer = async () => {
   await webcontainerInstance.mount(files);
   try {
     await Promise.all([
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server.js',
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/data.js',
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/package.json'
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/server.js',
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/data.js',
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/package.json'
     ].map(file => {
       const filename = file.replace(/^.*\//g,"");
       return Promise.resolve()
@@ -262,7 +259,7 @@ const bootstrapServer = async () => {
     }
   }));
   await installProcess.exit;
-  const runtimeProcess = await webcontainerInstance.spawn('node', ['server.js']);
+  const runtimeProcess = await webcontainerInstance.spawn('npm', ['run', 'server']);
   runtimeProcess.output.pipeTo(new WritableStream({
     write(data) {
       console.log(data);

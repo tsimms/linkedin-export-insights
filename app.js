@@ -237,6 +237,14 @@ const toggleSettings = () => {
   }
 }
 
+const toggleDeveloperMode = () => {
+  const developerMode = document.getElementById('developerMode').value;
+  const developerFrame = document.getElementById('developer-frame');
+  developerFrame.style.display = (developerMode === "yes" ? "block" : "none");
+  _settings.options.developerMode = developerMode;
+  setConfig();
+}
+
 const setGoal = (granularity, label, currentGoal) => {
   let prompt = `To what value should we set ${granularity} target for ${label}?`;
   if (currentGoal)
@@ -260,12 +268,16 @@ const setUx = () => {
     document.getElementById('granularity').value = _settings.options.granularity;
   if (_settings.options?.ignoreGroupPosts)
     document.getElementById('ignoreGroupPosts').value = _settings.options.ignoreGroupPosts;
+    if (_settings.options?.developerMode)
+    document.getElementById('developerMode').value = _settings.options.developerMode;
 
   // set UX event listeners
   document.getElementById('granularity').addEventListener('change', uxOptions);
   document.getElementById('ignoreGroupPosts').addEventListener('change', uxOptions);
   document.getElementById('filesInput').addEventListener('change', onFileSelected);
   document.getElementById('form-toggle').addEventListener('click', toggleSettings);
+  document.getElementById('developerMode').addEventListener('change', toggleDeveloperMode);
+  toggleDeveloperMode();
 }
 
 ///////////

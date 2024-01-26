@@ -40,42 +40,58 @@
     .hcard label { font-size: 0.7em; margin: 0 5px 0 0; }
     .goal .value { cursor: pointer; }
     .goal .value:hover { background-color: #ffa; font-size: 1.1em; }
+    #embedded-sandbox { width: 125%; height: 1000px; transform: scale(0.8); transform-origin: 0 0; }
   </style>
 </head>
 <body>
   <div id="page-container">
-  <header>
-    <img src="linkedinsight-logo.png" height="60" />
-  </header>
-  <div class="float-container">
-    <div id="form-toggle">Show Settings</div>
-  </div>
-  <form id="form">
-    <div>
-      What granularity do you want to inspect? <select id="granularity">
-        <option>yearly</option>
-        <option selected>monthly</option>
-        <option>weekly</option>
-      </select>  
+    <header>
+      <img src="linkedinsight-logo.png" height="60" />
+    </header>
+    <div class="float-container">
+      <div id="form-toggle">Show Settings</div>
     </div>
-    <div>
-      Do you want to ignore group posts? <select id="ignoreGroupPosts">
-        <option>yes</option>
-        <option>no</option>
-      </select>
-    </div>
-    <div>
-      <input id="filesInput" type="file" />
-    </div>
-    <hr />
-  </form>
+    <form id="form">
+      <div>
+        What granularity do you want to inspect? <select id="granularity">
+          <option>yearly</option>
+          <option selected>monthly</option>
+          <option>weekly</option>
+        </select>  
+      </div>
+      <div>
+        Do you want to ignore group posts? <select id="ignoreGroupPosts">
+          <option selected>yes</option>
+          <option>no</option>
+        </select>
+      </div>
+      <div>
+        Developer mode? <select id="developerMode">
+          <option>yes</option>
+          <option selected>no</option>
+        </select>
+      </div>
+      <div>
+        <input id="filesInput" type="file" />
+      </div>
+      <hr />
+    </form>
 
-  <div>
-    <div id="range"></div>
-    <canvas id="chart"></canvas>
-  </div>
-  <div id="analytics">
-  </div>
+    <div>
+      <div id="range"></div>
+      <canvas id="chart"></canvas>
+    </div>
+    <div id="analytics"></div>
+    <div id="developer-frame" class="display:none;">
+      <div id="embedded-sandbox"></div>
+      <script src="https://embeddable-sandbox.cdn.apollographql.com/_latest/embeddable-sandbox.umd.production.min.js"></script> 
+      <script>
+        new window.EmbeddedSandbox({
+          target: '#embedded-sandbox',
+          initialEndpoint: 'https://linkedinexportinsights-0umf--4000--fe7beb95.local-credentialless.webcontainer.io/',
+        });
+      </script>  
+    </div>
   </div>
 </body>
 </html>

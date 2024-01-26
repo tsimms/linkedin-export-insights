@@ -233,6 +233,7 @@ const ingest = async (file, granularity, JSZipLib) => {
         ...row,
         ...(dataFile.name === 'Reactions' ? { reactionType : row.type } : {}),
         type: dataFile.name.replace(/ |(s$)/g, "").toLowerCase(),
+        ...(row.date ? { date: (new Date()).toISOString()} : {}),
         year: (new Date(row.date)).getFullYear(),
         month: formatMonthKey(new Date(row.date)),
         week: formatWeekKey(new Date(row.date))

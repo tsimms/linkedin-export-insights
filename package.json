@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@apollo/sandbox": "^2.5.1",
-    "@webcontainer/api": "^1.1.8"
+    "@webcontainer/api": "^1.1.8",
+    "jszip": "^3.10.1"
   },
   "scripts": {
     "dev": "vite",

@@ -1,7 +1,7 @@
 import { ingest } from './server/data.js';
 import { WebContainer } from '@webcontainer/api';
 import { ApolloSandbox } from '@apollo/sandbox';
-import { JSZip } from 'jszip';
+import JSZip from 'jszip';
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
 let webcontainerInstance, _graphqlUrl;

@@ -1,4 +1,5 @@
 
+import { ProvidedRequiredArgumentsOnDirectivesRule } from 'graphql/validation/rules/ProvidedRequiredArgumentsRule.js';
 import { ingest } from './data.js';
 import { WebContainer } from '@webcontainer/api';
 
@@ -231,15 +232,37 @@ const bootstrapServer = async () => {
   };
   await webcontainerInstance.mount(files);
   try {
-    await webcontainerInstance.spawn('git', ['clone', 'https://github.com/tsimms/linkedin-export-insights.git']);
-    console.log('Repository cloned successfully!');
+    await Promise.all([
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server.js',
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/package.json'
+    ].map(file => {
+      const filename = file.replace(/^.*\//g,"");
+      return Promise.resolve()
+        .then(() => fetch(file))
+        .then(response => response.text())
+        .then(fileContent => {
+          webcontainerInstance.fs.writeFile(filename, fileContent)
+        })
+        .then(() => console.log(`Loaded ${filename} successfully!`))
+        .catch(e => { console.error(`Error writing ${filename}: ${e}`)})
+    }))
   } catch (err) {
-    console.error('Error cloning repository:', err.message);
+    console.error('Error loading files:', err.message);
   }
   const fileListing = await webcontainerInstance.fs.readdir('/', { withFileTypes: true });
   console.log('File Listing:');
   fileListing.forEach((entry) => {
     console.log(`- ${entry.name} (${entry.isDirectory() ? 'Directory' : 'File'})`);
+  });
+  const installProcess = await webcontainerInstance.spawn('npm', ['install']);
+  installProcess.output.pipeTo(new WritableStream({
+    write(data) {
+      console.log(data);
+    }
+  }));
+  await webcontainerInstance.spawn('node', ['server.js']);
+  webcontainerInstance.on('server-ready', (port, url) => {
+    console.log(`Server running at: ${url}`);
   });
 
 }

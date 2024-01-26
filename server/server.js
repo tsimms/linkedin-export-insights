@@ -32,9 +32,6 @@ const loadData = async (filename) => {
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
   const server = new ApolloServer({ schema: schemaWithResolvers });
-
-  await server.start();
-
   server.applyMiddleware({ app, path: '/graphql' });
 
   const PORT = process.env.PORT || 4000;

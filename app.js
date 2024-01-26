@@ -5,7 +5,7 @@ import { WebContainer } from '@webcontainer/api';
 
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
-let webcontainerInstance;
+let webcontainerInstance, _graphqlUrl;
 
 ////////
 // Data preparation routines
@@ -234,6 +234,7 @@ const bootstrapServer = async () => {
   try {
     await Promise.all([
       'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server.js',
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/data.js',
       'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/package.json'
     ].map(file => {
       const filename = file.replace(/^.*\//g,"");
@@ -260,27 +261,33 @@ const bootstrapServer = async () => {
       console.log(data);
     }
   }));
-  await webcontainerInstance.spawn('node', ['server.js']);
+  const runtimeProcess = await webcontainerInstance.spawn('node', ['server.js']);
+  runtimeProcess.output.pipeTo(new WritableStream({
+    write(data) {
+      console.log(data);
+    }
+  }));
   webcontainerInstance.on('server-ready', (port, url) => {
-    console.log(`Server running at: ${url}`);
+    _graphqlUrl = url;
   });
-
+  new window.EmbeddedSandbox({
+    target: '#embedded-sandbox',
+    initialEndpoint: _graphqlUrl,
+  });
+  console.log(`Server running at: ${_graphqlUrl}`);
 }
 
 const readAsUint8Array = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-
     reader.onload = (event) => {
       const result = event.target.result;
       const uint8Array = new Uint8Array(result);
       resolve(uint8Array);
     };
-
     reader.onerror = (error) => {
       reject(error);
     };
-
     reader.readAsArrayBuffer(file);
   });
 };

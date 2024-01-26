@@ -37,11 +37,11 @@ const getModelDefinitions = (data) => {
 
   type Query {
     allActivities: [Activity]
-    activitiesByType(type: String!): [Activity]
-    reactionsByType(reactionType: String!): [Reaction]
-    messagesByConversation(from: String!, to: String!): [Message]
-    activitiesByDate(date: DateTime): [Activity]
-    connectionsByFilter(filter: String!): [Connection]
+    activitiesByType(type: String!, startDate: String, endDate: String): [Activity]
+    reactionsByType(reactionType: String!, startDate: String, endDate: String): [Reaction]
+    messagesByConversation(from: String, to: String, startDate: String, endDate: String): [Message]
+    activitiesByDate(startDate: String, endDate: String): [Activity]
+    connectionsByFilter(filter: String!, startDate: String, endDate: String): [Connection]
   }
 
   type Message {
@@ -129,48 +129,59 @@ const getModelDefinitions = (data) => {
   union Activity = Message | Connection | Comment | Share | Reaction | Vote
   
   `;
+
+  // Filter routines
+  const dateFilter = (data, start, end) => {
+    if (!start || !end) return data;
+    const s = new Date(start);
+    const e = new Date(end);
+    return data.filter(d => (new Date(d.date) >= s && new Date(d.date) <= e));
+  }
+
+  const responseObject = (results) => {
+    // This doesn't seem to work for our sandbox
+/*
+    const response = {
+      count: results ? results.length : 0,
+      results: results || []
+    };
+*/
+    console.log(`Returned response of ${results.length} results`);
+    return results;
+  };
   
   const resolvers = {
     Query: {
       allActivities: (parent, args, context, info) => {
-        // Return the entire data set without filtering
-        // Replace this with your actual data fetching logic
         return data;
       },
-      activitiesByType: (parent, { type }, context, info) => {
-        // Logic to fetch activities by type
-        // Replace this with your actual data fetching logic
-        return data.filter(item => item.type === type);
+      activitiesByType: (parent, { type, startDate, endDate }, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(item => item.type === type);
+        return responseObject(data_typeFilter);
       },
-      reactionsByType: (parent, { reactionType }, context, info) => {
-        // Logic to fetch reactions by type
-        // Replace this with your actual data fetching logic
-        return data.filter(item => item.type === 'reaction' && item.reactionType === reactionType);
+      reactionsByType: (parent, { reactionType, startDate, endDate }, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_reactionFilter = data_dateFilter.filter(item => item.type === 'reaction' && item.reactionType === reactionType);
+        return responseObject(data_reactionFilter);
       },
-      messagesByConversation: (parent, { from, to }, context, info) => {
-        // Logic to fetch messages by conversation
-        // Replace this with your actual data fetching logic
-        return data.filter(item => item.type === 'message' && item.from === from && item.to.includes(to));
+      messagesByConversation: (parent, { from, to, startDate, endDate }, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_userFilter =  data_dateFilter.filter(item => item.type === 'message' && (item.from.includes(from) || item.to.includes(to)));
+        return responseObject(data_userFilter);
       },
-      activitiesByDate: (parent, { date }, context, info) => {
-        // Parse the input date string to a Date object
-        const targetDate = new Date(date);
-      
-        // Logic to fetch activities by date (using a date range comparison)
-        // Replace this with your actual data fetching logic
-        return data.filter(item => {
-          const itemDate = new Date(item.date);
-          // Adjust the condition based on your desired date range comparison
-          return itemDate.getTime() === targetDate.getTime();
-        });
+      activitiesByDate: (parent, { startDate, endDate }, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        return responseObject(data_dateFilter);
       },      
-      connectionsByFilter: (parent, { filter }, context, info) => {
-        // Logic to fetch connections by name, email, company, or position
-        // Replace this with your actual data fetching logic
-        return data.filter(item => item.type === 'connection' && 
+      connectionsByFilter: (parent, { filter, startDate, endDate }, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' && 
           (item.first_name.includes(filter) || item.last_name.includes(filter) ||
            item.email_address.includes(filter) || item.company.includes(filter) ||
            item.position.includes(filter)));
+
+        return responseObject(data_keywordFilter);
       }
     },
     DateTime: DateTimeResolver,

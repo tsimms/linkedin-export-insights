@@ -1,7 +1,10 @@
 
 import { ingest } from './data.js';
+import { WebContainer } from '@webcontainer/api';
+
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
+let webcontainerInstance;
 
 ////////
 // Data preparation routines
@@ -157,12 +160,20 @@ const getConfig = () => {
   const config = localStorage.getItem("config");
   let settingsJson;
   if (config) {
-    settingsJson = JSON.parse(config);
-    return settingsJson;
+    try {
+      settingsJson = JSON.parse(config);
+    } catch (e) {
+      // invalid JSON
+      settingsJson = {};
+      _settings = settingsJson;
+      setConfig();
+    }
   } else {
+    settingsJson = {};
+    _settings = settingsJson;
     setConfig();
   }
-  return _settings;
+  return settingsJson;  
 }
 
 const setConfig = () => {
@@ -205,6 +216,55 @@ const showRange = range => {
 }
 
 ////////////
+// Server
+////////////
+const bootstrapServer = async () => {
+  webcontainerInstance = await WebContainer.boot();
+  const dataFile = await readAsUint8Array(_uploadedFile);
+
+  const files = {
+    "dataFile.zip": {
+      file: {
+        contents: dataFile,
+      },
+    }
+  };
+  await webcontainerInstance.mount(files);
+  try {
+    await webcontainerInstance.spawn('git', ['clone', 'https://github.com/tsimms/linkedin-export-insights.git']);
+    console.log('Repository cloned successfully!');
+  } catch (err) {
+    console.error('Error cloning repository:', err.message);
+  }
+  const fileListing = await webcontainerInstance.fs.readdir('/', { withFileTypes: true });
+  console.log('File Listing:');
+  fileListing.forEach((entry) => {
+    console.log(`- ${entry.name} (${entry.isDirectory() ? 'Directory' : 'File'})`);
+  });
+
+}
+
+const readAsUint8Array = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      const result = event.target.result;
+      const uint8Array = new Uint8Array(result);
+      resolve(uint8Array);
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+};
+
+
+
+////////////
 // UX Exports
 ////////////
 const onFileSelected = () => {
@@ -212,6 +272,7 @@ const onFileSelected = () => {
   if (files.length) {
     _uploadedFile = files[0];
     processFile();
+    bootstrapServer();
   }
 };
 

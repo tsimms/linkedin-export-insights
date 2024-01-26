@@ -1,3 +1,4 @@
+import express from 'express';
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
 import { ApolloServer, gql } from 'apollo-server';
@@ -9,25 +10,37 @@ import { ingest } from './data.js';
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);
   const dataModel = (await ingest(dataStream, "all", JSZip))
-      .map((d,index) => ({ id: index, ...d }));
-  //console.log({ dataModel });
+    .map((d,index) => ({ id: index, ...d }));
   return dataModel;
 };
 
 (async () => {
   const dataModel = await loadData("dataFile.zip");
-/*
-  ["message", "connection", "comment", "share", "reaction", "vote"]
-    .forEach(type => { console.log(dataModel.filter(d => d.type === type)[0]); })
-*/
-    const { typeDefs, resolvers } = getModelDefinitions(dataModel)
-    const schema = makeExecutableSchema({ typeDefs, resolvers });
-    const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
-    const server = new ApolloServer({ schema: schemaWithResolvers });
+  const { typeDefs, resolvers } = getModelDefinitions(dataModel);
 
-    server.listen().then(({ url }) => {
-      console.log(`Server running at ${url}`);
-    });
+  const app = express();
+
+  // CORS middleware
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://www.your-web-app.com'); // Replace with your web app's origin
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    next();
+  });
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
+  const server = new ApolloServer({ schema: schemaWithResolvers });
+
+  await server.start();
+
+  server.applyMiddleware({ app, path: '/graphql' });
+
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => {
+    console.log(`Server running at http://localhost:${PORT}/graphql`);
+  });
 })();
 
 const getModelDefinitions = (data) => {

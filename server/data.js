@@ -100,7 +100,7 @@ const indexData = (data, key) => {
 
 
 const ingest = async (file, granularity, JSZipLib) => {
-  const zipFile = new JSZipLi();
+  const zipFile = new JSZipLib();
   const dataFiles = [
     {
       name: "Profile",

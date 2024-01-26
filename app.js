@@ -267,10 +267,12 @@ const bootstrapServer = async () => {
   }))
   _graphqlUrl = await (() => new Promise((resolve, reject) => {
     webcontainerInstance.on('server-ready', (port, url) => {
-      resolve(url);
+      //resolve(url);
+      debugger;
+      resolve('https://linkedinexportinsights-0umf-a3fqka4b--4000--6854296d.local-credentialless.webcontainer.io/');
     });
   }))();
-  console.log(`GOT ${_graphqlUrl}!`);
+  console.log(`GOT NEW: ${_graphqlUrl}!`);
   new window.EmbeddedSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _graphqlUrl,

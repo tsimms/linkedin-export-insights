@@ -15,7 +15,7 @@ const loadData = async (filename) => {
 };
 
 (async () => {
-  const dataModel = await loadData("data/Complete_LinkedInDataExport_01-23-2024.zip");
+  const dataModel = await loadData("dataFile.zip");
 /*
   ["message", "connection", "comment", "share", "reaction", "vote"]
     .forEach(type => { console.log(dataModel.filter(d => d.type === type)[0]); })

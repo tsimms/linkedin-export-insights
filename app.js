@@ -1,5 +1,6 @@
 import { ingest } from './server/data.js';
 import { WebContainer } from '@webcontainer/api';
+import { ApolloSandbox } from '@apollo/sandbox';
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
 let webcontainerInstance, _graphqlUrl;
@@ -265,15 +266,21 @@ const bootstrapServer = async () => {
       console.log(data);
     }
   }))
+  webcontainerInstance.on('port', (port, type, url) => {
+    console.log({ port, type, url });
+  })
+  webcontainerInstance.on('error', (err) => {
+    console.error(err);
+  })
   _graphqlUrl = await (() => new Promise((resolve, reject) => {
     webcontainerInstance.on('server-ready', (port, url) => {
-      //resolve(url);
-      debugger;
-      resolve('https://linkedinexportinsights-0umf-a3fqka4b--4000--6854296d.local-credentialless.webcontainer.io/');
+      resolve(url);
+      //debugger;
+      //resolve('https://linkedinexportinsights-0umf-a3fqka4b--4000--6854296d.local-credentialless.webcontainer.io/');
     });
   }))();
   console.log(`GOT NEW: ${_graphqlUrl}!`);
-  new window.EmbeddedSandbox({
+  new ApolloSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _graphqlUrl,
   });

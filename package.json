@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@apollo/sandbox": "^2.5.1",
     "@webcontainer/api": "^1.1.8"
   },
   "scripts": {

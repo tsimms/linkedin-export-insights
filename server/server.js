@@ -1,7 +1,6 @@
-import express from 'express';
 import { promises as fs } from 'fs';
 import JSZip from 'jszip';
-import { ApolloServer, gql } from 'apollo-server-express';
+import { ApolloServer, gql } from 'apollo-server';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
@@ -10,37 +9,26 @@ import { ingest } from './data.js';
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);
   const dataModel = (await ingest(dataStream, "all", JSZip))
-    .map((d, index) => ({ id: index, ...d }));
+      .map((d,index) => ({ id: index, ...d }));
+  //console.log({ dataModel });
   return dataModel;
 };
 
 (async () => {
   const dataModel = await loadData("dataFile.zip");
-  const { typeDefs, resolvers } = getModelDefinitions(dataModel);
+/*
+  ["message", "connection", "comment", "share", "reaction", "vote"]
+    .forEach(type => { console.log(dataModel.filter(d => d.type === type)[0]); })
+*/
+    const { typeDefs, resolvers } = getModelDefinitions(dataModel)
+    const schema = makeExecutableSchema({ typeDefs, resolvers });
+    const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
+    const server = new ApolloServer({ schema: schemaWithResolvers });
 
-  const app = express();
-  
-  const server = new ApolloServer({ typeDefs, resolvers });
-
-  await server.start(); // Make sure to await the server start
-
-  // CORS middleware
-  app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'https://www.your-web-app.com'); // Replace with your web app's origin
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    next();
-  });
-
-  server.applyMiddleware({ app, path: '/graphql' });
-
-  const PORT = process.env.PORT || 4000;
-  app.listen(PORT, () => {
-    console.log(`Server running at http://localhost:${PORT}/graphql`);
-  });
+    server.listen().then(({ url }) => {
+      console.log(`Server running at ${url}`);
+    });
 })();
-
 
 const getModelDefinitions = (data) => {
   const typeDefs = gql`
@@ -74,7 +62,7 @@ const getModelDefinitions = (data) => {
     week: String!
     direction: String!
   }
-
+  
   type Connection {
     id: ID!
     first_name: String!
@@ -90,7 +78,7 @@ const getModelDefinitions = (data) => {
     week: String!
     date: DateTime!
   }
-
+  
   type Comment {
     id: ID!
     date: DateTime!
@@ -101,7 +89,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-
+  
   type Share {
     id: ID!
     date: DateTime!
@@ -115,7 +103,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-
+  
   type Reaction {
     id: ID!
     date: DateTime!
@@ -126,7 +114,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-
+  
   type Vote {
     id: ID!
     date: DateTime!
@@ -137,9 +125,9 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-
+  
   union Activity = Message | Connection | Comment | Share | Reaction | Vote
-
+  
   `;
 
   // Filter routines
@@ -151,10 +139,17 @@ const getModelDefinitions = (data) => {
   }
 
   const responseObject = (results) => {
+    // This doesn't seem to work for our sandbox
+/*
+    const response = {
+      count: results ? results.length : 0,
+      results: results || []
+    };
+*/
     console.log(`Returned response of ${results.length} results`);
     return results;
   };
-
+  
   const resolvers = {
     Query: {
       allActivities: (parent, args, context, info) => {
@@ -178,13 +173,13 @@ const getModelDefinitions = (data) => {
       activitiesByDate: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         return responseObject(data_dateFilter);
-      },
+      },      
       connectionsByFilter: (parent, { filter, startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' &&
+        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' && 
           (item.first_name.includes(filter) || item.last_name.includes(filter) ||
-            item.email_address.includes(filter) || item.company.includes(filter) ||
-            item.position.includes(filter)));
+           item.email_address.includes(filter) || item.company.includes(filter) ||
+           item.position.includes(filter)));
 
         return responseObject(data_keywordFilter);
       }

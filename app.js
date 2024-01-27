@@ -281,10 +281,18 @@ const bootstrapServer = async () => {
     });
   }))();
   console.log(`GOT NEW: ${_graphqlUrl}!`);
+  /*
   new ApolloSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _graphqlUrl,
+    proxyHost: 'timjimsimms.com'
   });
+  */
+  document.getElementById('embedded-sandbox').innerHTML = `
+  <iframe
+    src="https://timjimsimms.com/sandbox/explorer?endpoint=${_graphqlUrl}&hideCookieToggle=true&initialRequestQueryPlan=false&parentSupportsSubscriptions=true&runTelemetry=true&shouldDefaultAutoupdateSchema=true&version=2.5.1"
+    ></iframe>
+  `;
   console.log(`Server running at: ${_graphqlUrl}`);
 }
 

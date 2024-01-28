@@ -4,8 +4,9 @@ import { ApolloServer, gql } from 'apollo-server';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
-import { createProxyMiddleware } from 'http-proxy-middleware';  // Import createProxyMiddleware directly
-import express from 'express';  // Use import for express
+import { createProxyMiddleware } from 'http-proxy-middleware';
+import express from 'express';
+import { ingest } from './data.js';
 
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);

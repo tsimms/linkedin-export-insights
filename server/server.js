@@ -33,6 +33,7 @@ const startApolloServer = async () => {
 const sandboxProxy = createProxyMiddleware({
   target: 'https://sandbox.embed.apollographql.com',
   changeOrigin: true,
+  secure: true
 });
 
 // Proxy server

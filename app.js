@@ -267,7 +267,10 @@ const bootstrapServer = async () => {
       console.log(data);
     }
   }))
+
+  const servers = {};
   webcontainerInstance.on('port', (port, type, url) => {
+    servers[port] = url;
     console.log({ port, type, url });
   })
   webcontainerInstance.on('error', (err) => {
@@ -275,12 +278,16 @@ const bootstrapServer = async () => {
   })
   _graphqlUrl = await (() => new Promise((resolve, reject) => {
     webcontainerInstance.on('server-ready', (port, url) => {
-      resolve(url);
+      console.log('Waiting for servers!');
+      while (servers.length < 2) {};
+      console.log('Servers are ready!');
+      resolve();
       //debugger;
       //resolve('https://linkedinexportinsights-0umf-a3fqka4b--4000--6854296d.local-credentialless.webcontainer.io/');
     });
   }))();
-  console.log(`GOT NEW: ${_graphqlUrl}!`);
+  _graphqlUrl = `${servers[3000]}/sandbox/explorer?endpoint=${servers[4000]}&hideCookieToggle=true&initialRequestQueryPlan=false&parentSupportsSubscriptions=true&runTelemetry=true&shouldDefaultAutoupdateSchema=true&version=2.5.1`;
+  console.log(`Sandbox URL: ${_graphqlUrl}!`);
   /*
   new ApolloSandbox({
     target: '#embedded-sandbox',
@@ -288,16 +295,16 @@ const bootstrapServer = async () => {
     proxyHost: 'timjimsimms.com'
   });
   */
- const embedUrl = `https://timjimsimms.com/sandbox/explorer?endpoint=${_graphqlUrl}&hideCookieToggle=true&initialRequestQueryPlan=false&parentSupportsSubscriptions=true&runTelemetry=true&shouldDefaultAutoupdateSchema=true&version=2.5.1`;
-/*
+ const embedUrl = _graphqlUrl;
+
  document.getElementById('embedded-sandbox').innerHTML = `
-  <iframe
+  <iframe style="width:100%; height:100%"
     src="${embedUrl}"
     ></iframe>
   `;
-*/
+
   window.open(embedUrl, '_blank');
-  console.log(`Server running at: ${_graphqlUrl}`);
+  //console.log(`Server running at: ${_graphqlUrl}`);
 }
 
 const readAsUint8Array = (file) => {

@@ -14,40 +14,40 @@ const loadData = async (filename) => {
   return dataModel;
 };
 
-(async () => {
+const startApolloServer = async () => {
   const dataModel = await loadData("dataFile.zip");
 
   const { typeDefs, resolvers } = getModelDefinitions(dataModel);
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
-
-  // Configure the proxy middleware to forward requests to the Apollo Sandbox server
-  const sandboxProxy = createProxyMiddleware('/sandbox', {
-    target: 'https://sandbox.embed.apollographql.com',
-    changeOrigin: true,
-  });
-
-  // Create Apollo Server instance
+  
   const server = new ApolloServer({ schema: schemaWithResolvers });
-
-  // Start Apollo Server
+  
   server.listen().then(({ url }) => {
-    console.log(`Apollo Server running at ${url}`);
+    console.log(`ApolloGraphQL server running at ${url}`);
   });
+};
 
-  // Start the proxy server
-  const proxyPort = 3001;  // Choose a port for the proxy server
-  const proxyServer = require('http').createServer((req, res) => {
-    sandboxProxy(req, res, () => {
-      res.statusCode = 404;
-      res.end('Not Found');
-    });
-  });
+// Proxy setup
+const sandboxProxy = createProxyMiddleware({
+  target: 'https://sandbox.embed.apollographql.com',
+  changeOrigin: true,
+});
 
-  proxyServer.listen(proxyPort, () => {
-    console.log(`Proxy server running at http://localhost:${proxyPort}`);
-  });
-})();
+// Proxy server
+const express = require('express');
+const app = express();
+const port = 4000;
+
+app.use('/', sandboxProxy);
+
+app.listen(port, () => {
+  console.log(`Proxy server running at http://localhost:${port}`);
+});
+
+// Start Apollo Server
+startApolloServer();
+
 
 const getModelDefinitions = (data) => {
   const typeDefs = gql`

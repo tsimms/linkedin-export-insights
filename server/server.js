@@ -4,8 +4,8 @@ import { ApolloServer, gql } from 'apollo-server';
 import { makeExecutableSchema } from '@graphql-tools/schema';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
-import { ingest } from './data.js';
-import { createProxyMiddleware } from 'http-proxy-middleware';
+import { createProxyMiddleware } from 'http-proxy-middleware';  // Import createProxyMiddleware directly
+import express from 'express';  // Use import for express
 
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);
@@ -20,9 +20,9 @@ const startApolloServer = async () => {
   const { typeDefs, resolvers } = getModelDefinitions(dataModel);
   const schema = makeExecutableSchema({ typeDefs, resolvers });
   const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
-  
+
   const server = new ApolloServer({ schema: schemaWithResolvers });
-  
+
   server.listen().then(({ url }) => {
     console.log(`ApolloGraphQL server running at ${url}`);
   });
@@ -35,7 +35,6 @@ const sandboxProxy = createProxyMiddleware({
 });
 
 // Proxy server
-const express = require('express');
 const app = express();
 const port = 4000;
 
@@ -47,7 +46,6 @@ app.listen(port, () => {
 
 // Start Apollo Server
 startApolloServer();
-
 
 const getModelDefinitions = (data) => {
   const typeDefs = gql`

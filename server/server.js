@@ -5,29 +5,48 @@ import { makeExecutableSchema } from '@graphql-tools/schema';
 import { addResolversToSchema } from '@graphql-tools/schema';
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
 import { ingest } from './data.js';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);
   const dataModel = (await ingest(dataStream, "all", JSZip))
-      .map((d,index) => ({ id: index, ...d }));
-  //console.log({ dataModel });
+    .map((d, index) => ({ id: index, ...d }));
   return dataModel;
 };
 
 (async () => {
   const dataModel = await loadData("dataFile.zip");
-/*
-  ["message", "connection", "comment", "share", "reaction", "vote"]
-    .forEach(type => { console.log(dataModel.filter(d => d.type === type)[0]); })
-*/
-    const { typeDefs, resolvers } = getModelDefinitions(dataModel)
-    const schema = makeExecutableSchema({ typeDefs, resolvers });
-    const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
-    const server = new ApolloServer({ schema: schemaWithResolvers });
 
-    server.listen().then(({ url }) => {
-      console.log(`Server running at ${url}`);
+  const { typeDefs, resolvers } = getModelDefinitions(dataModel);
+  const schema = makeExecutableSchema({ typeDefs, resolvers });
+  const schemaWithResolvers = addResolversToSchema({ schema, resolvers });
+
+  // Configure the proxy middleware to forward requests to the Apollo Sandbox server
+  const sandboxProxy = createProxyMiddleware('/sandbox', {
+    target: 'https://sandbox.embed.apollographql.com',
+    changeOrigin: true,
+  });
+
+  // Create Apollo Server instance
+  const server = new ApolloServer({ schema: schemaWithResolvers });
+
+  // Start Apollo Server
+  server.listen().then(({ url }) => {
+    console.log(`Apollo Server running at ${url}`);
+  });
+
+  // Start the proxy server
+  const proxyPort = 3001;  // Choose a port for the proxy server
+  const proxyServer = require('http').createServer((req, res) => {
+    sandboxProxy(req, res, () => {
+      res.statusCode = 404;
+      res.end('Not Found');
     });
+  });
+
+  proxyServer.listen(proxyPort, () => {
+    console.log(`Proxy server running at http://localhost:${proxyPort}`);
+  });
 })();
 
 const getModelDefinitions = (data) => {
@@ -62,7 +81,7 @@ const getModelDefinitions = (data) => {
     week: String!
     direction: String!
   }
-  
+
   type Connection {
     id: ID!
     first_name: String!
@@ -78,7 +97,7 @@ const getModelDefinitions = (data) => {
     week: String!
     date: DateTime!
   }
-  
+
   type Comment {
     id: ID!
     date: DateTime!
@@ -89,7 +108,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   type Share {
     id: ID!
     date: DateTime!
@@ -103,7 +122,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   type Reaction {
     id: ID!
     date: DateTime!
@@ -114,7 +133,7 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   type Vote {
     id: ID!
     date: DateTime!
@@ -125,31 +144,22 @@ const getModelDefinitions = (data) => {
     month: String!
     week: String!
   }
-  
+
   union Activity = Message | Connection | Comment | Share | Reaction | Vote
-  
   `;
 
-  // Filter routines
   const dateFilter = (data, start, end) => {
     if (!start || !end) return data;
     const s = new Date(start);
     const e = new Date(end);
     return data.filter(d => (new Date(d.date) >= s && new Date(d.date) <= e));
-  }
+  };
 
   const responseObject = (results) => {
-    // This doesn't seem to work for our sandbox
-/*
-    const response = {
-      count: results ? results.length : 0,
-      results: results || []
-    };
-*/
     console.log(`Returned response of ${results.length} results`);
     return results;
   };
-  
+
   const resolvers = {
     Query: {
       allActivities: (parent, args, context, info) => {
@@ -173,13 +183,13 @@ const getModelDefinitions = (data) => {
       activitiesByDate: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         return responseObject(data_dateFilter);
-      },      
+      },
       connectionsByFilter: (parent, { filter, startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' && 
+        const data_keywordFilter = data_dateFilter.filter(item => item.type === 'connection' &&
           (item.first_name.includes(filter) || item.last_name.includes(filter) ||
-           item.email_address.includes(filter) || item.company.includes(filter) ||
-           item.position.includes(filter)));
+            item.email_address.includes(filter) || item.company.includes(filter) ||
+            item.position.includes(filter)));
 
         return responseObject(data_keywordFilter);
       }
@@ -200,9 +210,10 @@ const getModelDefinitions = (data) => {
         } else if (obj.type === 'vote') {
           return 'Vote';
         }
-        return null; // Default fallback
+        return null;
       }
     }
   };
+
   return { typeDefs, resolvers };
-}
+};

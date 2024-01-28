@@ -288,11 +288,15 @@ const bootstrapServer = async () => {
     proxyHost: 'timjimsimms.com'
   });
   */
-  document.getElementById('embedded-sandbox').innerHTML = `
+ const embedUrl = `https://timjimsimms.com/sandbox/explorer?endpoint=${_graphqlUrl}&hideCookieToggle=true&initialRequestQueryPlan=false&parentSupportsSubscriptions=true&runTelemetry=true&shouldDefaultAutoupdateSchema=true&version=2.5.1`;
+/*
+ document.getElementById('embedded-sandbox').innerHTML = `
   <iframe
-    src="https://timjimsimms.com/sandbox/explorer?endpoint=${_graphqlUrl}&hideCookieToggle=true&initialRequestQueryPlan=false&parentSupportsSubscriptions=true&runTelemetry=true&shouldDefaultAutoupdateSchema=true&version=2.5.1"
+    src="${embedUrl}"
     ></iframe>
   `;
+*/
+  window.open(embedUrl, '_blank');
   console.log(`Server running at: ${_graphqlUrl}`);
 }
 

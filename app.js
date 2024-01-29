@@ -233,6 +233,7 @@ const bootstrapServer = async () => {
   try {
     await Promise.all([
       'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/server.js',
+      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/graphql-model.js',
       'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/data.js',
       'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/package.json'
     ].map(file => {
@@ -278,33 +279,32 @@ const bootstrapServer = async () => {
   })
   _graphqlUrl = await (() => new Promise((resolve, reject) => {
     webcontainerInstance.on('server-ready', (port, url) => {
-      console.log('Waiting for servers!');
-      while (servers.length < 2) {};
-      console.log('Servers are ready!');
-      resolve();
-      //debugger;
-      //resolve('https://linkedinexportinsights-0umf-a3fqka4b--4000--6854296d.local-credentialless.webcontainer.io/');
+      console.log('Server is ready!');
+      resolve(url);
     });
   }))();
-  _graphqlUrl = `${servers[3000]}/sandbox/explorer?endpoint=${servers[4000]}&hideCookieToggle=true&initialRequestQueryPlan=false&parentSupportsSubscriptions=true&runTelemetry=true&shouldDefaultAutoupdateSchema=true&version=2.5.1`;
-  console.log(`Sandbox URL: ${_graphqlUrl}!`);
-  /*
+  console.log(`Server URL: ${_graphqlUrl}!`);
+/*
   new ApolloSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _graphqlUrl,
-    proxyHost: 'timjimsimms.com'
+    initialState: {
+      headers: {
+        'Cross-Origin-Resource-Policy': "cross-origin"
+      }
+    }
   });
-  */
- const embedUrl = _graphqlUrl;
-
+*/
+/*
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${embedUrl}"
     ></iframe>
   `;
+*/
+ const embedUrl = _graphqlUrl;
 
-  window.open(embedUrl, '_blank');
-  //console.log(`Server running at: ${_graphqlUrl}`);
+  window.open(_graphqlUrl, '_blank');
 }
 
 const readAsUint8Array = (file) => {

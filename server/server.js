@@ -37,7 +37,7 @@ const startApolloServer = async () => {
   await server.start();
 
   app.use(
-    '/graphql',
+    '/',
     cors(),
     express.json(),
     expressMiddleware(server),
@@ -49,7 +49,7 @@ const startApolloServer = async () => {
   });
 
   await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
-  console.log(`🚀 Server ready at http://localhost:4000/graphql`);
+  console.log(`🚀 Server ready at http://localhost:4000`);
 };
 
 // Start Apollo Server

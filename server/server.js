@@ -3,6 +3,7 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import { makeExecutableSchema, addResolversToSchema } from '@graphql-tools/schema';
 import { expressMiddleware } from '@apollo/server/express4';
 import http from 'http';
+import httpProxy from 'http-proxy';
 import express from 'express';
 import cors from 'cors';
 import { promises as fs } from 'fs';
@@ -25,7 +26,15 @@ const startApolloServer = async () => {
 
   const app = express();
   const httpServer = http.createServer(app);
+  const proxy = httpProxy.createProxyServer();
 
+  app.use('/v2/embeddable-sandbox.umd.production.min.js', (req, res) => {
+    proxy.web(req, res, {
+      target: 'https://embeddable-sandbox.cdn.apollographql.com',
+      changeOrigin: true,
+    });
+  });
+  
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
     res.send('This is a test response!');

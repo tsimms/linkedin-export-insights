@@ -33,14 +33,15 @@ const startApolloServer = async () => {
 
   app.use('/sandbox', (req, res) => {
     proxy.web(req, res, {
-      target: 'https://sandbox.embed.apollographql.com',
+      target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
       changeOrigin: true,
     });
   });
 
   app.use('/v2', (req, res) => {
+    const filename = req.path.split('/').pop();
     proxy.web(req, res, {
-      target: 'https://embeddable-sandbox.cdn.apollographql.com',
+      target: `https://embeddable-sandbox.cdn.apollographql.com/v2/${filename}`,
       changeOrigin: true,
     });
   });

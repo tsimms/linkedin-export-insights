@@ -287,7 +287,7 @@ const bootstrapServer = async () => {
 
   if ('serviceWorker' in navigator) {  
     await navigator.serviceWorker
-      .register(`./gql-intercept.js?serverUrl=${_serverUrl}`, { scope: '/' })
+      .register(`./gql-intercept.js?serverUrl=${_serverUrl}`)
       .then(registration => {
         console.log('Service Worker registered with scope:', registration.scope);
   

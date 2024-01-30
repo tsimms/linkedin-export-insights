@@ -2,6 +2,7 @@ import { ingest } from './server/data.js';
 import { WebContainer } from '@webcontainer/api';
 import { ApolloSandbox } from '@apollo/sandbox';
 import JSZip from 'jszip';
+import './gql-intercept.js';
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
 let webcontainerInstance, _serverUrl;
@@ -285,8 +286,8 @@ const bootstrapServer = async () => {
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
 
-  if ('serviceWorker' in navigator && import.meta.env.VITE_SERVICE_WORKER_FILE) {  
-    await navigator.serviceWorker.register(`${import.meta.env.VITE_SERVICE_WORKER_FILE}?serverUrl=${_serverUrl}`)
+  if ('serviceWorker' in navigator) {  
+    await navigator.serviceWorker.register(`./linkedinsight/gql-intercept.js?serverUrl=${_serverUrl}`)
       .then(registration => {
         console.log('Service Worker registered with scope:', registration.scope);
   

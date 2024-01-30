@@ -286,7 +286,20 @@ const bootstrapServer = async () => {
   console.log(`Server URL: ${_serverUrl}!`);
 
   if ('serviceWorker' in navigator) {
-    await navigator.serviceWorker.register('./gql-intercept.js')
+    navigator.serviceWorker.register('data:text/javascript,' + encodeURIComponent(`
+      self.addEventListener('fetch', event => {
+        console.log('caught event!');
+        const url = new URL(event.request.url);
+        if ([
+          'sandbox.embed.apollographql.com',
+          'embeddable-sandbox.cdn.apollographql.com'
+        ].includes(url.hostname)) {
+          url.host = '${_serverUrl}';
+          const newRequest = new Request(url, event.request);
+          event.respondWith(fetch(newRequest));
+        }
+      });
+    `))
       .then(registration => {
         console.log('Service Worker registered with scope:', registration.scope);
   

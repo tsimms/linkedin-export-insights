@@ -27,7 +27,7 @@ const startApolloServer = async () => {
   const httpServer = http.createServer(app);
 
   app.get('/test', (req, res) => {
-    res.append('Cross-Origin-Resource-Policy', 'cross-origin');
+    //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
     res.send('This is a test response!');
   });
 

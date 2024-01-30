@@ -26,6 +26,11 @@ const startApolloServer = async () => {
   const app = express();
   const httpServer = http.createServer(app);
 
+  app.get('/test', (req, res) => {
+    res.append('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.send('This is a test response!');
+  });
+
   const server = new ApolloServer({
     schema: schemaWithResolvers,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],

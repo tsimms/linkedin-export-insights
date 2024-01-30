@@ -16,6 +16,8 @@ jobs:
           aws-region: us-east-1
       - run: npm install
       - run: npm run build --if-present
+      - name: Copy gql-intercept.js to dist
+        run: cp gql-intercept.js dist/
       - name: Sync files to S3 bucket
         run: |
           aws s3 sync dist s3://linkedinsight/linkedinsight --delete

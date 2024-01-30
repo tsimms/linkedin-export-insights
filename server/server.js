@@ -10,6 +10,9 @@ import { promises as fs } from 'fs';
 import JSZip from 'jszip';
 import { ingest } from './data.js';
 import getModelDefinitions from './graphql-model.js';
+import { isCompositeType } from 'graphql';
+
+let _serverUrl = '';
 
 const loadData = async (filename) => {
   const dataStream = await fs.readFile(filename);
@@ -47,9 +50,32 @@ const startApolloServer = async () => {
     res.send('This is a test response!');
   });
 
+  app.use((req, res, next) => {
+    const originalSend = res.send;
+    res.send = function (body) {
+      let newBody = body;
+      if (req.method === 'GET' && req.url.split('?')[0] ==='/') {
+        if (req.query.serverUrl) {
+          _serverUrl = req.query.serverUrl;
+          newBody = newBody.replaceAll("https://sandbox.embed.apollographql.com/", _serverUrl);
+          newBody = newBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com/", _serverUrl);
+          console.log('Response body:', body);
+        }
+        const { url, method, params, headers } = req;
+        console.log('Request: ', JSON.stringify({ method, url, headers, params}));
+        console.log('---');
+        console.log();  
+      }
+      originalSend.call(this, body);
+    };
+    next();
+  });
+
   const server = new ApolloServer({
     schema: schemaWithResolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer })
+    ],
     apollo: {
       csrfPrevention: false
     }

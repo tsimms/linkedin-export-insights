@@ -284,7 +284,7 @@ const bootstrapServer = async () => {
     });
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
-
+/*
   if ('serviceWorker' in navigator) {  
     await navigator.serviceWorker
       .register(`./gql-intercept.js?serverUrl=${_serverUrl}`)
@@ -302,6 +302,7 @@ const bootstrapServer = async () => {
   } else {
     console.error('Service Worker is not supported in this browser.');
   }
+  */
 /*
   new ApolloSandbox({
     target: '#embedded-sandbox',
@@ -315,7 +316,7 @@ const bootstrapServer = async () => {
 */
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
-    src="${_serverUrl}"
+    src="${_serverUrl}?serverUrl=${_serverUrl}"
     ></iframe>
   `;
 

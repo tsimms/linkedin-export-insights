@@ -285,8 +285,8 @@ const bootstrapServer = async () => {
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
 
-  if ('serviceWorker' in navigator) {  
-    await navigator.serviceWorker.register(`/linkedinsight/gql-intercept.js?serverUrl=${_serverUrl}`)
+  if ('serviceWorker' in navigator && import.meta.env.VITE_SERVICE_WORKER_FILE) {  
+    await navigator.serviceWorker.register(`${import.meta.env.VITE_SERVICE_WORKER_FILE}?serverUrl=${_serverUrl}`)
       .then(registration => {
         console.log('Service Worker registered with scope:', registration.scope);
   

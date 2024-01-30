@@ -302,7 +302,7 @@ const bootstrapServer = async () => {
   } else {
     console.error('Service Worker is not supported in this browser.');
   }
-
+/*
   new ApolloSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _serverUrl,
@@ -312,10 +312,10 @@ const bootstrapServer = async () => {
       }
     }
   });
-
+*/
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
-    src="${_serverUrl}/test"
+    src="${_serverUrl}"
     ></iframe>
   `;
 

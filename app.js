@@ -4,7 +4,7 @@ import { ApolloSandbox } from '@apollo/sandbox';
 import JSZip from 'jszip';
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
-let webcontainerInstance, _graphqlUrl;
+let webcontainerInstance, _serverUrl;
 
 ////////
 // Data preparation routines
@@ -277,31 +277,48 @@ const bootstrapServer = async () => {
   webcontainerInstance.on('error', (err) => {
     console.error(err);
   })
-  _graphqlUrl = await (() => new Promise((resolve, reject) => {
+  _serverUrl = await (() => new Promise((resolve, reject) => {
     webcontainerInstance.on('server-ready', (port, url) => {
       console.log('Server is ready!');
       resolve(url);
     });
   }))();
-  console.log(`Server URL: ${_graphqlUrl}!`);
-/*
+  console.log(`Server URL: ${_serverUrl}!`);
+
+  if ('serviceWorker' in navigator) {
+    await navigator.serviceWorker.register('./gql-intercept.js')
+      .then(registration => {
+        console.log('Service Worker registered with scope:', registration.scope);
+  
+        // Listen for messages from the service worker
+        navigator.serviceWorker.addEventListener('message', event => {
+          console.log('Service Worker Message:', event.data.log);
+        });
+      })
+      .catch(error => {
+        console.error('Service Worker registration failed:', error);
+      });
+  } else {
+    console.error('Service Worker is not supported in this browser.');
+  }
+
   new ApolloSandbox({
     target: '#embedded-sandbox',
-    initialEndpoint: _graphqlUrl,
+    initialEndpoint: _serverUrl,
     initialState: {
       headers: {
         'Cross-Origin-Resource-Policy': "cross-origin"
       }
     }
   });
-*/
+
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
-    src="${_graphqlUrl}/test"
+    src="${_serverUrl}/test"
     ></iframe>
   `;
 
-//  window.open(_graphqlUrl, '_blank');
+//  window.open(_serverUrl, '_blank');
 }
 
 const readAsUint8Array = (file) => {

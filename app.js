@@ -285,26 +285,8 @@ const bootstrapServer = async () => {
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
 
-  if ('serviceWorker' in navigator) {
-    const serviceWorkerScript = `
-      self.addEventListener('fetch', event => {
-        console.log('Service Worker caught fetch event!');
-        const url = new URL(event.request.url);
-        if ([
-          'sandbox.embed.apollographql.com',
-          'embeddable-sandbox.cdn.apollographql.com'
-        ].includes(url.hostname)) {
-          url.host = '${_serverUrl}';
-          const newRequest = new Request(url, event.request);
-          event.respondWith(fetch(newRequest));
-        }
-      });
-    `;
-  
-    const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
-    const blobURL = URL.createObjectURL(blob);
-  
-    await navigator.serviceWorker.register(blobURL)
+  if ('serviceWorker' in navigator) {  
+    await navigator.serviceWorker.register(`/linkedinsight/gql-intercept.js?serverUrl=${_serverUrl}`)
       .then(registration => {
         console.log('Service Worker registered with scope:', registration.scope);
   

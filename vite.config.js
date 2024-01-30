@@ -9,4 +9,13 @@ export default defineConfig({
       'Cross-Origin-Resource-Policy': 'cross-origin'
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'service-worker': ['gql-intercept.js'],
+        },
+      },
+    },
+  },
 });

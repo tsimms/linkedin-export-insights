@@ -66,7 +66,7 @@ const startApolloServer = async () => {
         console.log('---');
         console.log();  
       }
-      originalSend.call(this, body);
+      originalSend.call(this, newBody);
     };
     next();
   });

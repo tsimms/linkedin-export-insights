@@ -57,8 +57,8 @@ const startApolloServer = async () => {
       if (req.method === 'GET' && req.url.split('?')[0] ==='/') {
         if (req.query.serverUrl) {
           _serverUrl = req.query.serverUrl;
-          newBody = newBody.replaceAll("https://sandbox.embed.apollographql.com/", _serverUrl);
-          newBody = newBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com/", _serverUrl);
+          newBody = newBody.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
+          newBody = newBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
           console.log('Response body:', body);
         }
         const { url, method, params, headers } = req;

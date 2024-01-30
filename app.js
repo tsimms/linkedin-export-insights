@@ -284,7 +284,7 @@ const bootstrapServer = async () => {
     });
   }))();
   console.log(`Server URL: ${_graphqlUrl}!`);
-/*
+
   new ApolloSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: _graphqlUrl,
@@ -294,7 +294,7 @@ const bootstrapServer = async () => {
       }
     }
   });
-*/
+
 /*
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
@@ -304,7 +304,7 @@ const bootstrapServer = async () => {
 */
  const embedUrl = _graphqlUrl;
 
-  window.open(_graphqlUrl, '_blank');
+//  window.open(_graphqlUrl, '_blank');
 }
 
 const readAsUint8Array = (file) => {

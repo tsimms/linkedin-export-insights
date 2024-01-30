@@ -28,13 +28,20 @@ const startApolloServer = async () => {
   const httpServer = http.createServer(app);
   const proxy = httpProxy.createProxyServer();
 
-  app.use('/v2/embeddable-sandbox.umd.production.min.js', (req, res) => {
+  app.use('/sandbox', (req, res) => {
+    proxy.web(req, res, {
+      target: 'https://sandbox.embed.apollographql.com',
+      changeOrigin: true,
+    });
+  });
+
+  app.use('/v2', (req, res) => {
     proxy.web(req, res, {
       target: 'https://embeddable-sandbox.cdn.apollographql.com',
       changeOrigin: true,
     });
   });
-  
+
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
     res.send('This is a test response!');

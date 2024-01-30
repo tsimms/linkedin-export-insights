@@ -286,9 +286,9 @@ const bootstrapServer = async () => {
   console.log(`Server URL: ${_serverUrl}!`);
 
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('data:text/javascript,' + encodeURIComponent(`
+    const serviceWorkerScript = `
       self.addEventListener('fetch', event => {
-        console.log('caught event!');
+        console.log('Service Worker caught fetch event!');
         const url = new URL(event.request.url);
         if ([
           'sandbox.embed.apollographql.com',
@@ -299,7 +299,12 @@ const bootstrapServer = async () => {
           event.respondWith(fetch(newRequest));
         }
       });
-    `))
+    `;
+  
+    const blob = new Blob([serviceWorkerScript], { type: 'application/javascript' });
+    const blobURL = URL.createObjectURL(blob);
+  
+    await navigator.serviceWorker.register(blobURL)
       .then(registration => {
         console.log('Service Worker registered with scope:', registration.scope);
   

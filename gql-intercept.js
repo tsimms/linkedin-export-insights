@@ -5,7 +5,7 @@ self.addEventListener('fetch', event => {
     'sandbox.embed.apollographql.com',
     'embeddable-sandbox.cdn.apollographql.com'
   ].includes(url.hostname)) {
-    const serverUrl = params.get('proxyServer');
+    const serverUrl = event.params.get('serverUrl');
     url.host = serverUrl;
     const newRequest = new Request(url, event.request);
     event.respondWith(fetch(newRequest));

@@ -59,6 +59,7 @@ const startApolloServer = async () => {
     proxy.web(req, res, {
       target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
       changeOrigin: true,
+      selfHandleResponse: true
     });
   });
   

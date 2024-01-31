@@ -284,25 +284,7 @@ const bootstrapServer = async () => {
     });
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
-/*
-  if ('serviceWorker' in navigator) {  
-    await navigator.serviceWorker
-      .register(`./gql-intercept.js?serverUrl=${_serverUrl}`)
-      .then(registration => {
-        console.log('Service Worker registered with scope:', registration.scope);
-  
-        // Listen for messages from the service worker
-        navigator.serviceWorker.addEventListener('message', event => {
-          console.log('Service Worker Message:', event.data.log);
-        });
-      })
-      .catch(error => {
-        console.error('Service Worker registration failed:', error);
-      });
-  } else {
-    console.error('Service Worker is not supported in this browser.');
-  }
-  */
+
 /*
   new ApolloSandbox({
     target: '#embedded-sandbox',

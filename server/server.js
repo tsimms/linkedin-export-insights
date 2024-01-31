@@ -67,6 +67,7 @@ const startApolloServer = async () => {
           // Set Content-Encoding header in the response
           if (contentEncoding) {
             res.setHeader('Content-Type', 'text/html');
+            res.setHeader('Access-Control-Allow-Origin', '*');
           }
 
           responseSent = true;

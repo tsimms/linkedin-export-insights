@@ -292,7 +292,7 @@ const bootstrapServer = async () => {
 
   new ApolloSandbox({
     target: '#embedded-sandbox',
-    initialEndpoint: `_serverUrl?serverUrl=${_serverUrl}`,
+    initialEndpoint: `${_serverUrl}?serverUrl=${_serverUrl}`,
     initialState: {
       headers: {
         'Cross-Origin-Resource-Policy': "cross-origin"

@@ -230,12 +230,15 @@ const bootstrapServer = async () => {
     }
   };
   await webcontainerInstance.mount(files);
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const nocache = Array.from({ length:8 }, ()=>characters[Math.floor(Math.random() * characters.length)]).join('');
+
   try {
     await Promise.all([
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/server.js',
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/graphql-model.js',
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/data.js',
-      'https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/package.json'
+      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/server.js?${nocache}`,
+      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/graphql-model.js?${nocache}`,
+      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/data.js?${nocache}`,
+      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/package.json?${nocache}`
     ].map(file => {
       const filename = file.replace(/^.*\//g,"");
       return Promise.resolve()

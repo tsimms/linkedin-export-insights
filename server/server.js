@@ -39,16 +39,10 @@ const startApolloServer = async () => {
     });
   });
 
-  app.use('/v2', (req, res) => {
-    const filename = req.path.split('/').pop();
-    console.log(`got a v2 request: ${req.url} on filename: ${filename}`);
   
-    proxy.web(req, res, {
-      target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
-      changeOrigin: true,
-    });
-    let bodyChunks = [];
+  app.use('/v2', (req, res) => {
     proxy.on('proxyRes', (proxyRes) => {
+      let bodyChunks = [];
       proxyRes.on('data', (chunk) => {
         bodyChunks.push(chunk);
       });
@@ -60,6 +54,10 @@ const startApolloServer = async () => {
         console.log('Modified Response body:', body);
         res.send(body);
       });
+    });
+    proxy.web(req, res, {
+      target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
+      changeOrigin: true,
     });
   });
   

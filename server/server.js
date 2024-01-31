@@ -33,6 +33,7 @@ const startApolloServer = async () => {
   app.use(cors());
 
   app.use('/sandbox', (req, res) => {
+    let responseSent = false;
     const proxyReq = proxy.web(req, res, {
       target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
       changeOrigin: true,
@@ -44,9 +45,12 @@ const startApolloServer = async () => {
         bodyChunks.push(chunk);
       });
       proxyRes.on('end', () => {
+        if (responseSent)
+          return;
         const body = Buffer.concat(bodyChunks).toString();
         console.log('Response (sandbox) body:', body);
         console.log('Proxy (sandbox) Response:', proxyRes);
+        responseSent = true;
         res.send(body);
       });
     });

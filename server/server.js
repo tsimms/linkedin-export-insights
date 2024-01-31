@@ -53,6 +53,7 @@ const startApolloServer = async () => {
           .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
         console.log('Modified Response body:', body);
         res.send(body);
+        console.log('sent body');
       });
     });
     proxy.web(req, res, {

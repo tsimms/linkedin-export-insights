@@ -111,6 +111,10 @@ const startApolloServer = async () => {
     res.send('This is a test response!');
   });
 
+  app.get('/favicon.ico', (req, res) => {
+    res.sendStatus('204');
+  })
+
   app.use((req, res, next) => {
     // Accept incoming locally addressed requests that are ultimately destined for other origin
     const originalSend = res.send;

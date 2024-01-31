@@ -31,6 +31,8 @@ const startApolloServer = async () => {
   const httpServer = http.createServer(app);
   const proxy = httpProxy.createProxyServer();
 
+  app.use(cors());
+
   app.use('/sandbox', (req, res) => {
     console.log(`got a sandbox request: ${req.url}`)
     proxy.web(req, res, {
@@ -107,7 +109,6 @@ const startApolloServer = async () => {
 
   app.use(
     '/',
-    cors(),
     express.json(),
     expressMiddleware(server),
   );

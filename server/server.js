@@ -33,6 +33,7 @@ const startApolloServer = async () => {
 
   app.use('/sandbox', (req, res) => {
     console.log(`got a sandbox request: ${req.url}`)
+    //res.set('Access-Control-Allow-Origin', '*');
     proxy.web(req, res, {
       target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
       changeOrigin: true,
@@ -41,9 +42,10 @@ const startApolloServer = async () => {
 
   app.use('/v2', (req, res) => {
     const filename = req.path.split('/').pop();
-    console.log(`got a v2 request: ${req.url}`)
+    console.log(`got a v2 request: ${req.url} on filename: ${filename}`)
+    //res.set('Access-Control-Allow-Origin', '*');
     proxy.web(req, res, {
-      target: `https://embeddable-sandbox.cdn.apollographql.com/v2/${filename}`,
+      target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
       changeOrigin: true,
     });
   });

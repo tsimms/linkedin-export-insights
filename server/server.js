@@ -33,7 +33,6 @@ const startApolloServer = async () => {
 
   app.use('/sandbox', (req, res) => {
     console.log(`got a sandbox request: ${req.url}`)
-    //res.set('Access-Control-Allow-Origin', '*');
     proxy.web(req, res, {
       target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
       changeOrigin: true,
@@ -44,7 +43,6 @@ const startApolloServer = async () => {
     const filename = req.path.split('/').pop();
     console.log(`got a v2 request: ${req.url} on filename: ${filename}`);
   
-    // Intercept the proxy response
     proxy.web(req, res, {
       target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
       changeOrigin: true,
@@ -68,7 +66,7 @@ const startApolloServer = async () => {
 
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.set('Access-Control-Allow-Origin', '*');
+    //res.set('Access-Control-Allow-Origin', '*');
     res.send('This is a test response!');
   });
 
@@ -80,8 +78,9 @@ const startApolloServer = async () => {
         if (req.query.serverUrl) {
           _serverUrl = req.query.serverUrl;
           console.log(`Replacing to ${_serverUrl}`);
-          newBody = newBody.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
-          newBody = newBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
+          newBody = newBody
+            .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
+            .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
           console.log('Response body:', newBody);
         }
         const { url, method, params, headers } = req;

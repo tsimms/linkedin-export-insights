@@ -61,7 +61,7 @@ const startApolloServer = async () => {
           console.log(`Replacing to ${_serverUrl}`);
           newBody = newBody.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
           newBody = newBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
-          console.log('Response body:', body);
+          console.log('Response body:', newBody);
         }
         const { url, method, params, headers } = req;
         console.log('Request: ', JSON.stringify({ method, url, headers, params}));

@@ -7,6 +7,7 @@ import httpProxy from 'http-proxy';
 import express from 'express';
 import cors from 'cors';
 import { promises as fs } from 'fs';
+import zlib from 'zlib';
 import JSZip from 'jszip';
 import { ingest } from './data.js';
 import getModelDefinitions from './graphql-model.js';
@@ -39,31 +40,42 @@ const startApolloServer = async () => {
       changeOrigin: true,
       selfHandleResponse: true
     });
-  
+
     proxy.on('proxyRes', (proxyRes) => {
+      console.log('Proxy response received for /sandbox route');
+
       let bodyChunks = [];
-      let proxyHeaders = proxyRes.headers;
+      let contentEncoding = proxyRes.headers['content-encoding']; // Get Content-Encoding from the original response
+
       proxyRes.on('data', (chunk) => {
+        // Decode each chunk if necessary
         bodyChunks.push(chunk);
       });
+
       proxyRes.on('end', () => {
-        if (responseSent)
-          return;
-        const body = Buffer.concat(bodyChunks).toString();
-        console.log('Response (sandbox) body:', body);
-        console.log('Proxy (sandbox) Response:', proxyRes);
-        if (proxyHeaders) {
-          Object.keys(proxyHeaders).forEach(header => {
-            res.setHeader(header, proxyHeaders[header]);
-          })
+        console.log('Proxy response end for /sandbox route');
+
+        if (!responseSent) {
+          const data = Buffer.concat(bodyChunks);
+          const body = contentEncoding === 'br' ?
+            zlib.brotliDecompressSync(data) :
+            contentEncoding === 'gzip' ?
+              zlib.gunzipSync(data) :
+              data;
+          console.log('Response (sandbox) body:', body.toString());
+
+          // Set Content-Encoding header in the response
+          if (contentEncoding) {
+            res.setHeader('Content-Type', 'text/html');
+          }
+
+          responseSent = true;
+          res.send(body);
         }
-        responseSent = true;
-        res.send(body);
       });
     });
   });
 
-  
   app.use('/v2', (req, res) => {
     let responseSent = false;
     proxy.on('proxyRes', (proxyRes) => {
@@ -78,10 +90,9 @@ const startApolloServer = async () => {
         body = body
           .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
           .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
-//        console.log('Modified Response body:', body);
+        // console.log('Modified Response body:', body);
         responseSent = true;
         res.send(body);
-        console.log('sent body');
       });
     });
     proxy.web(req, res, {
@@ -90,7 +101,6 @@ const startApolloServer = async () => {
       selfHandleResponse: true
     });
   });
-  
 
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -103,7 +113,7 @@ const startApolloServer = async () => {
     const originalSend = res.send;
     res.send = function (body) {
       let newBody = body;
-      if (req.method === 'GET' && req.url.split('?')[0] ==='/') {
+      if (req.method === 'GET' && req.url.split('?')[0] === '/') {
         if (req.query.serverUrl) {
           _serverUrl = req.query.serverUrl;
           console.log(`Replacing to ${_serverUrl}`);
@@ -112,10 +122,10 @@ const startApolloServer = async () => {
             .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
           console.log('Response body:', newBody);
         }
+/*
         const { url, method, params, headers } = req;
-        console.log('Request: ', JSON.stringify({ method, url, headers, params}));
-        console.log('---');
-        console.log();  
+        console.log('Request: ', JSON.stringify({ method, url, headers, params }));
+*/
       }
       originalSend.call(this, newBody);
     };

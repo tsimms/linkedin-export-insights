@@ -50,23 +50,16 @@ const startApolloServer = async () => {
       changeOrigin: true,
     });
     let bodyChunks = [];
-  
     proxy.on('proxyRes', (proxyRes) => {
       proxyRes.on('data', (chunk) => {
         bodyChunks.push(chunk);
       });
-  
       proxyRes.on('end', () => {
-        const body = Buffer.concat(bodyChunks).toString();
-  
-        if (req.query.serverUrl) {
-          _serverUrl = req.query.serverUrl;
-          console.log(`Replacing to ${_serverUrl}`);
-          const modifiedBody = body.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
-          const finalBody = modifiedBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
-          console.log('Modified Response body:', finalBody);
-          res.send(finalBody);
-        }
+        let body = Buffer.concat(bodyChunks).toString();
+        body = body.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
+        body = modifiedBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
+        console.log('Modified Response body:', body);
+        es.send(body);
       });
     });
   });

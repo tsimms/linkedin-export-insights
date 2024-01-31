@@ -10,7 +10,6 @@ import { promises as fs } from 'fs';
 import JSZip from 'jszip';
 import { ingest } from './data.js';
 import getModelDefinitions from './graphql-model.js';
-import { isCompositeType } from 'graphql';
 
 let _serverUrl = '';
 

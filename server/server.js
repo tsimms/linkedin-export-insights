@@ -42,6 +42,7 @@ const startApolloServer = async () => {
   
     proxy.on('proxyRes', (proxyRes) => {
       let bodyChunks = [];
+      let contentEncoding = proxyRes.headers['content-encoding'];
       proxyRes.on('data', (chunk) => {
         bodyChunks.push(chunk);
       });
@@ -51,6 +52,9 @@ const startApolloServer = async () => {
         const body = Buffer.concat(bodyChunks).toString();
         console.log('Response (sandbox) body:', body);
         console.log('Proxy (sandbox) Response:', proxyRes);
+        if (contentEncoding) {
+          res.setHeader('Content-Encoding', contentEncoding);
+        }
         responseSent = true;
         res.send(body);
       });

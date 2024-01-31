@@ -43,29 +43,30 @@ const startApolloServer = async () => {
   app.use('/v2', (req, res) => {
     const filename = req.path.split('/').pop();
     console.log(`got a v2 request: ${req.url} on filename: ${filename}`);
+  
+    // Intercept the proxy response
     proxy.web(req, res, {
       target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
       changeOrigin: true,
     });
+    let bodyChunks = [];
   
     proxy.on('proxyRes', (proxyRes) => {
-      let body = [];
       proxyRes.on('data', (chunk) => {
-        body.push(chunk);
+        bodyChunks.push(chunk);
       });
   
       proxyRes.on('end', () => {
-        body = Buffer.concat(body).toString();
+        const body = Buffer.concat(bodyChunks).toString();
   
         if (req.query.serverUrl) {
           _serverUrl = req.query.serverUrl;
           console.log(`Replacing to ${_serverUrl}`);
-          body = body.replace("https://sandbox.embed.apollographql.com", _serverUrl);
-          body = body.replace("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
-          console.log('Modified Response body:', body);
+          const modifiedBody = body.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
+          const finalBody = modifiedBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
+          console.log('Modified Response body:', finalBody);
+          res.send(finalBody);
         }
-  
-        res.send(body);
       });
     });
   });

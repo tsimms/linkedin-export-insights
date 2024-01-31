@@ -38,7 +38,7 @@ const startApolloServer = async () => {
       changeOrigin: true,
     });
   
-    proxyReq.on('response', (proxyRes) => {
+    proxy.on('proxyRes', (proxyRes) => {
       let bodyChunks = [];
       proxyRes.on('data', (chunk) => {
         bodyChunks.push(chunk);
@@ -51,6 +51,7 @@ const startApolloServer = async () => {
       });
     });
   });
+  
 
   
   app.use('/v2', (req, res) => {

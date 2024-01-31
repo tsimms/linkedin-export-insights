@@ -69,6 +69,7 @@ const startApolloServer = async () => {
           if (contentEncoding) {
             res.setHeader('Content-Type', 'text/html');
             res.setHeader('Access-Control-Allow-Origin', '*');
+            res.setHeader('Cross-Origin-Embedder-Policy', 'credentialles')
           }
 
           responseSent = true;

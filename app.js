@@ -241,11 +241,12 @@ const bootstrapServer = async () => {
       `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/package.json?${nocache}`
     ].map(file => {
       const filename = file.replace(/^.*\//g,"");
+      const outputFilename = filename.replace(/\?.*$/,"");
       return Promise.resolve()
         .then(() => fetch(file))
         .then(response => response.text())
         .then(fileContent => {
-          webcontainerInstance.fs.writeFile(filename, fileContent)
+          webcontainerInstance.fs.writeFile(outputFilename, fileContent)
         })
         .then(() => console.log(`Loaded ${filename} successfully!`))
         .catch(e => { console.error(`Error writing ${filename}: ${e}`)})

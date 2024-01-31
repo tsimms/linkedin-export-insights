@@ -56,10 +56,11 @@ const startApolloServer = async () => {
       });
       proxyRes.on('end', () => {
         let body = Buffer.concat(bodyChunks).toString();
-        body = body.replaceAll("https://sandbox.embed.apollographql.com", _serverUrl);
-        body = modifiedBody.replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
+        body = body
+          .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
+          .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
         console.log('Modified Response body:', body);
-        es.send(body);
+        res.send(body);
       });
     });
   });

@@ -112,12 +112,12 @@ const startApolloServer = async () => {
     express.json(),
     expressMiddleware(server),
   );
-
+/*
   app.use((req, res, next) => {
     res.append('Cross-Origin-Resource-Policy', 'cross-origin');
     next();
   });
-
+*/
   await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
   console.log(`🚀 Server ready at http://localhost:4000`);
 };

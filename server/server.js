@@ -33,6 +33,7 @@ const startApolloServer = async () => {
 
   app.use(cors());
 
+  app.options('/sandbox', cors());
   app.use('/sandbox', (req, res) => {
     let responseSent = false;
     const proxyReq = proxy.web(req, res, {

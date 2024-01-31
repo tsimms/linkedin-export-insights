@@ -150,6 +150,10 @@ const startApolloServer = async () => {
 
   app.use(
     '/',
+    cors({
+      origin: true,
+      credentials: true,
+    }),
     express.json(),
     expressMiddleware(server),
   );

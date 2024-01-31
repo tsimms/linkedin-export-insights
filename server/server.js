@@ -37,6 +37,7 @@ const startApolloServer = async () => {
     const proxyReq = proxy.web(req, res, {
       target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
       changeOrigin: true,
+      selfHandleResponse: true
     });
   
     proxy.on('proxyRes', (proxyRes) => {

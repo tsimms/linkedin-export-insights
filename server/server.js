@@ -32,6 +32,7 @@ const startApolloServer = async () => {
   const proxy = httpProxy.createProxyServer();
 
   app.use('/sandbox', (req, res) => {
+    console.log(`got a sandbox request: ${req.url}`)
     proxy.web(req, res, {
       target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
       changeOrigin: true,
@@ -40,6 +41,7 @@ const startApolloServer = async () => {
 
   app.use('/v2', (req, res) => {
     const filename = req.path.split('/').pop();
+    console.log(`got a v2 request: ${req.url}`)
     proxy.web(req, res, {
       target: `https://embeddable-sandbox.cdn.apollographql.com/v2/${filename}`,
       changeOrigin: true,

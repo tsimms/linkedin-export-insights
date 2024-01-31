@@ -50,6 +50,7 @@ const startApolloServer = async () => {
 
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set('Access-Control-Allow-Origin', '*');
     res.send('This is a test response!');
   });
 

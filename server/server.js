@@ -51,21 +51,24 @@ const startApolloServer = async () => {
       });
     });
   });
-  
 
   
   app.use('/v2', (req, res) => {
+    let responseSent = false;
     proxy.on('proxyRes', (proxyRes) => {
       let bodyChunks = [];
       proxyRes.on('data', (chunk) => {
         bodyChunks.push(chunk);
       });
       proxyRes.on('end', () => {
+        if (responseSent)
+          return;
         let body = Buffer.concat(bodyChunks).toString();
         body = body
           .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
           .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
 //        console.log('Modified Response body:', body);
+        responseSent = true;
         res.send(body);
         console.log('sent body');
       });
@@ -85,6 +88,7 @@ const startApolloServer = async () => {
   });
 
   app.use((req, res, next) => {
+    // Accept incoming locally addressed requests that are ultimately destined for other origin
     const originalSend = res.send;
     res.send = function (body) {
       let newBody = body;
@@ -124,12 +128,12 @@ const startApolloServer = async () => {
     express.json(),
     expressMiddleware(server),
   );
-/*
+
   app.use((req, res, next) => {
     res.append('Cross-Origin-Resource-Policy', 'cross-origin');
     next();
   });
-*/
+
   await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
   console.log(`🚀 Server ready at http://localhost:4000`);
 };

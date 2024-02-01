@@ -36,6 +36,7 @@ const startApolloServer = async () => {
   app.options('/', cors());
   app.options('/sandbox', cors());
   app.use('/sandbox', (req, res) => {
+    console.log(`Handling request for ${req.url}`);
     let responseSent = false;
     const proxyReq = proxy.web(req, res, {
 //      target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
@@ -45,19 +46,11 @@ const startApolloServer = async () => {
     });
 
     proxy.on('proxyRes', (proxyRes) => {
-      console.log('Proxy response received for /sandbox route');
-
       let bodyChunks = [];
-      let contentEncoding = proxyRes.headers['content-encoding']; // Get Content-Encoding from the original response
+      let contentEncoding = proxyRes.headers['content-encoding'];
 
-      proxyRes.on('data', (chunk) => {
-        // Decode each chunk if necessary
-        bodyChunks.push(chunk);
-      });
-
+      proxyRes.on('data', (chunk) => { bodyChunks.push(chunk); });
       proxyRes.on('end', () => {
-        console.log('Proxy response end for /sandbox route');
-
         if (!responseSent) {
           const data = Buffer.concat(bodyChunks);
           const body = contentEncoding === 'br' ?
@@ -66,13 +59,12 @@ const startApolloServer = async () => {
               zlib.gunzipSync(data) :
               data;
 
-          //console.log('Response (sandbox) body:', body.toString());
+          body = body
+//            .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
 
           res.setHeader('Content-Type', 'text/html');
           res.setHeader('Access-Control-Allow-Origin', '*');
           res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
-          console.log(`Sandbox response headers: ${JSON.stringify(res.headers)}`);
-
           responseSent = true;
           res.send(body);
         }
@@ -81,6 +73,7 @@ const startApolloServer = async () => {
   });
 
   app.use('/v2', (req, res) => {
+    console.log(`Handling request for ${req.url}`);
     let responseSent = false;
     proxy.on('proxyRes', (proxyRes) => {
       let bodyChunks = [];
@@ -106,7 +99,7 @@ const startApolloServer = async () => {
     });
   });
 
-  app.use('/static', (req, res) => {
+  app.use('/build/static', (req, res) => {
     console.log(`Handling request for ${req.url}`);
     let responseSent = false;
     proxy.on('proxyRes', (proxyRes) => {
@@ -157,7 +150,8 @@ const startApolloServer = async () => {
             .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
             .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
             .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl);
-//          console.log('Response body:', newBody);
+          console.log(`Replacement on: ${req.url}`);
+          console.log(`Response body: ${newBody}`);
         }
 /*
         const { url, method, params, headers } = req;

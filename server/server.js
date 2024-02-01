@@ -66,6 +66,7 @@ const startApolloServer = async () => {
           res.setHeader('Access-Control-Allow-Origin', '*');
           res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
           responseSent = true;
+          console.log(`Response body: ${newBody}`);
           res.send(body);
         }
       });

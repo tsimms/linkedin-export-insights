@@ -101,10 +101,10 @@ const startApolloServer = async () => {
     });
   });
 
+  let proxyActive = false;
   app.use('/build/static', (req, res) => {
     console.log(`Handling request for ${req.url}`);
     const proxyQueue = [];
-    let proxyActive = false;
     let responseSent = false;
 
     const handleProxyRes = (proxyRes) => {

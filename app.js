@@ -235,10 +235,10 @@ const bootstrapServer = async () => {
 
   try {
     await Promise.all([
-      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/server.js?${nocache}`,
-      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/graphql-model.js?${nocache}`,
-      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/data.js?${nocache}`,
-      `https://raw.githubusercontent.com/tsimms/linkedin-export-insights/main/server/package.json?${nocache}`
+      `https://timjimsimms.com/linkedinsight/server/server.js?${nocache}`,
+      `https://timjimsimms.com/linkedinsight/server/graphql-model.js?${nocache}`,
+      `https://timjimsimms.com/linkedinsight/server/data.js?${nocache}`,
+      `https://timjimsimms.com/linkedinsight/server/package.json?${nocache}`
     ].map(file => {
       const filename = file.replace(/^.*\//g,"");
       const outputFilename = filename.replace(/\?.*$/,"");

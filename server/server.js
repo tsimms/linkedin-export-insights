@@ -108,6 +108,7 @@ const startApolloServer = async () => {
     let body = "";
     proxy.on('proxyRes', (proxyRes) => {
       proxyRes.on('data', (chunk) => {
+        console.log(`url: ${req.url}, chunk: ${chunk}`)
         bodyChunks.push(chunk);
       });
       proxyRes.on('end', () => {

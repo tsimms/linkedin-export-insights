@@ -67,7 +67,6 @@ const startApolloServer = async () => {
           res.setHeader('Access-Control-Allow-Origin', '*');
           res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
           responseSent = true;
-          console.log(`Response body: ${body}`);
           res.send(body);
         }
       });
@@ -131,12 +130,10 @@ const startApolloServer = async () => {
           console.log(`
           ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
           headers: ${JSON.stringify(proxyRes.headers)}
-          ${body}
           `);
   
           if (!responseSent) {
             res.setHeader('Content-Type', proxyRes.headers['content-type']);
-            res.send(body);
             responseSent = true;
           }
           console.log(`proxyRes complete for ${req.url}`);

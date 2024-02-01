@@ -101,6 +101,7 @@ const startApolloServer = async () => {
     });
   });
 
+
 ////////////////
 
 
@@ -172,6 +173,45 @@ const startApolloServer = async () => {
 
 
 /////////////
+
+  app.post('/api', (req, res) => {
+    console.log(`Handling request for ${req.url}`);
+    let responseSent = false;
+
+    proxy.on('proxyRes', (proxyRes) => {
+      let bodyChunks = [];
+      let contentEncoding = proxyRes.headers['content-encoding'];
+
+      proxyRes.on('data', (chunk) => {
+        bodyChunks.push(chunk);
+      });
+
+      proxyRes.on('end', () => {
+        if (!responseSent) {
+          const data = Buffer.concat(bodyChunks);
+          let body =
+            contentEncoding === 'br'
+              ? zlib.brotliDecompressSync(data)
+              : contentEncoding === 'gzip'
+              ? zlib.gunzipSync(data)
+              : data;
+
+          body = body.toString();
+          responseSent = true;
+          console.log(`Response body: ${body}`);
+          res.send(body);
+        }
+      });
+    });
+    proxy.web(req, res, {
+      target: 'https://graphql-staging.api.apollographql.com',
+      changeOrigin: true,
+      selfHandleResponse: true,
+    });
+
+  });
+
+
 
 
   app.get('/test', (req, res) => {

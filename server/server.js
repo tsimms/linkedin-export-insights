@@ -103,45 +103,55 @@ const startApolloServer = async () => {
 
   app.use('/build/static', (req, res) => {
     console.log(`Handling request for ${req.url}`);
+    const proxyQueue = [];
+    let proxyActive = false;
 
     const handleProxyRes = (proxyRes) => {
       let responseSent = false;
       let bodyChunks = [];
       let body = "";
   
-        proxyRes.on('data', (chunk) => {
-          bodyChunks.push(chunk);
-        });
-        proxyRes.on('end', () => {
-          if (responseSent)
-            return;
-          body = Buffer.concat(bodyChunks).toString();
-          body = body
-            .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
-            .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
-            .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
-            .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl)
-          console.log(`
-          ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
-          bodyChunks: ${bodyChunks.length} elements
-          headers: ${JSON.stringify(proxyRes.headers)}
-  ${body}
-          `);
-          responseSent = true;
-          res.setHeader('Content-Type', proxyRes.headers['content-type']);
-          res.send(body);
-          proxy.removeListener('proxyRes', handleProxyRes);
-        });
+      proxyRes.on('data', (chunk) => {
+        bodyChunks.push(chunk);
+      });
+      proxyRes.on('end', () => {
+        body = Buffer.concat(bodyChunks).toString();
+        body = body
+          .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
+          .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
+          .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
+          .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl)
+        console.log(`
+        ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
+        bodyChunks: ${bodyChunks.length} elements
+        headers: ${JSON.stringify(proxyRes.headers)}
+${body}
+        `);
+        if (responseSent)
+          return;
+        res.setHeader('Content-Type', proxyRes.headers['content-type']);
+        res.send(body);
+        proxy.removeListener('proxyRes', handleProxyRes);
+        responseSent = true;
+        proxyActive = false;
+      });
 
     }
 
-      proxy.on('proxyRes', handleProxyRes);
 
-      proxy.web(req, res, {
-        target: `https://studio-ui-deployments.apollographql.com/build/static`,
-        changeOrigin: true,
-        selfHandleResponse: true
-      });
+    proxyQueue.push({ req, res});
+    while (proxyQueue.length) {
+      if (! proxyActive) {
+        proxyActive = true;
+        const {req, res } = proxyQueue.shift();
+        proxy.on('proxyRes', handleProxyRes);
+        proxy.web(req, res, {
+          target: `https://studio-ui-deployments.apollographql.com/build/static`,
+          changeOrigin: true,
+          selfHandleResponse: true
+        });    
+      }
+    }
 
   });
 

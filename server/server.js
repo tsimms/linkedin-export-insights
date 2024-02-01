@@ -53,7 +53,7 @@ const startApolloServer = async () => {
       proxyRes.on('end', () => {
         if (!responseSent) {
           const data = Buffer.concat(bodyChunks);
-          const body = contentEncoding === 'br' ?
+          let body = contentEncoding === 'br' ?
             zlib.brotliDecompressSync(data) :
             contentEncoding === 'gzip' ?
               zlib.gunzipSync(data) :

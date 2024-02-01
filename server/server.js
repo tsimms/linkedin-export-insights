@@ -41,8 +41,10 @@ const startApolloServer = async () => {
     console.log(`Handling request for ${req.url}`);
     let responseSent = false;
     const proxyReq = proxy.web(req, res, {
-//      target: 'https://sandbox.embed.apollographql.com/sandbox/explorer',
-      target: 'https://timjimsimms.com/sandbox/explorer',
+//      target: 'https://sandbox.embed.apollographql.com/sandbox/',
+      target: 'https://timjimsimms.com/sandbox/',
+        // can't pull directly from sandbox.embed.apollographql.com because there's no ACAO header
+        // on the preflight check, which is needed when loading into webcontainer. so we've gotta fake it.
       changeOrigin: true,
       selfHandleResponse: true
     });
@@ -124,7 +126,7 @@ const startApolloServer = async () => {
             .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
             .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
             .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
-//            .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl);
+            .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl);
   
           console.log(`
           ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
@@ -172,8 +174,8 @@ const startApolloServer = async () => {
 
 /////////////
 
-  app.post('/api', (req, res) => {
-    console.log(`Handling request for ${req.url}`);
+  app.use('/api', (req, res) => {
+    console.log(`>>>> Handling request for ${req.url}`);
     let responseSent = false;
 
     proxy.on('proxyRes', (proxyRes) => {
@@ -202,7 +204,7 @@ const startApolloServer = async () => {
       });
     });
     proxy.web(req, res, {
-      target: 'https://graphql-staging.api.apollographql.com',
+      target: 'https://graphql-staging.api.apollographql.com/api',
       changeOrigin: true,
       selfHandleResponse: true,
     });

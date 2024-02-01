@@ -106,36 +106,44 @@ const startApolloServer = async () => {
     let responseSent = false;
     let bodyChunks = [];
     let body = "";
-    proxy.on('proxyRes', (proxyRes) => {
-      proxyRes.on('data', (chunk) => {
-        console.log(`url: ${req.url}, chunk: ${chunk}`)
-        bodyChunks.push(chunk);
+
+    const handleProxyRes = (proxyRes) => {
+
+        proxyRes.on('data', (chunk) => {
+          console.log(`url: ${req.url}, chunk: ${chunk}`)
+          bodyChunks.push(chunk);
+        });
+        proxyRes.on('end', () => {
+          if (responseSent)
+            return;
+          body = Buffer.concat(bodyChunks).toString();
+          body = body
+            .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
+            .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
+            .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
+            .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl)
+          console.log(`
+          ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
+          bodyChunks: ${bodyChunks.length} elements
+          headers: ${JSON.stringify(proxyRes.headers)}
+  ${body}
+          `);
+          responseSent = true;
+          res.setHeader('Content-Type', proxyRes.headers['content-type']);
+          res.send(body);
+          proxy.removeListener('proxyRes', handleProxyRes);
+        });
+
+    }
+
+      proxy.on('proxyRes', handleProxyRes);
+
+      proxy.web(req, res, {
+        target: `https://studio-ui-deployments.apollographql.com/build/static`,
+        changeOrigin: true,
+        selfHandleResponse: true
       });
-      proxyRes.on('end', () => {
-        if (responseSent)
-          return;
-        body = Buffer.concat(bodyChunks).toString();
-        body = body
-          .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
-          .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
-          .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
-          .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl)
-        console.log(`
-        ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
-        bodyChunks: ${bodyChunks.length} elements
-        headers: ${JSON.stringify(proxyRes.headers)}
-${body}
-        `);
-        responseSent = true;
-        res.setHeader('Content-Type', proxyRes.headers['content-type']);
-        res.send(body);
-      });
-    });
-    proxy.web(req, res, {
-      target: `https://studio-ui-deployments.apollographql.com/build/static`,
-      changeOrigin: true,
-      selfHandleResponse: true
-    });
+
   });
 
   app.get('/test', (req, res) => {

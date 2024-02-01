@@ -100,16 +100,20 @@ const startApolloServer = async () => {
       selfHandleResponse: true
     });
   });
+
+////////////////
+
+
   const proxyQueue = [];
   let isProxying = false;
   
-  const handleProxyRes = async (req, res) => {
-    console.log(`Handling request for ${req.url}`);
-    let responseSent = false;
-    let bodyChunks = [];
-    let body = "";
+  const handleProxyRes = (req, res) => {
+    return new Promise((resolve) => {
+      console.log(`Handling request for ${req.url}`);
+      let responseSent = false;
+      let bodyChunks = [];
+      let body = "";
   
-    const proxyRes = await new Promise((resolve) => {
       proxy.on('proxyRes', (proxyRes) => {
         proxyRes.on('data', (chunk) => {
           bodyChunks.push(chunk);
@@ -135,38 +139,39 @@ const startApolloServer = async () => {
             responseSent = true;
           }
   
-          resolve(proxyRes);
+          resolve();
         });
       });
     });
+  };
   
-    return proxyRes;
+  const proxyRequest = async (req, res) => {
+    return new Promise((resolve) => {
+      proxy.web(req, res, {
+        target: `https://studio-ui-deployments.apollographql.com/build/static`,
+        changeOrigin: true,
+        selfHandleResponse: true
+      }, resolve);
+    });
   };
   
   app.use('/build/static', async (req, res) => {
-    // Set up the proxy.web listener within the route
-    proxy.web(req, res, {
-      target: `https://studio-ui-deployments.apollographql.com/build/static`,
-      changeOrigin: true,
-      selfHandleResponse: true,
-    });
-  
-    // Enqueue the current request with its handler
     proxyQueue.push({ req, res });
   
     if (!isProxying) {
       isProxying = true;
   
-      // Process the next request in the queue
       while (proxyQueue.length > 0) {
         const { req, res } = proxyQueue.shift();
-        await handleProxyRes(req, res);
+        await Promise.all([handleProxyRes(req, res), proxyRequest(req, res)]);
       }
   
       isProxying = false;
     }
   });
-  
+
+/////////////
+
 
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');

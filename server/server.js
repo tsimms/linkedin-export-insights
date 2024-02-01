@@ -104,15 +104,16 @@ const startApolloServer = async () => {
   app.use('/build/static', (req, res) => {
     console.log(`Handling request for ${req.url}`);
     let responseSent = false;
+    let bodyChunks = [];
+    let body = "";
     proxy.on('proxyRes', (proxyRes) => {
-      let bodyChunks = [];
       proxyRes.on('data', (chunk) => {
         bodyChunks.push(chunk);
       });
       proxyRes.on('end', () => {
         if (responseSent)
           return;
-        let body = Buffer.concat(bodyChunks).toString();
+        body = Buffer.concat(bodyChunks).toString();
         body = body
           .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
           .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)

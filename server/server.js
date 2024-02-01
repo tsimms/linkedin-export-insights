@@ -162,6 +162,7 @@ const startApolloServer = async () => {
         console.log(`Starting with ${req.url}`);
         await Promise.all([handleProxyRes(req, res), proxyRequest(req, res)]);
         console.log(`Done with ${req.url}`);
+        console.log(`${proxyQueue.length} in q: ${JSON.stringify(proxyQueue.map(p => p.url))}`)
       }
       isProxying = false;
     }

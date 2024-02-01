@@ -105,9 +105,9 @@ const startApolloServer = async () => {
     console.log(`Handling request for ${req.url}`);
     const proxyQueue = [];
     let proxyActive = false;
+    let responseSent = false;
 
     const handleProxyRes = (proxyRes) => {
-      let responseSent = false;
       let bodyChunks = [];
       let body = "";
   
@@ -144,6 +144,7 @@ ${body}
       if (! proxyActive) {
         proxyActive = true;
         const {req, res } = proxyQueue.shift();
+        console.log(`running proxy for ${req.url}`);
         proxy.on('proxyRes', handleProxyRes);
         proxy.web(req, res, {
           target: `https://studio-ui-deployments.apollographql.com/build/static`,

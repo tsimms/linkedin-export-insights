@@ -204,7 +204,10 @@ const startApolloServer = async () => {
       });
     });
     proxy.web(req, res, {
-      target: 'https://graphql-staging.api.apollographql.com/api',
+      // target: 'https://graphql-staging.api.apollographql.com/api',
+      target: 'https://timjimsimms.com/api/',
+        // can't pull directly from https://graphql-staging.api.apollographql.com because there's no ACAO header
+        // on the preflight check, which is needed when loading into webcontainer. so we've gotta fake it.
       changeOrigin: true,
       selfHandleResponse: true,
     });

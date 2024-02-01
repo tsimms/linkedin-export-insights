@@ -54,9 +54,9 @@ const startApolloServer = async () => {
         if (!responseSent) {
           const data = Buffer.concat(bodyChunks);
           let body = contentEncoding === 'br' ?
-            zlib.brotliDecompressSync(data) :
+            zlib.brotliDecompressSync(data).toString() :
             contentEncoding === 'gzip' ?
-              zlib.gunzipSync(data) :
+              zlib.gunzipSync(data).toString() :
               data;
 
           body = body

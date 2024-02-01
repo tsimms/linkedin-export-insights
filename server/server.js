@@ -88,7 +88,6 @@ const startApolloServer = async () => {
         body = body
           .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
           .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
-        // console.log('Modified Response body:', body);
         responseSent = true;
         res.send(body);
       });
@@ -137,7 +136,7 @@ const startApolloServer = async () => {
             responseSent = true;
           }
           console.log(`proxyRes complete for ${req.url}`);
-          return resolve();
+          resolve();
         });
       });
     });
@@ -195,7 +194,7 @@ const startApolloServer = async () => {
 
           body = body.toString();
           responseSent = true;
-          console.log(`Response body: ${body}`);
+          console.log(`API Response body: ${body}`);
           res.send(body);
         }
       });
@@ -235,12 +234,7 @@ const startApolloServer = async () => {
             .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
             .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl);
           console.log(`Replacement on: ${req.url}`);
-          console.log(`Response body: ${newBody}`);
         }
-/*
-        const { url, method, params, headers } = req;
-        console.log('Request: ', JSON.stringify({ method, url, headers, params }));
-*/
       }
       originalSend.call(this, newBody);
     };

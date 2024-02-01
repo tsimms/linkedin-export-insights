@@ -101,14 +101,17 @@ const startApolloServer = async () => {
     });
   });
 
-  app.use('/build/static', async (req, res) => {
+  const proxyQueue = [];
+  let isProxying = false;
+  
+  const handleProxyRes = async (req, res) => {
     console.log(`Handling request for ${req.url}`);
     let responseSent = false;
     let bodyChunks = [];
     let body = "";
   
-    const handleProxyRes = (proxyRes) => {
-      return new Promise((resolve) => {
+    const proxyRes = await new Promise((resolve) => {
+      proxy.on('proxyRes', (proxyRes) => {
         proxyRes.on('data', (chunk) => {
           bodyChunks.push(chunk);
         });
@@ -132,26 +135,42 @@ const startApolloServer = async () => {
             res.send(body);
             responseSent = true;
           }
-          resolve();
+  
+          resolve(proxyRes);
         });
       });
-    };
   
-    // Attach the listener to the 'proxyRes' event
-    proxy.on('proxyRes', handleProxyRes);
-  
-    // Trigger the proxy request
-    await new Promise((resolve) => {
-      proxy.web(req, res, {
-        target: `https://studio-ui-deployments.apollographql.com/build/static`,
-        changeOrigin: true,
-        selfHandleResponse: true
-      }, resolve);
+      // End the promise when proxyRes ends
+      proxyRes.on('end', resolve);
     });
   
-    // Remove the listener after handling the first request
-    proxy.removeListener('proxyRes', handleProxyRes);
+    return proxyRes;
+  };
+  
+  app.use('/build/static', async (req, res) => {
+    // Set up the proxy.web listener within the route
+    proxy.web(req, res, {
+      target: `https://studio-ui-deployments.apollographql.com/build/static`,
+      changeOrigin: true,
+      selfHandleResponse: true,
+    });
+  
+    // Enqueue the current request with its handler
+    proxyQueue.push({ req, res });
+  
+    if (!isProxying) {
+      isProxying = true;
+  
+      // Process the next request in the queue
+      while (proxyQueue.length > 0) {
+        const { req, res } = proxyQueue.shift();
+        await handleProxyRes(req, res);
+      }
+  
+      isProxying = false;
+    }
   });
+  
   
 
   app.get('/test', (req, res) => {

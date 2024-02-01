@@ -145,14 +145,13 @@ const startApolloServer = async () => {
     });
   };
   
-  const proxyRequest = async (req, res) => {
-    return new Promise((resolve) => {
-      proxy.web(req, res, {
-        target: `https://studio-ui-deployments.apollographql.com/build/static`,
-        changeOrigin: true,
-        selfHandleResponse: true
-      }, () => { console.log(`proxyReq complete for ${req.url}`); return resolve(); });
+  const proxyRequest = (req, res) => {
+    proxy.web(req, res, {
+      target: `https://studio-ui-deployments.apollographql.com/build/static`,
+      changeOrigin: true,
+      selfHandleResponse: true
     });
+    return Promise.resolve();
   };
   
   app.use('/build/static', async (req, res) => {

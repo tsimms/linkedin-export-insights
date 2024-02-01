@@ -106,6 +106,34 @@ const startApolloServer = async () => {
     });
   });
 
+  app.use('/static', (req, res) => {
+    console.log(`Handling request for ${req.url}`);
+    let responseSent = false;
+    proxy.on('proxyRes', (proxyRes) => {
+      let bodyChunks = [];
+      proxyRes.on('data', (chunk) => {
+        bodyChunks.push(chunk);
+      });
+      proxyRes.on('end', () => {
+        if (responseSent)
+          return;
+        let body = Buffer.concat(bodyChunks).toString();
+        body = body
+          .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
+          .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
+          .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
+        // console.log('Modified Response body:', body);
+        responseSent = true;
+        res.send(body);
+      });
+    });
+    proxy.web(req, res, {
+      target: `https://studio-ui-deployments.apollographql.com`,
+      changeOrigin: true,
+      selfHandleResponse: true
+    });
+  });
+
   app.get('/test', (req, res) => {
     //res.append('Cross-Origin-Resource-Policy', 'cross-origin');
     //res.set('Access-Control-Allow-Origin', '*');
@@ -127,7 +155,8 @@ const startApolloServer = async () => {
           console.log(`Replacing to ${_serverUrl}`);
           newBody = newBody
             .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
-            .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
+            .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
+            .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl);
 //          console.log('Response body:', newBody);
         }
 /*

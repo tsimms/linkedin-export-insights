@@ -157,6 +157,7 @@ const startApolloServer = async () => {
   
   app.use('/build/static', async (req, res) => {
     proxyQueue.push({ req, res });
+    await new Promise(resolve => setTimeout(resolve, Math.ceil(Math.random()*1000)));
   
     if (!isProxying) {
       isProxying = true;

@@ -100,7 +100,6 @@ const startApolloServer = async () => {
       selfHandleResponse: true
     });
   });
-
   const proxyQueue = [];
   let isProxying = false;
   
@@ -139,9 +138,6 @@ const startApolloServer = async () => {
           resolve(proxyRes);
         });
       });
-  
-      // End the promise when proxyRes ends
-      proxyRes.on('end', resolve);
     });
   
     return proxyRes;
@@ -170,7 +166,6 @@ const startApolloServer = async () => {
       isProxying = false;
     }
   });
-  
   
 
   app.get('/test', (req, res) => {

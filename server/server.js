@@ -118,7 +118,7 @@ const startApolloServer = async () => {
           .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
           .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
         console.log(`
-        ${{ url: req.url, path: req.path, route: req.route }}
+        ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
         headers: ${JSON.stringify(proxyRes.headers)}
 ${body}
         `);

@@ -138,8 +138,8 @@ const startApolloServer = async () => {
             res.send(body);
             responseSent = true;
           }
-  
-          resolve();
+          console.log(`proxyRes complete for ${req.url}`);
+          return resolve();
         });
       });
     });
@@ -151,7 +151,7 @@ const startApolloServer = async () => {
         target: `https://studio-ui-deployments.apollographql.com/build/static`,
         changeOrigin: true,
         selfHandleResponse: true
-      }, resolve);
+      }, () => { console.log(`proxyReq complete for ${req.url}`); return resolve(); });
     });
   };
   

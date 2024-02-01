@@ -103,14 +103,13 @@ const startApolloServer = async () => {
 
   app.use('/build/static', (req, res) => {
     console.log(`Handling request for ${req.url}`);
-    let responseSent = false;
-    let bodyChunks = [];
-    let body = "";
 
     const handleProxyRes = (proxyRes) => {
-
+      let responseSent = false;
+      let bodyChunks = [];
+      let body = "";
+  
         proxyRes.on('data', (chunk) => {
-          console.log(`url: ${req.url}, chunk: ${chunk}`)
           bodyChunks.push(chunk);
         });
         proxyRes.on('end', () => {

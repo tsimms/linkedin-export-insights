@@ -134,6 +134,7 @@ const startApolloServer = async () => {
           if (!responseSent) {
             res.setHeader('Content-Type', proxyRes.headers['content-type']);
             responseSent = true;
+            res.send(body);
           }
           console.log(`proxyRes complete for ${req.url}`);
           resolve();

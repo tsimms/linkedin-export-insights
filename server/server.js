@@ -37,6 +37,7 @@ const startApolloServer = async () => {
 
   app.options('/', cors());
   app.options('/sandbox', cors());
+  app.options('/api/graphql', cors());
   app.use('/sandbox', (req, res) => {
     console.log(`Handling request for ${req.url}`);
     let responseSent = false;

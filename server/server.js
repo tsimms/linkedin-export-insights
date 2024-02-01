@@ -121,6 +121,7 @@ const startApolloServer = async () => {
           .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl)
         console.log(`
         ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
+        bodyChunks: ${bodyChunks.length} elements
         headers: ${JSON.stringify(proxyRes.headers)}
 ${body}
         `);

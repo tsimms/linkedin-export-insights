@@ -21,6 +21,8 @@ const loadData = async (filename) => {
   return dataModel;
 };
 
+const proxyQueue = [];
+
 const startApolloServer = async () => {
   const dataModel = await loadData("dataFile.zip");
   const { typeDefs, resolvers } = getModelDefinitions(dataModel);
@@ -102,8 +104,6 @@ const startApolloServer = async () => {
 
 ////////////////
 
-
-  const proxyQueue = [];
   let isProxying = false;
   
   const handleProxyRes = (req, res) => {
@@ -162,7 +162,7 @@ const startApolloServer = async () => {
         console.log(`Starting with ${req.url}`);
         await Promise.all([handleProxyRes(req, res), proxyRequest(req, res)]);
         console.log(`Done with ${req.url}`);
-        console.log(`${proxyQueue.length} in q: ${JSON.stringify(proxyQueue.map(p => p.url))}`)
+        console.log(`${proxyQueue.length} in q: ${JSON.stringify(proxyQueue.map(p => p.req.url))}`)
       }
       isProxying = false;
     }

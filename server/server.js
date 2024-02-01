@@ -123,7 +123,7 @@ const startApolloServer = async () => {
       });
     });
     proxy.web(req, res, {
-      target: `https://studio-ui-deployments.apollographql.com`,
+      target: `https://studio-ui-deployments.apollographql.com/build/static`,
       changeOrigin: true,
       selfHandleResponse: true
     });

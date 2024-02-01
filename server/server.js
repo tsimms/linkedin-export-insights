@@ -60,7 +60,7 @@ const startApolloServer = async () => {
               data;
 
           body = body
-//            .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
+            .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl)
 
           res.setHeader('Content-Type', 'text/html');
           res.setHeader('Access-Control-Allow-Origin', '*');

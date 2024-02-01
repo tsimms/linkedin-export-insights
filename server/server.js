@@ -54,12 +54,13 @@ const startApolloServer = async () => {
         if (!responseSent) {
           const data = Buffer.concat(bodyChunks);
           let body = contentEncoding === 'br' ?
-            zlib.brotliDecompressSync(data).toString() :
+            zlib.brotliDecompressSync(data) :
             contentEncoding === 'gzip' ?
-              zlib.gunzipSync(data).toString() :
+              zlib.gunzipSync(data) :
               data;
 
           body = body
+            .toString()
             .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl)
 
           res.setHeader('Content-Type', 'text/html');

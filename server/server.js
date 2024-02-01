@@ -160,15 +160,16 @@ const startApolloServer = async () => {
   
     if (!isProxying) {
       isProxying = true;
-  
       while (proxyQueue.length > 0) {
         const { req, res } = proxyQueue.shift();
+        console.log(`Starting with ${req.url}`);
         await Promise.all([handleProxyRes(req, res), proxyRequest(req, res)]);
+        console.log(`Done with ${req.url}`);
       }
-  
       isProxying = false;
     }
   });
+
 
 /////////////
 

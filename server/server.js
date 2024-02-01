@@ -119,6 +119,7 @@ const startApolloServer = async () => {
           .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
         // console.log('Modified Response body:', body);
         responseSent = true;
+        res.setHeader('Content-Type', proxyRes.headers['content-type']);
         res.send(body);
       });
     });

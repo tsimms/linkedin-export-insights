@@ -173,7 +173,7 @@ const startApolloServer = async () => {
 
 
 /////////////
-
+/*
   app.use('/api', (req, res) => {
     console.log(`>>>> Handling request for ${req.url}`);
     let responseSent = false;
@@ -213,7 +213,7 @@ const startApolloServer = async () => {
     });
 
   });
-
+*/
 
 
 

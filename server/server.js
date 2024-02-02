@@ -151,7 +151,7 @@ const startApolloServer = async () => {
         "https://sandbox.embed.apollographql.com",
         "https://embeddable-sandbox.cdn.apollographql.com",
         "https://studio-staging.apollographql.com",
-        "https://graphql-staging.api.apollographql.com"
+//        "https://graphql-staging.api.apollographql.com"
       ]
     });
   });

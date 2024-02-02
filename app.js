@@ -289,23 +289,24 @@ const bootstrapServer = async () => {
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
 
-/*
+
   new ApolloSandbox({
     target: '#embedded-sandbox',
-    initialEndpoint: `${_serverUrl}?serverUrl=${_serverUrl}`,
+    initialEndpoint: `${_serverUrl}/graphql?serverUrl=${_serverUrl}`,
     initialState: {
       headers: {
         'Cross-Origin-Resource-Policy': "cross-origin"
       }
     }
   });
-*/
 
+/*
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${_serverUrl}?serverUrl=${_serverUrl}"
     ></iframe>
   `;
+*/
 
 //  window.open(_serverUrl, '_blank');
 }

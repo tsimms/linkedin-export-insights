@@ -136,6 +136,7 @@ const startApolloServer = async () => {
   
           if (!responseSent) {
             res.setHeader('Content-Type', proxyRes.headers['content-type']);
+            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
             responseSent = true;
             res.send(body);
           }

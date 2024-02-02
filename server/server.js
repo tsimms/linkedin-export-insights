@@ -56,9 +56,8 @@ const startApolloServer = async () => {
           body = body.replaceAll(replace, _serverUrl);
         })
       };
-      if (data !== rawData) 
         // override content-type when encrypted
-        res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Content-Type', proxyRes.headers['content-type']);
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
       res.send(body);

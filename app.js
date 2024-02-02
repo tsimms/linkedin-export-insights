@@ -289,24 +289,25 @@ const bootstrapServer = async () => {
   }))();
   console.log(`Server URL: ${_serverUrl}!`);
 
-
+/*
+  // the reason this doesn't work is because the /sandbox/explorer endpoint doesn't include a
+  // CORP header ("Cross-Origin-Resource-Policy: cross-origin"), which is needed in this
+  // context, because we have a COEP policy on the document for the webcontainer execution
   new ApolloSandbox({
     target: '#embedded-sandbox',
     initialEndpoint: `${_serverUrl}/graphql?serverUrl=${_serverUrl}`,
     initialState: {
-      headers: {
-        'Cross-Origin-Resource-Policy': "cross-origin"
-      }
     }
   });
+  */
 
-/*
+
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${_serverUrl}?serverUrl=${_serverUrl}"
     ></iframe>
   `;
-*/
+
 
 //  window.open(_serverUrl, '_blank');
 }

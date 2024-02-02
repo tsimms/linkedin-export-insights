@@ -39,49 +39,6 @@ const startApolloServer = async () => {
   app.options('/sandbox', cors());
   app.options('/api/graphql', cors());
 
-  /*
-  app.use('/sandbox', (req, res) => {
-    console.log(`Handling request for ${req.url}`);
-    console.log(`Headers: ${JSON.stringify(req.headers)}`);
-    let responseSent = false;
-    const proxyReq = proxy.web(req, res, {
-//      target: 'https://sandbox.embed.apollographql.com/sandbox/',
-      target: 'https://timjimsimms.com/sandbox/',
-        // can't pull directly from sandbox.embed.apollographql.com because there's no ACAO header
-        // on the preflight check, which is needed when loading into webcontainer. so we've gotta fake it.
-      changeOrigin: true,
-      selfHandleResponse: true
-    });
-
-    proxy.on('proxyRes', (proxyRes) => {
-      console.log(JSON.stringify(Object.keys(proxyRes)))
-      let bodyChunks = [];
-      let contentEncoding = proxyRes.headers['content-encoding'];
-
-      proxyRes.on('data', (chunk) => { bodyChunks.push(chunk); });
-      proxyRes.on('end', () => {
-        if (!responseSent) {
-          const data = Buffer.concat(bodyChunks);
-          let body = contentEncoding === 'br' ?
-            zlib.brotliDecompressSync(data) :
-            contentEncoding === 'gzip' ?
-              zlib.gunzipSync(data) :
-              data;
-
-          body = body
-            .toString()
-            .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl)
-
-          res.setHeader('Content-Type', 'text/html');
-          res.setHeader('Access-Control-Allow-Origin', '*');
-          res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
-          responseSent = true;
-          res.send(body);
-        }
-      });
-    });
-  });
-*/
 
   proxy.on('proxyRes', (proxyRes, req, res) => {
     let bodyChunks = [];
@@ -99,7 +56,9 @@ const startApolloServer = async () => {
           body = body.replaceAll(replace, _serverUrl);
         })
       };
-      res.setHeader('Content-Type', 'text/html');
+      if (data !== rawData) 
+        // override content-type when encrypted
+        res.setHeader('Content-Type', 'text/html');
       res.setHeader('Access-Control-Allow-Origin', '*');
       res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
       res.send(body);
@@ -155,146 +114,6 @@ const startApolloServer = async () => {
       ]
     });
   });
-
-/*
-  app.use('/v2', (req, res) => {
-    console.log(`Handling request for ${req.url}`);
-    let responseSent = false;
-    proxy.on('proxyRes', (proxyRes) => {
-      let bodyChunks = [];
-      proxyRes.on('data', (chunk) => {
-        bodyChunks.push(chunk);
-      });
-      proxyRes.on('end', () => {
-        if (responseSent)
-          return;
-        let body = Buffer.concat(bodyChunks).toString();
-        body = body
-          .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
-          .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl);
-        responseSent = true;
-        res.send(body);
-      });
-    });
-    proxy.web(req, res, {
-      target: `https://embeddable-sandbox.cdn.apollographql.com/v2/`,
-      changeOrigin: true,
-      selfHandleResponse: true
-    });
-  });
-*/
-
-////////////////
-/*
-  let isProxying = false;
-  
-  const handleProxyRes = (req, res) => {
-    return new Promise((resolve) => {
-      console.log(`Handling request for ${req.url}`);
-      let responseSent = false;
-      let bodyChunks = [];
-      let body = "";
-  
-      proxy.on('proxyRes', (proxyRes) => {
-        proxyRes.on('data', (chunk) => {
-          bodyChunks.push(chunk);
-        });
-  
-        proxyRes.on('end', () => {
-          body = Buffer.concat(bodyChunks).toString();
-          body = body
-            .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
-            .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
-            .replaceAll("https://studio-staging.apollographql.com", _serverUrl)
-            .replaceAll("https://graphql-staging.api.apollographql.com", _serverUrl);
-  
-          console.log(`
-          ${JSON.stringify({ url: req.url, path: req.path, route: req.route })}
-          headers: ${JSON.stringify(proxyRes.headers)}
-          `);
-  
-          if (!responseSent) {
-            res.setHeader('Content-Type', proxyRes.headers['content-type']);
-            res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-            responseSent = true;
-            res.send(body);
-          }
-          console.log(`proxyRes complete for ${req.url}`);
-          resolve();
-        });
-      });
-    });
-  };
-  
-  const proxyRequest = (req, res) => {
-    proxy.web(req, res, {
-      target: `https://studio-ui-deployments.apollographql.com/build/static`,
-      changeOrigin: true,
-      selfHandleResponse: true
-    });
-    return Promise.resolve();
-  };
-  
-  app.use('/build/static', async (req, res) => {
-    proxyQueue.push({ req, res });
-    await new Promise(resolve => setTimeout(resolve, Math.ceil(Math.random()*1000)));
-  
-    if (!isProxying) {
-      isProxying = true;
-      while (proxyQueue.length > 0) {
-        const { req, res } = proxyQueue.shift();
-        console.log(`Starting with ${req.url}`);
-        await Promise.all([handleProxyRes(req, res), proxyRequest(req, res)]);
-        console.log(`Done with ${req.url}`);
-        console.log(`${proxyQueue.length} in q: ${JSON.stringify(proxyQueue.map(p => p.req.url))}`)
-      }
-      isProxying = false;
-    }
-  });
-*/
-
-/////////////
-/*
-  app.use('/api', (req, res) => {
-    console.log(`>>>> Handling request for ${req.url}`);
-    let responseSent = false;
-
-    proxy.on('proxyRes', (proxyRes) => {
-      let bodyChunks = [];
-      let contentEncoding = proxyRes.headers['content-encoding'];
-
-      proxyRes.on('data', (chunk) => {
-        bodyChunks.push(chunk);
-      });
-
-      proxyRes.on('end', () => {
-        if (!responseSent) {
-          const data = Buffer.concat(bodyChunks);
-          let body =
-            contentEncoding === 'br'
-              ? zlib.brotliDecompressSync(data)
-              : contentEncoding === 'gzip'
-              ? zlib.gunzipSync(data)
-              : data;
-
-          body = body.toString();
-          responseSent = true;
-          console.log(`API Response body: ${body}`);
-          res.send(body);
-        }
-      });
-    });
-    proxy.web(req, res, {
-      // target: 'https://graphql-staging.api.apollographql.com/api',
-      target: 'https://timjimsimms.com/api/',
-        // can't pull directly from https://graphql-staging.api.apollographql.com because there's no ACAO header
-        // on the preflight check, which is needed when loading into webcontainer. so we've gotta fake it.
-      changeOrigin: true,
-      selfHandleResponse: true,
-    });
-
-  });
-*/
 
 
 

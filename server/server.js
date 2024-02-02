@@ -125,7 +125,9 @@ const startApolloServer = async () => {
       targetHost: 'timjimsimms.com',
 // can't pull directly from sandbox.embed.apollographql.com because there's no ACAO header
 // on the preflight check, which is needed when loading into webcontainer. so we've gotta fake it.
-      replacements: []
+      replacements: [
+        "studio-ui-deployments.apollographql.com"
+      ]
 
     })
   });

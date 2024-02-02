@@ -40,6 +40,7 @@ const startApolloServer = async () => {
   app.options('/api/graphql', cors());
   app.use('/sandbox', (req, res) => {
     console.log(`Handling request for ${req.url}`);
+    console.log(`Headers: ${JSON.stringify(req.headers)}`);
     let responseSent = false;
     const proxyReq = proxy.web(req, res, {
 //      target: 'https://sandbox.embed.apollographql.com/sandbox/',

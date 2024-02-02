@@ -79,6 +79,17 @@ const startApolloServer = async () => {
     })
   };
 
+  app.use('/v2', (req, res) => {
+    setProxyRoute(req, res, {
+      route: '/v2',
+      targetHost: 'embeddable-sandbox.cdn.apollographql.com',
+      replacements: [
+        "https://sandbox.embed.apollographql.com",
+        "https://embeddable-sandbox.cdn.apollographql.com"
+      ]
+    });
+  });
+
   app.use('/sandbox', (req, res) => {
     setProxyRoute(req, res, {
       route: '/sandbox',
@@ -91,17 +102,6 @@ const startApolloServer = async () => {
       ]
 
     })
-  });
-
-  app.use('/v2', (req, res) => {
-    setProxyRoute(req, res, {
-      route: '/v2',
-      targetHost: 'embeddable-sandbox.cdn.apollographql.com',
-      replacements: [
-        "https://sandbox.embed.apollographql.com",
-        "https://embeddable-sandbox.cdn.apollographql.com"
-      ]
-    });
   });
 
   app.use('/build/static', (req, res) => {

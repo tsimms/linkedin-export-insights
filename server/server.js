@@ -38,6 +38,8 @@ const startApolloServer = async () => {
   app.options('/', cors());
   app.options('/sandbox', cors());
   app.options('/api/graphql', cors());
+
+  /*
   app.use('/sandbox', (req, res) => {
     console.log(`Handling request for ${req.url}`);
     console.log(`Headers: ${JSON.stringify(req.headers)}`);
@@ -52,6 +54,7 @@ const startApolloServer = async () => {
     });
 
     proxy.on('proxyRes', (proxyRes) => {
+      console.log(JSON.stringify(Object.keys(proxyRes)))
       let bodyChunks = [];
       let contentEncoding = proxyRes.headers['content-encoding'];
 
@@ -78,7 +81,80 @@ const startApolloServer = async () => {
       });
     });
   });
+*/
 
+  proxy.on('proxyRes', (proxyRes, req, res) => {
+    let bodyChunks = [];
+    proxyRes.on('data',(chunk) => { bodyChunks.push(chunk) });
+    proxyRes.on('end', () => {
+      const rawData = Buffer.concat(bodyChunks);
+      const data = proxyRes.headers['content-encoding'] === 'br'
+        ? zlib.brotliDecompressSync(rawData)
+        : proxyRes.headers['content-encoding'] === 'gzip'
+          ? zlib.gunzipSync(rawData)
+          : rawData;
+      let body = data.toString();
+      if (req.graphql && req.graphql.replacements) {
+        req.graphql.replacements.forEach((replace) => {
+          body = body.replaceAll(replace, _serverUrl);
+        })
+      };
+      res.setHeader('Content-Type', 'text/html');
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless')
+      res.send(body);
+    });
+  })
+  const setProxyRoute = (req, res, options) => {
+    const { route, targetHost, replacements } = options;
+    console.log(`Handling request for ${req.url}`);
+    req.graphql = {
+      replacements
+    };
+    proxy.web(req, res, {
+      target: `https://${targetHost}${route}/`,
+      changeOrigin: true,
+      selfHandleResponse: true
+    })
+  };
+
+  app.use('/sandbox', (req, res) => {
+    setProxyRoute(req, res, {
+      route: '/sandbox',
+//      targetHost: 'sandbox.embed.apollographql.com',
+      targetHost: 'timjimsimms.com',
+// can't pull directly from sandbox.embed.apollographql.com because there's no ACAO header
+// on the preflight check, which is needed when loading into webcontainer. so we've gotta fake it.
+      replacements: []
+
+    })
+  });
+
+  app.use('/v2', (req, res) => {
+    setProxyRoute(req, res, {
+      route: '/v2',
+      targetHost: 'embeddable-sandbox.cdn.apollographql.com',
+      replacements: [
+        "https://sandbox.embed.apollographql.com",
+        "https://embeddable-sandbox.cdn.apollographql.com"
+      ]
+    });
+  });
+
+  app.use('/build/static', (req, res) => {
+    setProxyRoute(req, res, {
+      route: '/build/static',
+      targetHost: 'studio-ui-deployments.apollographql.com',
+      replacements: [
+        "https://sandbox.embed.apollographql.com",
+        "https://embeddable-sandbox.cdn.apollographql.com",
+        "https://studio-staging.apollographql.com",
+        "https://graphql-staging.api.apollographql.com"
+      ]
+    });
+  });
+
+/*
   app.use('/v2', (req, res) => {
     console.log(`Handling request for ${req.url}`);
     let responseSent = false;
@@ -104,10 +180,10 @@ const startApolloServer = async () => {
       selfHandleResponse: true
     });
   });
-
+*/
 
 ////////////////
-
+/*
   let isProxying = false;
   
   const handleProxyRes = (req, res) => {
@@ -173,7 +249,7 @@ const startApolloServer = async () => {
       isProxying = false;
     }
   });
-
+*/
 
 /////////////
 /*

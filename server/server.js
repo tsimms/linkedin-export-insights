@@ -40,6 +40,9 @@ const startApolloServer = async () => {
   app.options('/api/graphql', cors());
 
 
+  proxy.on('proxyReq', (proxyReq, req, res) => {
+    console.log(`proxyReq headers: ${JSON.stringify(proxyReq.headers)}`);
+  })
   proxy.on('proxyRes', (proxyRes, req, res) => {
     let bodyChunks = [];
     proxyRes.on('data',(chunk) => { bodyChunks.push(chunk) });

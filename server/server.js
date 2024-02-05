@@ -121,7 +121,7 @@ const startApolloServer = async () => {
   app.use('/inigo', (req, res) => {
     setProxyRoute(req, res, {
       route: '/inigo',
-      targetHost: 'https://explorer.inigo.io',
+      targetHost: 'explorer.inigo.io',
       replacements: []
     })
   });

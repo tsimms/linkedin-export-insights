@@ -142,7 +142,7 @@ const startApolloServer = async () => {
           newBody = newBody
             .replaceAll("https://sandbox.embed.apollographql.com", _serverUrl)
             .replaceAll("https://embeddable-sandbox.cdn.apollographql.com", _serverUrl)
-            .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl);
+//            .replaceAll("https://studio-ui-deployments.apollographql.com", _serverUrl);
           console.log(`Replacement on: ${req.url}`);
         }
       }
@@ -155,7 +155,7 @@ const startApolloServer = async () => {
     schema: schemaWithResolvers,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerPluginLandingPageLocalDefault({ footer: false, embed: false, headers: { 'X-LI-TJS': '12345' } })
+      ApolloServerPluginLandingPageLocalDefault({ footer: false, headers: { 'X-LI-TJS': '12345' } })
     ],
     apollo: {
       csrfPrevention: false

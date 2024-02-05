@@ -155,7 +155,7 @@ const startApolloServer = async () => {
     schema: schemaWithResolvers,
     plugins: [
       ApolloServerPluginDrainHttpServer({ httpServer }),
-      ApolloServerPluginLandingPageLocalDefault({ footer: false, embed: false })
+      ApolloServerPluginLandingPageLocalDefault({ footer: false, embed: false, headers: { 'X-LI-TJS': '12345' } })
     ],
     apollo: {
       csrfPrevention: false

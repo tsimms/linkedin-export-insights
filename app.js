@@ -301,13 +301,47 @@ const bootstrapServer = async () => {
   });
   */
 
-
+/*
  document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${_serverUrl}?serverUrl=${_serverUrl}"
     ></iframe>
   `;
+  */
 
+  document.getElementById('embedded-sandbox').innerHTML = `
+  <iframe style="width:100%; height:100%"
+    src="${_serverUrl}/inigo"
+    ></iframe>
+  `;
+
+  /*
+  {
+    "welcomeModal": [],
+    "explorer": {
+        "url": serverUrl,
+        "activeTabId": "01d3",
+        "tabs": [
+            {
+                "id": "01d3",
+                "query": "",
+                "variables": "{}",
+                "docLastQuery": ""
+            }
+        ],
+        "collections": [],
+        "preflightScript": "",
+        "history": [],
+        "headers": "",
+        "preflightEnabled": true,
+        "envVariables": "",
+        "proxyEnabled": false,
+        "historyEnabled": true
+    },
+    "theme": "dark"
+}
+
+*/
 
 //  window.open(_serverUrl, '_blank');
 }

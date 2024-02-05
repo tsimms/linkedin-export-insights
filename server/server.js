@@ -54,6 +54,8 @@ const startApolloServer = async () => {
           ? zlib.gunzipSync(rawData)
           : rawData;
       let body = data.toString();
+      if (body.match("https://graphql-staging.api.apollographql.com"))
+        console.log(`FOUND >>> ${req.url}`);
       if (req.graphql && req.graphql.replacements) {
         req.graphql.replacements.forEach((replace) => {
           body = body.replaceAll(replace, _serverUrl);

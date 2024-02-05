@@ -1,5 +1,6 @@
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
+import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { makeExecutableSchema, addResolversToSchema } from '@graphql-tools/schema';
 import { expressMiddleware } from '@apollo/server/express4';
 import http from 'http';
@@ -41,7 +42,7 @@ const startApolloServer = async () => {
 
 
   proxy.on('proxyReq', (proxyReq, req, res) => {
-    console.log(`proxyReq headers: ${JSON.stringify(proxyReq.headers)}`);
+    console.log(`proxyReq props: ${JSON.stringify(Object.keys(proxyReq))}`);
   })
   proxy.on('proxyRes', (proxyRes, req, res) => {
     let bodyChunks = [];
@@ -54,8 +55,6 @@ const startApolloServer = async () => {
           ? zlib.gunzipSync(rawData)
           : rawData;
       let body = data.toString();
-      if (body.match("https://graphql-staging.api.apollographql.com"))
-        console.log(`FOUND >>> ${req.url}`);
       if (req.graphql && req.graphql.replacements) {
         req.graphql.replacements.forEach((replace) => {
           body = body.replaceAll(replace, _serverUrl);
@@ -155,7 +154,8 @@ const startApolloServer = async () => {
   const server = new ApolloServer({
     schema: schemaWithResolvers,
     plugins: [
-      ApolloServerPluginDrainHttpServer({ httpServer })
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      ApolloServerPluginLandingPageLocalDefault({ footer: false, embed: false })
     ],
     apollo: {
       csrfPrevention: false

@@ -29,7 +29,7 @@ const startServer = async (options) => {
     }
   };
 
-  webcontainerInstance = await WebContainer.boot();
+  const webcontainerInstance = await WebContainer.boot();
   const dataFile = await readAsUint8Array(dataFileInput);
   const files = {
     _dataFilename: {
@@ -96,7 +96,7 @@ const startServer = async (options) => {
       resolve(url);
     });
   }))();
-  return serverUrl;
+  return { webContainerInstance, serverUrl };
 };
 
 

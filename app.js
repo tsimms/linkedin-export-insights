@@ -219,7 +219,7 @@ const showRange = range => {
 // Server
 ////////////
 const launchServer = async () => {
-  _serverUrl = await gqlContainer({ 
+  ({ webcontainerInstance, _serverUrl }) = await gqlContainer({ 
     dataFileInput:_uploadedFile,
     staticFiles: [
       `https://timjimsimms.com/linkedinsight/server/server.js`,

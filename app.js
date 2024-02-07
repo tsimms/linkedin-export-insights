@@ -316,11 +316,14 @@ const launchServer = async () => {
 
 // Query response message handler
 window.addEventListener('message', (event) => {
-  const { type, messageId, payload } = JSON.parse(event);
-  if (type === 'bridge_response') {
-    const results = document.getElementById('explore-results');
-    results.innerHTML = JSON.stringify(payload);
-  }
+  try {
+    const { type, messageId, payload } = event;
+    if (type === 'bridge_response') {
+      const results = document.getElementById('explore-results');
+      results.innerHTML = JSON.stringify(payload);
+    }
+  
+  } catch (e) {}
 });
 
 const runQuery = async () => {
@@ -329,7 +332,7 @@ const runQuery = async () => {
     .replaceAll('\n',"")
     .replaceAll(/[ ]+/g," ");
 
-  document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+  document.getElementById('bridge-frame').contentWindow.postMessage({
     type: 'invoke_endpoint', 
     messageId: null, 
     payload: { 
@@ -339,7 +342,7 @@ const runQuery = async () => {
         "Content-type": "application/json"
       },
       body: query
-    }}), '*')
+    }}, '*')
 /*
   const res = await fetch(_serverUrl, {
     method: "POST",

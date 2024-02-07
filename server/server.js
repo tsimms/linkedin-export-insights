@@ -139,11 +139,11 @@ const startApolloServer = async () => {
     res.send(`
     <script>
     function sendEvent (type, messageId, payload) {
-      window.parent.postMessage(JSON.stringify({ type, messageId, payload }), '*');
+      window.parent.postMessage({ type, messageId, payload }, '*');
     }
   
     function sendError (type, messageId, payload) {
-      window.parent.postMessage(JSON.stringify({ type, messageId, payload, isError: true }), '*');
+      window.parent.postMessage({ type, messageId, payload, isError: true }, '*');
     }
   
     function parseEvent (event) {
@@ -168,7 +168,8 @@ const startApolloServer = async () => {
     }
   
     function handleEvent (event) {
-      const parsed = parseEvent(event);
+      //const parsed = parseEvent(event);
+      const parsed = event;
       if (parsed) {
         const { type, payload, messageId } = parsed;
         console.log('BRIDGE EVENT [' + type + ']:', payload);

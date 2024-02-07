@@ -2,9 +2,11 @@ import { ingest } from './server/data.js';
 import gqlContainer from './gql-container.js';
 import { ApolloSandbox } from '@apollo/sandbox';
 import JSZip from 'jszip';
+import './app.css';
 
 let _data, _chart, _chartData, _settings, _uploadedFile;
 let webcontainerInstance, _serverUrl;
+
 
 ////////
 // Data preparation routines
@@ -215,10 +217,21 @@ const showRange = range => {
   document.getElementById('range').innerHTML = rangeString;
 }
 
+const showLoading = () => {
+  const sandbox = document.getElementById('spinner');
+  sandbox.classList.remove('hide');
+};
+
+const hideLoading = () => {
+  const sandbox = document.getElementById('embedded-sandbox');
+  sandbox.classList.add('hide');
+}
+
 ////////////
 // Server
 ////////////
 const launchServer = async () => {
+  showLoading();
   const server = await gqlContainer({ 
     dataFileInput:_uploadedFile,
     staticFiles: [
@@ -233,6 +246,7 @@ const launchServer = async () => {
   _serverUrl = server.serverUrl;
 
   console.log(`Server URL: ${_serverUrl}!`);
+  hideLoading();
 
 /*
   // the reason this doesn't work is because the /sandbox/explorer endpoint doesn't include a
@@ -253,13 +267,13 @@ const launchServer = async () => {
     ></iframe>
   `;
   */
-
+/*
   document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${_serverUrl}/inigo"
     ></iframe>
   `;
-
+*/
   /*
   {
     "welcomeModal": [],
@@ -296,11 +310,11 @@ const launchServer = async () => {
 ////////////
 // UX Exports
 ////////////
-const onFileSelected = () => {
+const onFileSelected = async () => {
   const files = filesInput.files;
   if (files.length) {
     _uploadedFile = files[0];
-    processFile();
+    await processFile();
     launchServer();
   }
 };
@@ -450,7 +464,7 @@ const processFile = () => {
     _chart.destroy();
   }
   if (_uploadedFile) {
-    ingest(_uploadedFile, _settings.options.granularity, JSZip)
+    return ingest(_uploadedFile, _settings.options.granularity, JSZip)
       .then(setChart);
   }
 };

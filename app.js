@@ -332,17 +332,14 @@ const runQuery = async () => {
     .replaceAll('\n',"")
     .replaceAll(/[ ]+/g," ");
 
-  document.getElementById('bridge-frame').contentWindow.postMessage({
-    type: 'invoke_endpoint', 
-    messageId: null, 
-    payload: { 
-      url: _serverUrl, 
-      method: 'POST',
-      headers: {
-        "Content-type": "application/json"
-      },
-      body: query
-    }}, '*')
+  document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+    url: _serverUrl, 
+    method: 'POST',
+    headers: {
+      "Content-type": "application/json"
+    },
+    body: query
+  }), _serverUrl);
 /*
   const res = await fetch(_serverUrl, {
     method: "POST",

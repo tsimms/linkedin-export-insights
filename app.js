@@ -1,5 +1,5 @@
 import { ingest } from './server/data.js';
-import { WebContainer } from '@webcontainer/api';
+import gqlContainer from './gql-container.js';
 import { ApolloSandbox } from '@apollo/sandbox';
 import JSZip from 'jszip';
 
@@ -218,75 +218,18 @@ const showRange = range => {
 ////////////
 // Server
 ////////////
-const bootstrapServer = async () => {
-  webcontainerInstance = await WebContainer.boot();
-  const dataFile = await readAsUint8Array(_uploadedFile);
-
-  const files = {
-    "dataFile.zip": {
-      file: {
-        contents: dataFile,
-      },
-    }
-  };
-  await webcontainerInstance.mount(files);
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const nocache = Array.from({ length:8 }, ()=>characters[Math.floor(Math.random() * characters.length)]).join('');
-
-  try {
-    await Promise.all([
-      `https://timjimsimms.com/linkedinsight/server/server.js?${nocache}`,
-      `https://timjimsimms.com/linkedinsight/server/graphql-model.js?${nocache}`,
-      `https://timjimsimms.com/linkedinsight/server/data.js?${nocache}`,
-      `https://timjimsimms.com/linkedinsight/server/package.json?${nocache}`
-    ].map(file => {
-      const filename = file.replace(/^.*\//g,"");
-      const outputFilename = filename.replace(/\?.*$/,"");
-      return Promise.resolve()
-        .then(() => fetch(file))
-        .then(response => response.text())
-        .then(fileContent => {
-          webcontainerInstance.fs.writeFile(outputFilename, fileContent)
-        })
-        .then(() => console.log(`Loaded ${filename} successfully!`))
-        .catch(e => { console.error(`Error writing ${filename}: ${e}`)})
-    }))
-  } catch (err) {
-    console.error('Error loading files:', err.message);
-  }
-  const fileListing = await webcontainerInstance.fs.readdir('/', { withFileTypes: true });
-  console.log('File Listing:');
-  fileListing.forEach((entry) => {
-    console.log(`- ${entry.name} (${entry.isDirectory() ? 'Directory' : 'File'})`);
+const launchServer = async () => {
+  _serverUrl = await gqlContainer({ 
+    dataFileInput:_uploadedFile,
+    staticFiles: [
+      `https://timjimsimms.com/linkedinsight/server/server.js`,
+      `https://timjimsimms.com/linkedinsight/server/graphql-model.js`,
+      `https://timjimsimms.com/linkedinsight/server/data.js`,
+      `https://timjimsimms.com/linkedinsight/server/package.json`
+    ],
+    debug:true
   });
-  const installProcess = await webcontainerInstance.spawn('npm', ['install']);
-  installProcess.output.pipeTo(new WritableStream({
-    write(data) {
-      console.log(data);
-    }
-  }));
-  await installProcess.exit;
-  const runtimeProcess = await webcontainerInstance.spawn('npm', ['run', 'server']);
-  runtimeProcess.output.pipeTo(new WritableStream({
-    write(data) {
-      console.log(data);
-    }
-  }))
 
-  const servers = {};
-  webcontainerInstance.on('port', (port, type, url) => {
-    servers[port] = url;
-    console.log({ port, type, url });
-  })
-  webcontainerInstance.on('error', (err) => {
-    console.error(err);
-  })
-  _serverUrl = await (() => new Promise((resolve, reject) => {
-    webcontainerInstance.on('server-ready', (port, url) => {
-      console.log('Server is ready!');
-      resolve(url);
-    });
-  }))();
   console.log(`Server URL: ${_serverUrl}!`);
 
 /*
@@ -346,21 +289,6 @@ const bootstrapServer = async () => {
 //  window.open(_serverUrl, '_blank');
 }
 
-const readAsUint8Array = (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const result = event.target.result;
-      const uint8Array = new Uint8Array(result);
-      resolve(uint8Array);
-    };
-    reader.onerror = (error) => {
-      reject(error);
-    };
-    reader.readAsArrayBuffer(file);
-  });
-};
-
 
 
 ////////////
@@ -371,7 +299,7 @@ const onFileSelected = () => {
   if (files.length) {
     _uploadedFile = files[0];
     processFile();
-    bootstrapServer();
+    launchServer();
   }
 };
 

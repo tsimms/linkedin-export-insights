@@ -138,7 +138,7 @@ const startApolloServer = async () => {
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.send(`
     <script>
-    const targetOrigin = window.parent.location.href.split('/').slice(0,3).join('/');
+    //const targetOrigin = window.parent.location.href.split('/').slice(0,3).join('/');
     function sendEvent (type, messageId, payload) {
       window.parent.postMessage(JSON.stringify({ type, messageId, payload }), targetOrigin);
     }

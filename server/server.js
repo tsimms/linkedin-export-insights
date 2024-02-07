@@ -140,8 +140,8 @@ const startApolloServer = async () => {
   <script>
 
     window.addEventListener('message', async (event) => {
-      const { payload, origin } = event;
-      const { url, method, headers, body } = payload;
+      const { data, origin } = event;
+      const { url, method, headers, body } = data;
       try {
         const res = await fetch(url, { method, headers, body });
         if (res.ok) {

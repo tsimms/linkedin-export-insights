@@ -32,7 +32,7 @@ const startServer = async (options) => {
   const webcontainerInstance = await WebContainer.boot();
   const dataFile = await readAsUint8Array(dataFileInput);
   const files = {
-    _dataFilename: {
+    [_dataFilename]: {
       file: {
         contents: dataFile,
       },

@@ -219,7 +219,7 @@ const showRange = range => {
 // Server
 ////////////
 const launchServer = async () => {
-  ({ webcontainerInstance, _serverUrl }) = await gqlContainer({ 
+  ({ webcontainerInstance, _serverUrl } = await gqlContainer({ 
     dataFileInput:_uploadedFile,
     staticFiles: [
       `https://timjimsimms.com/linkedinsight/server/server.js`,
@@ -228,7 +228,7 @@ const launchServer = async () => {
       `https://timjimsimms.com/linkedinsight/server/package.json`
     ],
     debug:true
-  });
+  }));
 
   console.log(`Server URL: ${_serverUrl}!`);
 

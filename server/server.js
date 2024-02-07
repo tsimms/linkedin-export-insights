@@ -159,16 +159,12 @@ const startApolloServer = async () => {
       const { url, method, body, headers } = eventPayload;
       const res = await fetch(url, { method, headers, body });
       if (res.ok) {
-        console.log('BRIDGE: ' + await res.text());
+        const results = await res.json();
+        console.log('BRIDGE: ' + results);
+        sendEvent('bridge_response', messageId, results);
+      } else {
+        console.error('Error response from endpoint');
       }
-/*
-        .then((data) => sendEvent('fetch_response', messageId, data))
-        .catch((err) => {
-          err.json().then((json) => {
-            sendError('fetch_error', messageId, json.message);
-          });
-        });
-*/
     }
   
     function handleEvent (event) {

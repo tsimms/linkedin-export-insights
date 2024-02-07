@@ -314,6 +314,15 @@ const launchServer = async () => {
 //  window.open(_serverUrl, '_blank');
 }
 
+// Query response message handler
+window.addEventListener('message', (event) => {
+  const { type, messageId, payload } = JSON.parse(event);
+  if (type === 'bridge_response') {
+    const results = document.getElementById('explore-results');
+    results.innerHTML = JSON.stringify(payload);
+  }
+});
+
 const runQuery = async () => {
   const query = document.getElementById('explore-query')
     .value

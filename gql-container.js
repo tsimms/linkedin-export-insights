@@ -85,7 +85,7 @@ const startServer = async (options) => {
   const servers = {};
   webcontainerInstance.on('port', (port, type, url) => {
     servers[port] = url;
-    log({ port, type, url });
+    log(JSON.stringify({ port, type, url }));
   })
   webcontainerInstance.on('error', (err) => {
     console.error(err);

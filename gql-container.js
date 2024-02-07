@@ -96,7 +96,7 @@ const startServer = async (options) => {
       resolve(url);
     });
   }))();
-  return { webContainerInstance, serverUrl };
+  return { webcontainerInstance, serverUrl };
 };
 
 

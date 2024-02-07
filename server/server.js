@@ -170,7 +170,7 @@ const startApolloServer = async () => {
     }
   
     function handleEvent (event) {
-      console.log('BRIDGE: ' + JSON.stringify(event));
+      console.log('BRIDGE: ' + JSON.stringify(event.data));
       return;
       const parsed = parseEvent(event);
       if (parsed) {

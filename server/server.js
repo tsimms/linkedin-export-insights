@@ -157,7 +157,7 @@ const startApolloServer = async () => {
   
     const invokeEndpoint = async (messageId, eventPayload) => {
       const { url, method, body, headers } = eventPayload;
-      const res = await fetch(url, { method, headers, body: JSON.stringify(body) });
+      const res = await fetch(url, { method, headers, body });
       if (res.ok) {
         console.log('BRIDGE: ' + await res.text());
       }

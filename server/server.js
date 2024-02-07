@@ -133,6 +133,83 @@ const startApolloServer = async () => {
     res.send('This is a test response!');
   });
 
+  app.get('/bridge', (req, res) => {
+    res.setHeader('Content-type', 'text/html');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.send(`
+    <script>
+    function sendEvent (type, messageId, payload) {
+      window.parent.postMessage(JSON.stringify({
+        type,
+        messageId,
+        payload,
+      }), '*');
+    }
+  
+    function sendError (type, messageId, payload) {
+      window.parent.postMessage(JSON.stringify({
+        type,
+        messageId,
+        payload,
+        isError: true,
+      }), '*');
+    }
+  
+    function parseEvent (event) {
+      try {
+        const { type, messageId, payload } = JSON.parse(event.data);
+        return { type, payload, messageId };
+      } catch (e) {
+        return null;
+      }
+    }
+  
+    function invokeEndpoint (messageId, eventPayload) {
+      const { url, method, body, headers } = eventPayload;
+      fetch(url, {
+        method,
+        headers,
+        body: JSON.stringify(body),
+      })
+        .then((res) => {
+          if (res.ok) {
+            return res.json();
+          } else {
+            throw res;         
+          }
+        })
+        .then((data) => sendEvent('fetch_response', messageId, data))
+        .catch((err) => {
+          err.json().then((json) => {
+            sendError('fetch_error', messageId, json.message);
+          });
+        });
+    }
+  
+    function handleEvent (event) {
+      const parsed = parseEvent(event);
+      if (parsed) {
+        const { type, payload, messageId } = parsed;
+        console.log('BRIDGE EVENT [' + type + ']:', payload);
+        switch (type) {
+            case 'ping':
+              sendEvent('pong', messageId, { message: 'Hello from WebContainer!' });
+              break
+            case 'invoke_endpoint':
+              invokeEndpoint(messageId, payload);
+              break;
+          default:
+            console.log('Unknown event type:', type);
+        }
+      }
+    }
+  
+    window.addEventListener('message', handleEvent);
+    sendEvent('ready');
+  </script>
+    `);
+  })
+
   app.get('/favicon.ico', (req, res) => {
     res.sendStatus('204');
   })

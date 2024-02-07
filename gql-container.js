@@ -90,7 +90,7 @@ const startServer = async (options) => {
   webcontainerInstance.on('error', (err) => {
     console.error(err);
   })
-  serverUrl = await (() => new Promise((resolve, reject) => {
+  const serverUrl = await (() => new Promise((resolve, reject) => {
     webcontainerInstance.on('server-ready', (port, url) => {
       log(`Server is ready! URL: ${url}`);
       resolve(url);

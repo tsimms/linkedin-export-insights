@@ -315,7 +315,10 @@ const launchServer = async () => {
 }
 
 const runQuery = async () => {
-  const query = document.getElementById('explore-query').value;
+  const query = document.getElementById('explore-query')
+    .value
+    .replaceAll('\n',"")
+    .replaceAll(/[ ]+/g," ");
 
   document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
     type: 'invoke_endpoint', 

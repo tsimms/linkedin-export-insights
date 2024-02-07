@@ -228,8 +228,11 @@ const hideLoading = () => {
 }
 
 const showExplore = () => {
-  const explore = document.getElementById('explore');
+  const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
+  document.getElementById('bridge').innerHTML = `
+  <iframe style="width:100%; height:100%" src="${_serverUrl}/bridge"></iframe>
+  `;
 }
 
 ////////////

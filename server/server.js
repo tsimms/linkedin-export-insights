@@ -139,6 +139,7 @@ const startApolloServer = async () => {
     res.send(`
     <script>
     //const targetOrigin = window.parent.location.href.split('/').slice(0,3).join('/');
+    const targetOrigin = "*";
     function sendEvent (type, messageId, payload) {
       window.parent.postMessage(JSON.stringify({ type, messageId, payload }), targetOrigin);
     }

@@ -139,26 +139,17 @@ const startApolloServer = async () => {
     res.send(`
     <script>
     function sendEvent (type, messageId, payload) {
-      window.parent.postMessage(JSON.stringify({
-        type,
-        messageId,
-        payload,
-      }), '*');
+      window.parent.postMessage(JSON.stringify({ type, messageId, payload }), '*');
     }
   
     function sendError (type, messageId, payload) {
-      window.parent.postMessage(JSON.stringify({
-        type,
-        messageId,
-        payload,
-        isError: true,
-      }), '*');
+      window.parent.postMessage(JSON.stringify({ type, messageId, payload, isError: true }), '*');
     }
   
     function parseEvent (event) {
       try {
-        const { type, messageId, payload } = JSON.parse(event.data);
-        return { type, payload, messageId };
+        const ret = JSON.parse(event.data);
+        return ret;
       } catch (e) {
         return null;
       }

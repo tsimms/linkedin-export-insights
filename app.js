@@ -231,7 +231,7 @@ const showExplore = () => {
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
   document.getElementById('bridge').innerHTML = `
-  <iframe id="bridge-frame" style="width:100%; height:100%" src="${_serverUrl}/bridge"></iframe>
+  <iframe id="bridge-frame" style="width:1px; height:1px; border:none;" src="${_serverUrl}/bridge"></iframe>
   `;
 }
 
@@ -316,6 +316,19 @@ const launchServer = async () => {
 
 const runQuery = async () => {
   const query = document.getElementById('explore-query').value;
+
+  document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+    type: 'invoke_endpoint', 
+    messageId: null, 
+    payload: { 
+      url: _serverUrl, 
+      method: 'POST',
+      headers: {
+        "Content-type": "application/json"
+      },
+      body: query
+    }}), '*')
+/*
   const res = await fetch(_serverUrl, {
     method: "POST",
     headers: {
@@ -324,6 +337,7 @@ const runQuery = async () => {
     body: query
   });
   console.log(await res.json());
+  */
 }
 
 

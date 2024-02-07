@@ -79,13 +79,20 @@
       <canvas id="chart"></canvas>
     </div>
     <div id="analytics"></div>
-    <div id="developer-frame" class="display:none;">
+    <div id="developer-frame" class="hide">
       <div id="embedded-sandbox">
         <div id="spinner" class="hide">
-          <div class="lds-ripple">
-            <div></div><div></div>
-          </div>
+          <div class="lds-ripple"><div></div><div></div></div>
           <span>Building Server.</span>
+        </div>
+        <div id="explore" class="hide">
+          <div id="query">
+            <textarea id="explore-query"></textarea>
+            <button id="run-query">Run query</button>
+          </div>
+          <div id="results">
+            <textarea id="explore-results"></textarea>
+          </div>
         </div>
       </div>
     </div>

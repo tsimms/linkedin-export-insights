@@ -52,3 +52,21 @@
       opacity: 0;
     }
   }
+
+  #explore {
+    display: flex;
+  }
+
+  #explore > div {
+    width:100%;
+  }
+
+  #explore textarea {
+    width:100%;
+    height:150px;
+  }
+
+
+  #explore #query button {
+    width: 100%;
+  }

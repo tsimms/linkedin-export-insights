@@ -223,8 +223,13 @@ const showLoading = () => {
 };
 
 const hideLoading = () => {
-  const sandbox = document.getElementById('embedded-sandbox');
+  const sandbox = document.getElementById('spinner');
   sandbox.classList.add('hide');
+}
+
+const showExplore = () => {
+  const explore = document.getElementById('explore');
+  explore.classList.remove('hide');
 }
 
 ////////////
@@ -247,6 +252,7 @@ const launchServer = async () => {
 
   console.log(`Server URL: ${_serverUrl}!`);
   hideLoading();
+  showExplore();
 
 /*
   // the reason this doesn't work is because the /sandbox/explorer endpoint doesn't include a
@@ -305,6 +311,17 @@ const launchServer = async () => {
 //  window.open(_serverUrl, '_blank');
 }
 
+const runQuery = async () => {
+  const query = document.getElementById('explore-query').value;
+  const res = await fetch(_serverUrl, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: query
+  });
+  console.log(await res.json());
+}
 
 
 ////////////
@@ -381,6 +398,7 @@ const setUx = () => {
   document.getElementById('filesInput').addEventListener('change', onFileSelected);
   document.getElementById('form-toggle').addEventListener('click', toggleSettings);
   document.getElementById('developerMode').addEventListener('change', toggleDeveloperMode);
+  document.getElementById('run-query').addEventListener('click', runQuery)
   toggleDeveloperMode();
 }
 

@@ -155,26 +155,20 @@ const startApolloServer = async () => {
       }
     }
   
-    function invokeEndpoint (messageId, eventPayload) {
+    const invokeEndpoint = async (messageId, eventPayload) => {
       const { url, method, body, headers } = eventPayload;
-      fetch(url, {
-        method,
-        headers,
-        body: JSON.stringify(body),
-      })
-        .then((res) => {
-          if (res.ok) {
-            return res.json();
-          } else {
-            throw res;         
-          }
-        })
+      const res = await fetch(url, { method, headers, body: JSON.stringify(body) });
+      if (res.ok) {
+        console.log('BRIDGE: ' + await res.text());
+      }
+/*
         .then((data) => sendEvent('fetch_response', messageId, data))
         .catch((err) => {
           err.json().then((json) => {
             sendError('fetch_error', messageId, json.message);
           });
         });
+*/
     }
   
     function handleEvent (event) {

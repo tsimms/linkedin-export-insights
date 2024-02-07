@@ -158,7 +158,7 @@ const startApolloServer = async () => {
         console.error(message);
         window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message }), origin);
       }
-    };
+    });
   
   </script>
     `);

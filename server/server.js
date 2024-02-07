@@ -137,60 +137,29 @@ const startApolloServer = async () => {
     res.setHeader('Content-type', 'text/html');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.send(`
-    <script>
-    //const targetOrigin = window.parent.location.href.split('/').slice(0,3).join('/');
-    const targetOrigin = "*";
-    function sendEvent (type, messageId, payload) {
-      window.parent.postMessage(JSON.stringify({ type, messageId, payload }), targetOrigin);
-    }
-  
-    function sendError (type, messageId, payload) {
-      window.parent.postMessage(JSON.stringify({ type, messageId, payload, isError: true }), targetOrigin);
-    }
-  
-    function parseEvent (event) {
+  <script>
+
+    window.addEventListener('message', (event) => {
+      const { payload, origin } = event;
+      const { url, method, headers, body } = payload;
       try {
-        const ret = JSON.parse(event.data);
-        return ret;
-      } catch (e) {
-        return null;
-      }
-    }
-  
-    const invokeEndpoint = async (messageId, eventPayload) => {
-      const { url, method, body, headers } = eventPayload;
-      const res = await fetch(url, { method, headers, body });
-      if (res.ok) {
-        const results = await res.json();
-        console.log('BRIDGE: ' + results);
-        sendEvent('bridge_response', messageId, results);
-      } else {
-        console.error('Error response from endpoint');
-      }
-    }
-  
-    function handleEvent (event) {
-      console.log('BRIDGE: ' + JSON.stringify(event.origin));
-      return;
-      const parsed = parseEvent(event);
-      if (parsed) {
-        const { type, payload, messageId } = parsed;
-        console.log('BRIDGE EVENT [' + type + ']:', payload);
-        switch (type) {
-            case 'ping':
-              sendEvent('pong', messageId, { message: 'Hello from WebContainer!' });
-              break
-            case 'invoke_endpoint':
-              invokeEndpoint(messageId, payload);
-              break;
-          default:
-            console.log('Unknown event type:', type);
+        const res = await fetch(url, { method, headers, body });
+        if (res.ok) {
+          const results = await res.json();
+          console.log('BRIDGE: sending response from successful query');
+          window.parent.postMessage(JSON.stringify({ type: 'bridge_response', results }), origin);
+        } else {
+          const message = 'Error response from endpoint';
+          console.error(message);
+          window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message }), origin);
         }
+      } catch (e) {
+        const message = 'Error sending request to endpoint';
+        console.error(message);
+        window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message }), origin);
       }
-    }
+    };
   
-    window.addEventListener('message', handleEvent);
-    sendEvent('ready');
   </script>
     `);
   })
@@ -246,7 +215,7 @@ const startApolloServer = async () => {
   });
 
   await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
-  console.log(`🚀 Server ready at http://localhost:4000`);
+  console.log(`🚀 Apollo Server ready at http://localhost:4000`);
 };
 
 // Start Apollo Server

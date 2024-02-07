@@ -139,7 +139,7 @@ const startApolloServer = async () => {
     res.send(`
   <script>
 
-    window.addEventListener('message', (event) => {
+    window.addEventListener('message', async (event) => {
       const { payload, origin } = event;
       const { url, method, headers, body } = payload;
       try {

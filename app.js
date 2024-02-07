@@ -316,18 +316,18 @@ const launchServer = async () => {
 
 // Query response message handler
 window.addEventListener('message', (event) => {
-  try {
-    const { data, origin } = event;
-    if (origin === _serverUrl) {
+  const { data, origin } = event;
+  if (origin === _serverUrl) {
+    try {
       const { type, results, message } = JSON.parse(data);
       if (type === 'bridge_response') {
         const results = document.getElementById('explore-results');
         results.innerHTML = results;
         return
       }
-    }
-  } catch (e) {}
-  console.error('something went wrong on response');
+    } catch (e) {}
+    console.error('something went wrong on response');
+  }
 });
 
 const runQuery = async () => {

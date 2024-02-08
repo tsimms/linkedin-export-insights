@@ -18,4 +18,4 @@
 .goal .value { cursor: pointer; }
 .goal .value:hover { background-color: #ffa; font-size: 1.1em; }
 .spacer-400h { height: 400px; }
-.spacer-40h { height: 40px; }
+.spacer-20h { height: 20px; }

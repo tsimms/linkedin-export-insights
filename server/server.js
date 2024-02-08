@@ -142,7 +142,7 @@ const startApolloServer = async () => {
     window.addEventListener('message', async (event) => {
       const { data, origin } = event;
       try {
-        const { url, method, headers, body } = JSON.parse(data);
+        const { url, method, headers, body, timestamp } = JSON.parse(data);
         console.log({ body });
         // body is JSON
         const res = await fetch(url, { method, headers, body });
@@ -153,7 +153,7 @@ const startApolloServer = async () => {
             type = 'bridge_introspection';
           }
           console.log('BRIDGE: sending "' + type + '" response from successful query');
-          window.parent.postMessage(JSON.stringify({ type, results }), origin);
+          window.parent.postMessage(JSON.stringify({ type, timestamp, results }), origin);
         } else {
           console.log(Object.keys(res));
           const message = 'Error response from endpoint: ' + res.statusText;

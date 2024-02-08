@@ -166,15 +166,19 @@ window.addEventListener('message', (event) => {
   const { data, origin } = event;
   if (origin === _serverUrl) {
     try {
-      const { type, results, message } = JSON.parse(data);
+      const { type, results, timestamp, message } = JSON.parse(data);
+      const duration = (new Date()).getTime() - timestamp;
       if (type === 'bridge_response') {
         const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);
         if (results.data[Object.keys(results.data)[0]].length) {
+          document.getElementById('results-header').classList.remove('hide');
           document.getElementById('results-status').classList.remove('hide');
+          document.getElementById('results-header').innerHTML = `Elapsed query time: ${duration}ms`;
           document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
         } else {
           document.getElementById('results-status').classList.add('hide');
+          document.getElementById('results-header').classList.add('hide');
         }
         return;
       } else if (type === 'bridge_introspection') {
@@ -358,6 +362,7 @@ const runQuery = (query) => {
     headers: {
       "Content-type": "application/json"
     },
+    timestamp: (new Date()).getTime(),
     body: query
   }), _serverUrl);
 }

@@ -172,7 +172,9 @@ window.addEventListener('message', (event) => {
       } else if (type === 'bridge_error') {
         console.error(message);
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(`Caught error on response: ${e.message}`);
+    }
     console.error('something went wrong on response');
   }
 });
@@ -280,9 +282,8 @@ const runIntrospection = async () => {
 }
 
 const processIntrospectionData = (data) => {
-  debugger;
   const queries = data?.data?.__schema?.types?.filter(t => t.name === 'Query')[0]?.fields;
-  console.loog({ queries });
+  console.log({ queries });
 }
 
 const runQuery = (query) => {

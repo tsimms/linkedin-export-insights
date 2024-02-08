@@ -248,7 +248,7 @@ const launchServer = async () => {
       `https://timjimsimms.com/linkedinsight/server/data.js`,
       `https://timjimsimms.com/linkedinsight/server/package.json`
     ],
-    debug:true
+    debug:false
   });
   ({ webcontainerInstance } = server);
   _serverUrl = server.serverUrl;
@@ -324,9 +324,10 @@ window.addEventListener('message', (event) => {
         const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);
         if (results.data[Object.keys(results.data)[0]].length) {
+          document.getElementById('results-status').classList.remove('hide');
           document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
         } else {
-          document.getElementById('results-count').innerHTML = '';
+          document.getElementById('results-status').classList.add('hide');
         }
         return
       } else if (type === 'bridge_error') {

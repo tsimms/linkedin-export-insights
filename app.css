@@ -70,3 +70,6 @@
   #explore #query button {
     width: 100%;
   }
+
+  #explore #results #results-count { margin: 0 10px; font-size: small; }
+  #explore #results #results-status button { float: right; }

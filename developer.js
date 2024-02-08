@@ -19,13 +19,15 @@ const hideLoading = () => {
   sandbox.classList.add('hide');
 }
 
-const showExplore = () => {
+const showExplore = () => new Promise(( resolve ) => {
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
-  document.getElementById('bridge').innerHTML = `
-  <iframe id="bridge-frame" style="width:1px; height:1px; border:none;" src="${_serverUrl}/bridge"></iframe>
-  `;
-}
+  var iframe = document.createElement('iframe');
+  iframe.id = 'bridge-frame';
+  iframe.onload = resolve;
+  iframe.src = _serverUrl;
+  document.getElementById('bridge').appendChild(iframe);
+});
 
 const developerFrameUx = () => {
   const panel = document.getElementById("developer-frame");
@@ -88,7 +90,7 @@ const launchServer = async (uploadedFile) => {
 
   console.log(`Server URL: ${_serverUrl}!`);
   hideLoading();
-  showExplore();
+  await showExplore();
   runIntrospection();
 
 /*

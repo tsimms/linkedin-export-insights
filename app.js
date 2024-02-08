@@ -322,7 +322,7 @@ window.addEventListener('message', (event) => {
       const { type, results, message } = JSON.parse(data);
       if (type === 'bridge_response') {
         const results = document.getElementById('explore-results');
-        results.innerHTML = results;
+        results.innerHTML = JSON.stringify(results);
         return
       }
     } catch (e) {}

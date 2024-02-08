@@ -352,16 +352,6 @@ const runQuery = async () => {
     },
     body: query
   }), _serverUrl);
-/*
-  const res = await fetch(_serverUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: query
-  });
-  console.log(await res.json());
-  */
 }
 
 

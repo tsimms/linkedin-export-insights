@@ -145,6 +145,7 @@ const startApolloServer = async () => {
         const { url, method, headers, body } = JSON.parse(data);
         const res = await fetch(url, { method, headers, body });
         if (res.ok) {
+          debugger;
           const results = JSON.parse(await res.json());
           console.log('BRIDGE: sending response from successful query');
           window.parent.postMessage(JSON.stringify({ type: 'bridge_response', results }), origin);

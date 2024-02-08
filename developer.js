@@ -3,6 +3,7 @@ import { ApolloSandbox } from '@apollo/sandbox';
 import './developer.css';
 
 let webcontainerInstance, _serverUrl, _schema;
+const _queries = { schema: {}, saved: {} };
 
 
 ///////////
@@ -292,8 +293,52 @@ const processIntrospectionData = (data) => {
     option.textContent = name;
     option.value = name;
     schemaQuerySelect.appendChild(option);
+    _queries.schema[name] = `
+    {
+      "query":"query ExampleQuery${
+        // vars
+        q.args.length ? 
+          '(' +
+          q.args.map(a => (`${a.name}: ${a.type.kind === "NON_NULL" ? `${a.type.ofType.name}!`: a.type.name}`)) +
+          ')'
+          : ""
+      }) {
+        ${name} (${
+          // args
+          q.args.length ? q.args.map(a => (`${a.name}: ${a.name}`)).join(', ')
+            : ""
+        }) {
+          first_name
+          last_name
+          email_address
+          position
+          company
+        }
+      }",
+      "variables":{
+        ${
+          q.args.length ? q.args.map(a => (`"${a.name}": null`)).join(', ')
+            : ""
+        }
+      }
+    }    
+    `;
   });
-  console.log({ queries });
+  console.log({ _queries });
+  /*
+{
+  "query":"query ExampleQuery($filter: String!) {
+    connectionsByFilter(filter: $filter) {
+      first_name
+      last_name
+      email_address
+      position
+      company
+    }
+  }",
+  "variables":{"filter":"ounder"}
+}
+  */
 }
 
 const runQuery = (query) => {

@@ -338,6 +338,12 @@ window.addEventListener('message', (event) => {
   }
 });
 
+document.getElementById('btn-copy').addEventListener('click', () => {
+  navigator.clipboard.writeText(document.getElementById('explore-query').value);
+  this.innerHTML = 'Copied!';
+  setTimeout(() => { document.getElementById('btn-copy').innerHTML = 'Copy' }, 3000);
+})
+
 const runQuery = async () => {
   const query = document.getElementById('explore-query')
     .value

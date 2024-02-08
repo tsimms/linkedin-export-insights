@@ -25,7 +25,7 @@ const showExplore = () => new Promise(( resolve ) => {
   var iframe = document.createElement('iframe');
   iframe.id = 'bridge-frame';
   iframe.onload = resolve;
-  iframe.src = _serverUrl;
+  iframe.src = `${_serverUrl}/bridge`;
   document.getElementById('bridge').appendChild(iframe);
 });
 

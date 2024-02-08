@@ -217,6 +217,10 @@ const showRange = range => {
   document.getElementById('range').innerHTML = rangeString;
 }
 
+///////////
+// Develope Frame UX
+///////////
+
 const showLoading = () => {
   const sandbox = document.getElementById('spinner');
   sandbox.classList.remove('hide');
@@ -338,7 +342,7 @@ window.addEventListener('message', (event) => {
   }
 });
 
-document.getElementById('btn-copy').addEventListener('click', async (e) => {
+document.getElementById('btn-copy').addEventListener('click', async () => {
   const textarea = document.getElementById('explore-results');
   textarea.focus();
   await navigator.clipboard.writeText(textarea.value);
@@ -346,6 +350,11 @@ document.getElementById('btn-copy').addEventListener('click', async (e) => {
   button.innerHTML = 'Copied!';
   button.disabled = true;
   setTimeout(() => { button.innerHTML = 'Copy'; button.disabled = false; }, 2000);
+})
+
+document.getElementById('explore-query').addEventListener('change', () => {
+  const textarea = document.getElementById('explore-query');
+  setTimeout(() => { textarea.value = textarea.value.replace(/\\n/g, '\n') }, 2000);
 })
 
 const runQuery = async () => {

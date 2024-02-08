@@ -69,7 +69,17 @@ const developerFrameUx = () => {
     const textarea = e.target;
     setTimeout(() => { textarea.value = textarea.value.replace(/\\n/g, '\n') }, 2000);
   });
+
+  document.getElementById('schema-query-list').addEventListener('change', (e) => {
+    const selectedOption = e.target.options[e.target.selectedIndex];
+    const selectedValue = selectedOption.value;
+    const queryText = _queries.schema[selectedValue];
+    if (queryText) {
+      document.getElementById('explore-query').innerHTML = queryText;
+    };
+  });
 }
+
 
 ////////////
 // Server
@@ -299,13 +309,13 @@ const processIntrospectionData = (data) => {
         // vars
         q.args.length ? 
           '(' +
-          q.args.map(a => (`${a.name}: ${a.type.kind === "NON_NULL" ? `${a.type.ofType.name}!`: a.type.name}`)) +
+          q.args.map(a => (`$${a.name}: ${a.type.kind === "NON_NULL" ? `${a.type.ofType.name}!`: a.type.name}`)).join(', ') +
           ')'
           : ""
       }) {
         ${name} (${
           // args
-          q.args.length ? q.args.map(a => (`${a.name}: ${a.name}`)).join(', ')
+          q.args.length ? q.args.map(a => (`${a.name}: $${a.name}`)).join(', ')
             : ""
         }) {
           first_name

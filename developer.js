@@ -71,12 +71,11 @@ const developerFrameUx = () => {
   });
 
   document.getElementById('schema-query-list').addEventListener('change', (e) => {
-    debugger;
     const selectedOption = e.target.options[e.target.selectedIndex];
     const selectedValue = selectedOption.value;
     const queryText = _queries.schema[selectedValue];
     if (queryText) {
-      document.getElementById('explore-query').innerHTML = queryText;
+      document.getElementById('explore-query').value = queryText;
     };
   });
 }

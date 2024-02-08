@@ -143,6 +143,7 @@ const startApolloServer = async () => {
       const { data, origin } = event;
       const { url, method, headers, body } = data;
       try {
+        console.log(JSON.stringify({ url, method, headers, body }));
         const res = await fetch(url, { method, headers, body });
         if (res.ok) {
           const results = await res.json();

@@ -168,7 +168,7 @@ window.addEventListener('message', (event) => {
     try {
       const { type, results, timestamp, message } = JSON.parse(data);
       const duration = (new Date()).getTime() - timestamp;
-      const size = TextEncoder().encode(JSON.stringify(results)).length;
+      const size = new TextEncoder().encode(JSON.stringify(results)).length;
       if (type === 'bridge_response') {
         const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);

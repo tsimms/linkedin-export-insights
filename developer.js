@@ -154,6 +154,7 @@ const launchServer = async (uploadedFile) => {
 window.addEventListener('message', (event) => {
   const { data, origin } = event;
   if (origin === _serverUrl) {
+    debugger;
     try {
       const { type, results, message } = JSON.parse(data);
       if (type === 'bridge_response') {

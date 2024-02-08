@@ -169,6 +169,7 @@ window.addEventListener('message', (event) => {
       const { type, results, timestamp, message } = JSON.parse(data);
       const duration = (new Date()).getTime() - timestamp;
       const size = new TextEncoder().encode(JSON.stringify(results)).length;
+      const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
       if (type === 'bridge_response') {
         const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);
@@ -176,7 +177,7 @@ window.addEventListener('message', (event) => {
           document.getElementById('results-header').classList.remove('hide');
           document.getElementById('results-status').classList.remove('hide');
           document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;
-          document.getElementById('results-size').innerHTML = `${size} Bytes`;
+          document.getElementById('results-size').innerHTML = sizeText;
           document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
         } else {
           document.getElementById('results-status').classList.add('hide');

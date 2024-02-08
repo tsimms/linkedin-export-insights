@@ -344,7 +344,8 @@ document.getElementById('btn-copy').addEventListener('click', async (e) => {
   await navigator.clipboard.writeText(textarea.value);
   const button = document.getElementById('btn-copy')
   button.innerHTML = 'Copied!';
-  setTimeout(() => { button.innerHTML = 'Copy' }, 3000);
+  button.disabled = true;
+  setTimeout(() => { button.innerHTML = 'Copy'; button.disabled = false; }, 2000);
 })
 
 const runQuery = async () => {

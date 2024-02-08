@@ -338,9 +338,9 @@ window.addEventListener('message', (event) => {
   }
 });
 
-document.getElementById('btn-copy').addEventListener('click', () => {
+document.getElementById('btn-copy').addEventListener('click', (e) => {
   navigator.clipboard.writeText(document.getElementById('explore-query').value);
-  this.innerHTML = 'Copied!';
+  e.innerHTML = 'Copied!';
   setTimeout(() => { document.getElementById('btn-copy').innerHTML = 'Copy' }, 3000);
 })
 

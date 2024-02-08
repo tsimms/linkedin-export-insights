@@ -285,7 +285,7 @@ const processIntrospectionData = (data) => {
   _schema = data?.data?.__schema;
   const queries = _schema?.types?.filter(t => t.name === 'Query')[0]?.fields;
   // populate select
-  const schemaQuerySelect = document.getElementById('schema-query');
+  const schemaQuerySelect = document.getElementById('schema-query-list');
   queries.forEach(q => {
     const { name } = q;
     const option = document.createElement('option');

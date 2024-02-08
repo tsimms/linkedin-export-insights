@@ -145,11 +145,12 @@ const startApolloServer = async () => {
         debugger;
         const { url, method, headers, body } = JSON.parse(data);
         console.log({ body });
+        // body is JSON
         const res = await fetch(url, { method, headers, body });
         if (res.ok) {
           const results = await res.json();
           let type = 'bridge_response';
-          if (body.query.includes('query IntrospectionQuery')) {
+          if (JSON.parse(body).query.includes('query IntrospectionQuery')) {
             type = 'bridge_introspection';
           }
           console.log('BRIDGE: sending "' + type + '" response from successful query');

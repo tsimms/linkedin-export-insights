@@ -174,7 +174,7 @@ window.addEventListener('message', (event) => {
         if (results.data[Object.keys(results.data)[0]].length) {
           document.getElementById('results-header').classList.remove('hide');
           document.getElementById('results-status').classList.remove('hide');
-          document.getElementById('results-header').innerHTML = `Elapsed query time: ${duration}ms`;
+          document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;
           document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
         } else {
           document.getElementById('results-status').classList.add('hide');

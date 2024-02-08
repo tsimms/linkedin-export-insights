@@ -185,12 +185,12 @@ const getModelDefinitions = (data) => {
         const lastName = connection.last_name;
         const data_toFilter = data.filter(item =>
           item.type === 'message' &&
-          item.direction === 'to' &&
+          item.direction === 'from' &&
           (item.to.split(',').includes(`${firstName} ${lastName}`))
         );
         const data_fromFilter = data.filter(item =>
           item.type === 'message' &&
-          item.direction === 'from' &&
+          item.direction === 'to' &&
           (item.from.includes(`${firstName} ${lastName}`))
         );
         return responseObject([...data_toFilter, ...data_fromFilter]);

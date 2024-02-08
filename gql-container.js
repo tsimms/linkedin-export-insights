@@ -56,7 +56,7 @@ const startServer = async (options) => {
         .then(fileContent => {
             webcontainerInstance.fs.writeFile(outputFilename, fileContent)
         })
-        .then(() => console.log(`Loaded ${filename} successfully!`))
+        .then(() => log(`Loaded ${outputFilename} successfully!`))
         .catch(e => { console.error(`Error writing ${filename}: ${e}`)})
       }))
   } catch (err) {

@@ -218,7 +218,7 @@ const showRange = range => {
 }
 
 ///////////
-// Develope Frame UX
+// Developer Frame UX
 ///////////
 
 const showLoading = () => {
@@ -237,6 +237,29 @@ const showExplore = () => {
   document.getElementById('bridge').innerHTML = `
   <iframe id="bridge-frame" style="width:1px; height:1px; border:none;" src="${_serverUrl}/bridge"></iframe>
   `;
+}
+
+const developerFrameUx = () => {
+  let m_pos;
+
+  const resizeDeveloperFrame = (e) => {
+    const dy = m_pos - e.y;
+    m_pos = e.y;
+    panel.style.height = (parseInt(getComputedStyle(panel, '').height) + dy) + "px";
+
+    // TODO: resize filler div
+  };
+  
+  panel.addEventListener("mousedown", function(e){
+    if (e.offsetY < 4) {
+      m_pos = e.y;
+      document.addEventListener("mousemove", resizeDeveloperFrame, false);
+    }
+  }, false);
+  
+  document.addEventListener("mouseup", function(){
+      document.removeEventListener("mousemove", resizeDeveloperFrame, false);
+  }, false);  
 }
 
 ////////////
@@ -450,6 +473,7 @@ const setUx = () => {
   document.getElementById('developerMode').addEventListener('change', toggleDeveloperMode);
   document.getElementById('run-query').addEventListener('click', runQuery)
   toggleDeveloperMode();
+  developerFrameUx();
 }
 
 ///////////

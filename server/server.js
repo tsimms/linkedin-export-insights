@@ -141,8 +141,8 @@ const startApolloServer = async () => {
 
     window.addEventListener('message', async (event) => {
       const { data, origin } = event;
-      const { url, method, headers, body } = data;
       try {
+        const { url, method, headers, body } = JSON.parse(data);
         console.log(JSON.stringify({ url, method, headers, body }));
         const res = await fetch(url, { method, headers, body });
         if (res.ok) {

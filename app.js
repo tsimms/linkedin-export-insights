@@ -339,9 +339,12 @@ window.addEventListener('message', (event) => {
 });
 
 document.getElementById('btn-copy').addEventListener('click', async (e) => {
-  await navigator.clipboard.writeText(document.getElementById('explore-query').value);
-  e.innerHTML = 'Copied!';
-  setTimeout(() => { document.getElementById('btn-copy').innerHTML = 'Copy' }, 3000);
+  const textarea = document.getElementById('explore-results');
+  textarea.focus();
+  await navigator.clipboard.writeText(textarea.value);
+  const button = document.getElementById('btn-copy')
+  button.innerHTML = 'Copied!';
+  setTimeout(() => { button.innerHTML = 'Copy' }, 3000);
 })
 
 const runQuery = async () => {

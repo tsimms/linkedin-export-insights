@@ -147,8 +147,12 @@ const startApolloServer = async () => {
         const res = await fetch(url, { method, headers, body });
         if (res.ok) {
           const results = await res.json();
-          console.log('BRIDGE: sending response from successful query');
-          window.parent.postMessage(JSON.stringify({ type: 'bridge_response', results }), origin);
+          let type = 'bridge_response';
+          if (body.contains('query IntrospectionQuery')) {
+            type = 'bridge_introspection';
+          }
+          console.log('BRIDGE: sending "' + type + '" response from successful query');
+          window.parent.postMessage(JSON.stringify({ type, results }), origin);
         } else {
           console.log(Object.keys(res));
           const message = 'Error response from endpoint: ' + res.statusText;

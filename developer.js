@@ -89,6 +89,7 @@ const launchServer = async (uploadedFile) => {
   console.log(`Server URL: ${_serverUrl}!`);
   hideLoading();
   showExplore();
+  runIntrospection();
 
 /*
   // the reason this doesn't work is because the /sandbox/explorer endpoint doesn't include a
@@ -162,7 +163,10 @@ window.addEventListener('message', (event) => {
         } else {
           document.getElementById('results-status').classList.add('hide');
         }
-        return
+        return;
+      } else if (type === 'bridge_introspection') {
+        processIntrospectionData(results);
+        return;
       } else if (type === 'bridge_error') {
         console.error(message);
       }
@@ -171,6 +175,118 @@ window.addEventListener('message', (event) => {
   }
 });
 
+const runIntrospection = async () => {
+  const query = `
+    {"query":"
+      query IntrospectionQuery {
+        __schema {
+          
+          queryType { name }
+          mutationType { name }
+          subscriptionType { name }
+          types {
+            ...FullType
+          }
+          directives {
+            name
+            description
+            
+            locations
+            args {
+              ...InputValue
+            }
+          }
+        }
+      }
+
+      fragment FullType on __Type {
+        kind
+        name
+        description
+        
+        fields(includeDeprecated: true) {
+          name
+          description
+          args {
+            ...InputValue
+          }
+          type {
+            ...TypeRef
+          }
+          isDeprecated
+          deprecationReason
+        }
+        inputFields {
+          ...InputValue
+        }
+        interfaces {
+          ...TypeRef
+        }
+        enumValues(includeDeprecated: true) {
+          name
+          description
+          isDeprecated
+          deprecationReason
+        }
+        possibleTypes {
+          ...TypeRef
+        }
+      }
+
+      fragment InputValue on __InputValue {
+        name
+        description
+        type { ...TypeRef }
+        defaultValue
+      }
+
+      fragment TypeRef on __Type {
+        kind
+        name
+        ofType {
+          kind
+          name
+          ofType {
+            kind
+            name
+            ofType {
+              kind
+              name
+              ofType {
+                kind
+                name
+                ofType {
+                  kind
+                  name
+                  ofType {
+                    kind
+                    name
+                    ofType {
+                      kind
+                      name
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    "}
+  `.replaceAll('\n',"").replaceAll(/[ ]+/g," ");
+  documentElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+    url: _serverUrl,
+    method: 'POST',
+    headers: { "Content-type": "application/json" },
+    body: query
+  }), _serverUrl)
+}
+
+const processIntrospectionData = (data) => {
+  const queries = data.__schema.types.filter(t => t.name === 'Query')[0].fields;
+  debugger;
+  console.loog({ fields });
+}
 
 
 const runQuery = async () => {

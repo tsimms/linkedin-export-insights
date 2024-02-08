@@ -240,6 +240,7 @@ const showExplore = () => {
 }
 
 const developerFrameUx = () => {
+  const panel = document.getElementById("developer-frame");
   let m_pos;
 
   const resizeDeveloperFrame = (e) => {

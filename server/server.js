@@ -148,7 +148,7 @@ const startApolloServer = async () => {
         if (res.ok) {
           const results = await res.json();
           let type = 'bridge_response';
-          if (body.contains('query IntrospectionQuery')) {
+          if (body.query.contains('query IntrospectionQuery')) {
             type = 'bridge_introspection';
           }
           console.log('BRIDGE: sending "' + type + '" response from successful query');

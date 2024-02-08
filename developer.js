@@ -170,8 +170,8 @@ window.addEventListener('message', (event) => {
       const duration = (new Date()).getTime() - timestamp;
       const size = new TextEncoder().encode(JSON.stringify(results)).length;
       const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
+      const resultsElement = document.getElementById('explore-results');
       if (type === 'bridge_response') {
-        const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);
         if (results.data[Object.keys(results.data)[0]].length) {
           document.getElementById('results-header').classList.remove('hide');
@@ -188,7 +188,11 @@ window.addEventListener('message', (event) => {
         processIntrospectionData(results);
         return;
       } else if (type === 'bridge_error') {
+        resultsElement.value = JSON.stringify(results, undefined, 2);
+        document.getElementById('results-status').classList.add('hide');
+        document.getElementById('results-header').classList.add('hide');
         console.error(message);
+        return;
       }
     } catch (e) {
       console.error(`Caught error on response: ${e.message}`);

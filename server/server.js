@@ -155,9 +155,9 @@ const startApolloServer = async () => {
           console.log('BRIDGE: sending "' + type + '" response from successful query');
           window.parent.postMessage(JSON.stringify({ type, timestamp, results }), origin);
         } else {
-          console.log(await res.text());
+          const { errors } = await res.json();
           const message = 'Error response from endpoint: ' + res.statusText;
-          window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message }), origin);
+          window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message, results: errors }), origin);
         }
       } catch (e) {
         const message = 'Error sending request to endpoint';

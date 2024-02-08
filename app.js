@@ -321,8 +321,8 @@ window.addEventListener('message', (event) => {
     try {
       const { type, results, message } = JSON.parse(data);
       if (type === 'bridge_response') {
-        const results = document.getElementById('explore-results');
-        results.value = JSON.stringify(results, undefined, 2);
+        const resultsElement = document.getElementById('explore-results');
+        resultsElement.value = JSON.stringify(results, undefined, 2);
         return
       }
     } catch (e) {}

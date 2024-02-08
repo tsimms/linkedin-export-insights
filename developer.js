@@ -2,7 +2,7 @@ import gqlContainer from './gql-container.js';
 import { ApolloSandbox } from '@apollo/sandbox';
 import './developer.css';
 
-let webcontainerInstance, _serverUrl;
+let webcontainerInstance, _serverUrl, _schema;
 
 
 ///////////
@@ -282,7 +282,17 @@ const runIntrospection = async () => {
 }
 
 const processIntrospectionData = (data) => {
-  const queries = data?.data?.__schema?.types?.filter(t => t.name === 'Query')[0]?.fields;
+  _schema = data?.data?.__schema;
+  const queries = _schema?.types?.filter(t => t.name === 'Query')[0]?.fields;
+  // populate select
+  const schemaQuerySelect = document.getElementById('schema-query');
+  queries.forEach(q => {
+    const { name } = q;
+    const option = document.createElement('option');
+    option.textContent = name;
+    option.value = name;
+    schemaQuerySelect.appendChild(option);
+  });
   console.log({ queries });
 }
 

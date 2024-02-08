@@ -30,5 +30,6 @@
   #explore > div { width:100%; margin:0 4px; }
   #explore textarea { width:100%; height:calc(100% - 120px); font-size:x-small; overflow-y:scroll; scrollbar-width:thin; border-radius:4px; }
   #explore #query button { width: 100%; }
+  #explore #query select { width: 100%; } 
   #explore #results #results-count { margin: 0 10px; font-size: small; }
   #explore #results #results-status button { float: right; }

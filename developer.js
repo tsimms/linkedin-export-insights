@@ -154,7 +154,6 @@ const launchServer = async (uploadedFile) => {
 window.addEventListener('message', (event) => {
   const { data, origin } = event;
   if (origin === _serverUrl) {
-    debugger;
     try {
       const { type, results, message } = JSON.parse(data);
       if (type === 'bridge_response') {
@@ -281,8 +280,7 @@ const runIntrospection = async () => {
 }
 
 const processIntrospectionData = (data) => {
-  const queries = data.__schema.types.filter(t => t.name === 'Query')[0].fields;
-  debugger;
+  const queries = data?.data?.__schema?.types?.filter(t => t.name === 'Query')[0]?.fields;
   console.loog({ queries });
 }
 

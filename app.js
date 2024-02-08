@@ -323,8 +323,8 @@ window.addEventListener('message', (event) => {
       if (type === 'bridge_response') {
         const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);
-        if (results.data?.length) {
-          document.getElementById('results-count').innerHTML = `Results count: ${results.data.length}`;
+        if (results.data[Object.keys(results.data)[0]].length) {
+          document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
         } else {
           document.getElementById('results-count').innerHTML = '';
         }

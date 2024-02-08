@@ -312,7 +312,7 @@ const processIntrospectionData = (data) => {
           q.args.map(a => (`$${a.name}: ${a.type.kind === "NON_NULL" ? `${a.type.ofType.name}!`: a.type.name}`)).join(', ') +
           ')'
           : ""
-      }) {
+      } {
         ${name} (${
           // args
           q.args.length ? q.args.map(a => (`${a.name}: $${a.name}`)).join(', ')

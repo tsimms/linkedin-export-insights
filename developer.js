@@ -50,7 +50,7 @@ const developerFrameUx = () => {
       document.removeEventListener("mousemove", resizeDeveloperFrame, false);
   }, false);
 
-  document.getElementById('run-query').addEventListener('click', runQuery)
+  document.getElementById('run-query').addEventListener('click', getQuery)
 
   document.getElementById('btn-copy').addEventListener('click', async () => {
     const textarea = document.getElementById('explore-results');
@@ -274,12 +274,7 @@ const runIntrospection = async () => {
       }
     "}
   `.replaceAll('\n',"").replaceAll(/[ ]+/g," ");
-  documentElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
-    url: _serverUrl,
-    method: 'POST',
-    headers: { "Content-type": "application/json" },
-    body: query
-  }), _serverUrl)
+  runQuery(query);
 }
 
 const processIntrospectionData = (data) => {
@@ -288,13 +283,7 @@ const processIntrospectionData = (data) => {
   console.loog({ fields });
 }
 
-
-const runQuery = async () => {
-  const query = document.getElementById('explore-query')
-    .value
-    .replaceAll('\n',"")
-    .replaceAll(/[ ]+/g," ");
-
+const runQuery = (query) => {
   document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
     url: _serverUrl, 
     method: 'POST',
@@ -303,6 +292,14 @@ const runQuery = async () => {
     },
     body: query
   }), _serverUrl);
+}
+
+const getQuery = () => {
+  const query = document.getElementById('explore-query')
+    .value
+    .replaceAll('\n',"")
+    .replaceAll(/[ ]+/g," ");
+  runQuery(query);
 }
 
 

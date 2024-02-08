@@ -33,4 +33,5 @@
   #explore #query select { width: 100%; } 
   #explore #results #results-count { margin: 0 10px; font-size: small; }
   #explore #results #results-duration { margin: 0 10px; font-size: small; }
+  #explore #results #results-size { float: right; font-size: small; }
   #explore #results #results-status button { float: right; }

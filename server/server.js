@@ -140,7 +140,6 @@ const startApolloServer = async () => {
   <script>
 
     window.addEventListener('message', async (event) => {
-      debugger;
       const { data, origin } = event;
       try {
         const { url, method, headers, body } = JSON.parse(data);

@@ -323,7 +323,14 @@ window.addEventListener('message', (event) => {
       if (type === 'bridge_response') {
         const resultsElement = document.getElementById('explore-results');
         resultsElement.value = JSON.stringify(results, undefined, 2);
+        if (results.data?.length) {
+          document.getElementById('results-count').innerHTML = `Results count: ${results.data.length}`;
+        } else {
+          document.getElementById('results-count').innerHTML = '';
+        }
         return
+      } else if (type === 'bridge_error') {
+        console.error(message);
       }
     } catch (e) {}
     console.error('something went wrong on response');

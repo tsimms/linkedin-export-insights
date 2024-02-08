@@ -280,7 +280,7 @@ const runIntrospection = async () => {
 const processIntrospectionData = (data) => {
   const queries = data.__schema.types.filter(t => t.name === 'Query')[0].fields;
   debugger;
-  console.loog({ fields });
+  console.loog({ queries });
 }
 
 const runQuery = (query) => {

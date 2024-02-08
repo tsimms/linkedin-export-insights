@@ -193,7 +193,7 @@ const getModelDefinitions = (data) => {
           item.direction === 'to' &&
           (item.from.includes(`${firstName} ${lastName}`))
         );
-        return responseObject([...data_toFilter, ...data_fromFilter]);
+        return responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date)));
       }
     }
   };

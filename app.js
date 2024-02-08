@@ -352,8 +352,8 @@ document.getElementById('btn-copy').addEventListener('click', async () => {
   setTimeout(() => { button.innerHTML = 'Copy'; button.disabled = false; }, 2000);
 })
 
-document.getElementById('explore-query').addEventListener('change', () => {
-  const textarea = document.getElementById('explore-query');
+document.getElementById('explore-query').addEventListener('input', (e) => {
+  const textarea = e.target;
   setTimeout(() => { textarea.value = textarea.value.replace(/\\n/g, '\n') }, 2000);
 })
 

@@ -186,12 +186,12 @@ const getModelDefinitions = (data) => {
         const data_toFilter = data.filter(item =>
           item.type === 'message' &&
           item.direction === 'to' &&
-          (item.to.includes(firstName) || item.to.includes(lastName))
+          (item.to.split(',').includes(`${firstName} ${lastname}`))
         );
         const data_fromFilter = data.filter(item =>
           item.type === 'message' &&
           item.direction === 'from' &&
-          (item.from.includes(firstName) || item.from.includes(lastName))
+          (item.from.includes(`${firstName} ${lastname}`))
         );
         return responseObject([...data_toFilter, ...data_fromFilter]);
       }

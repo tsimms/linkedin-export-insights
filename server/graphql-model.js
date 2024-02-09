@@ -50,6 +50,7 @@ const getModelDefinitions = (data) => {
       week: String!
       date: DateTime!
       messages: [Message!]!
+      message_count: Int!
     }
 
     type Comment {
@@ -231,7 +232,8 @@ const getModelDefinitions = (data) => {
           (item.from.includes(`${firstName} ${lastName}`))
         );
         return responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date)));
-      }
+      },
+      message_count: (connection, _, context) => (connection.messages.length)
     },
     Message: {
       connections: (parent, _, context) => {

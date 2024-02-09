@@ -130,7 +130,7 @@ const getModelDefinitions = (data) => {
 
   const getCache = (context, type, key) => {
     debugger;
-    const empty = !(context?.cache[type]);
+    const empty = !(context?.cache?.[type]);
     switch (type) {
       case "connections":
         if (empty) {

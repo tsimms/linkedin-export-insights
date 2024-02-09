@@ -219,7 +219,6 @@ const getModelDefinitions = (data) => {
     },
     Connection: {
       messages: (connection, _, context)  => {
-debugger;
         const firstName = connection.first_name;
         const lastName = connection.last_name;
         const data_toFilter = data.filter(item =>
@@ -232,7 +231,11 @@ debugger;
           item.direction === 'to' &&
           (item.from.includes(`${firstName} ${lastName}`))
         );
-        return (responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date))));
+         
+        const results = responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date)));
+        context.messages = results;
+        debugger;
+        return results;
       },
       message_count: (connection, _, context) => {
 debugger;

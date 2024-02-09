@@ -173,7 +173,6 @@ window.addEventListener('message', (event) => {
       const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
       const resultsElement = document.getElementById('explore-results');
       if (type === 'bridge_response') {
-debugger;
         resultsElement.value = JSON.stringify(results, undefined, 2);
         if (results.data[Object.keys(results.data)[0]].length) {
           document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;

@@ -198,14 +198,15 @@ const getModelDefinitions = (data) => {
       }
     },
     Message: {
-      connections: (parent, args, context) => {
+      connections: (parent, _, context) => {
         const connectionIds = (parent.direction === 'from')
           ? parent.to.split(',')
           : [ parent.from ]
-  
-        const connections = context.connections
-          .filter(connection => connectionIds.includes(`${connection.first_name} ${connection.last_name}`));
-        
+        const connections = data
+          .filter(connection =>
+            item.type === 'connection' &&
+            connectionIds.includes(`${connection.first_name} ${connection.last_name}`)
+          );        
         return connections;
       }
     }

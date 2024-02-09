@@ -114,6 +114,41 @@ const getModelDefinitions = (data) => {
     return results;
   };
 
+  const setCache = (context, type, data, reset) => {
+    if (!context.cache)
+      context.cache = {};
+    const isArray = Array.isArray(data);
+    if (!context.cache[type] || reset)
+      context.cache[type] = isArray ? [] : {}; 
+    if (isArray)
+      context.cache[type].push(...data)
+    else
+      context.cache[type] = { ...context.cache[type], ...data };
+    return context;
+  }
+
+  const getCache = (context, type, key) => {
+    const empty = !(context?.cache[type]);
+    switch (type) {
+      case "connections":
+        if (empty) {
+          const { cache } = setCache(context, type, data.filter(d => d.type === 'connection'), true);
+          context.cache = cache;
+        }
+        break;
+      default:
+        if (empty && !context.cache) {
+          context.cache = {};
+        }
+    }
+    if (!context.cache[type])
+      return null;
+    if (!Array.isArray(context.cache[type]))
+      return context.cache[type][key]
+    else
+      return context.cache[type]
+  }
+
   const resolvers = {
     Query: {
       allActivities: (parent, args, context, info) => {
@@ -202,11 +237,13 @@ const getModelDefinitions = (data) => {
         const connectionIds = (parent.direction === 'from')
           ? parent.to.split(',')
           : [ parent.from ]
-        const connections = data
-          .filter(item =>
-            item.type === 'connection' &&
-            connectionIds.includes(`${item.first_name} ${item.last_name}`)
-          );        
+        const connectionsSet = getCache(context, "connections");
+        const connectionStore = {};
+        const connections = connectionsSet
+          .filter(i => connectionIds.includes(`${i.first_name} ${i.last_name}`))
+          .forEach(c => { connectionStore[`${c.first_name} ${c.last_name}`] = c });    
+        const { cache } = setCache(context, "connection", connectionStore, false);
+        context.cache = cache;
         return connections;
       }
     }

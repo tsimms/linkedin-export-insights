@@ -234,6 +234,7 @@ const getModelDefinitions = (data) => {
         resolve(responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date))));
       }),
       message_count: async (connection, _, context) => {
+debugger;
         const messages = await connection.messages;
         return messages.length;
       }

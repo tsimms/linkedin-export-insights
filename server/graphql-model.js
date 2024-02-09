@@ -234,11 +234,12 @@ const getModelDefinitions = (data) => {
     },
     Message: {
       connections: (parent, _, context) => {
+        debugger;
         const connectionIds = (parent.direction === 'from')
           ? parent.to.split(',')
           : [ parent.from ]
-        const connectionsSet = getCache(context, "connections");
         const connectionStore = {};
+        const connectionsSet = getCache(context, "connections");
         const connections = connectionsSet
           .filter(i => connectionIds.includes(`${i.first_name} ${i.last_name}`))
           .forEach(c => { connectionStore[`${c.first_name} ${c.last_name}`] = c });    

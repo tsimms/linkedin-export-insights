@@ -32,6 +32,7 @@ const getModelDefinitions = (data) => {
       month: String!
       week: String!
       direction: String!
+      connections: [Connection!]!
     }
 
     type Connection {
@@ -194,6 +195,18 @@ const getModelDefinitions = (data) => {
           (item.from.includes(`${firstName} ${lastName}`))
         );
         return responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date)));
+      }
+    },
+    Message: {
+      connections: (parent, args, context) => {
+        const connectionIds = (parent.direction === 'from')
+          ? parent.to.split(',')
+          : [ parent.from ]
+  
+        const connections = context.connections
+          .filter(connection => connectionIds.includes(`${connection.first_name} ${connection.last_name}`));
+        
+        return connections;
       }
     }
   };

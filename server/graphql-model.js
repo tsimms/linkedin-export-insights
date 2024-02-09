@@ -114,6 +114,7 @@ const getModelDefinitions = (data) => {
     return results;
   };
 
+
   const setCache = (context, type, data, reset) => {
     if (!context.cache)
       context.cache = {};
@@ -128,6 +129,7 @@ const getModelDefinitions = (data) => {
   }
 
   const getCache = (context, type, key) => {
+    debugger;
     const empty = !(context?.cache[type]);
     switch (type) {
       case "connections":
@@ -186,12 +188,12 @@ const getModelDefinitions = (data) => {
         const data_toFilter = data.filter(item =>
           item.type === 'message' &&
           item.direction === 'to' &&
-          (item.to.includes(firstName) || item.to.includes(lastName))
+          (item.to.includes(firstName) && item.to.includes(lastName))
         );
         const data_fromFilter = data.filter(item =>
           item.type === 'message' &&
           item.direction === 'from' &&
-          (item.from.includes(firstName) || item.from.includes(lastName))
+          (item.from.includes(firstName) && item.from.includes(lastName))
         );
         return responseObject([...data_toFilter, ...data_fromFilter]);
       }
@@ -222,7 +224,7 @@ const getModelDefinitions = (data) => {
         const data_toFilter = data.filter(item =>
           item.type === 'message' &&
           item.direction === 'from' &&
-          (item.to.split(',').includes(`${firstName} ${lastName}`))
+          (item.to.split(/,(?[^ ])/).includes(`${firstName} ${lastName}`))
         );
         const data_fromFilter = data.filter(item =>
           item.type === 'message' &&
@@ -234,9 +236,8 @@ const getModelDefinitions = (data) => {
     },
     Message: {
       connections: (parent, _, context) => {
-        debugger;
         const connectionIds = (parent.direction === 'from')
-          ? parent.to.split(',')
+          ? parent.to.split(/,(?[^ ])/)
           : [ parent.from ]
         const connectionStore = {};
         const connectionsSet = getCache(context, "connections");

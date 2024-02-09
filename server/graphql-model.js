@@ -203,9 +203,9 @@ const getModelDefinitions = (data) => {
           ? parent.to.split(',')
           : [ parent.from ]
         const connections = data
-          .filter(connection =>
+          .filter(item =>
             item.type === 'connection' &&
-            connectionIds.includes(`${connection.first_name} ${connection.last_name}`)
+            connectionIds.includes(`${item.first_name} ${item.last_name}`)
           );        
         return connections;
       }

@@ -129,7 +129,6 @@ const getModelDefinitions = (data) => {
   }
 
   const getCache = (context, type, key) => {
-    debugger;
     const empty = !(context?.cache?.[type]);
     switch (type) {
       case "connections":
@@ -236,17 +235,33 @@ const getModelDefinitions = (data) => {
     },
     Message: {
       connections: (parent, _, context) => {
-        const connectionIds = (parent.direction === 'from')
+        const names = (parent.direction === 'from')
           ? parent.to.split(/,(?![ ])/)
           : [ parent.from ]
         const connectionStore = {};
         const connectionsSet = getCache(context, "connections");
+        const connectionsCached = names.map(name => {
+          const fromCache = getCache(context, "connection", name);
+          if (fromCache) return ({ name, value: fromCache });
+          return ({ name, value: null });
+        })
+        // if it's uncached, find them in the dataset and set cache
+        const namesUncached = connectionsCached.filter(n => !n.value).map(n => n.name);
         const connections = connectionsSet
-          .filter(i => connectionIds.includes(`${i.first_name} ${i.last_name}`))
-          .forEach(c => { connectionStore[`${c.first_name} ${c.last_name}`] = c });    
+          .filter(c => namesUncached.includes(`${c.first_name} ${c.last_name}`));
+        connections
+          .forEach(c => {
+            connectionStore[`${c.first_name} ${c.last_name}`] = c;
+          });    
         const { cache } = setCache(context, "connection", connectionStore, false);
         context.cache = cache;
-        return connections;
+
+        const resultSet = [
+          ...connectionsCached.filter(n => n.value !== null).map(n => n.value),
+          ...Object.values(connectionStore)
+        ].sort((a, b) => (new Date(a)).getTime() - (new Date(b)).getTime());
+
+        return resultSet;
       }
     }
   };

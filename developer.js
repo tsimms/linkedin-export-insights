@@ -191,8 +191,8 @@ debugger;
         return;
       } else if (type === 'bridge_error') {
         resultsElement.value = JSON.stringify(results, undefined, 2);
-        document.getElementById('results-status').classList.add('hide');
-        document.getElementById('results-header').classList.add('hide');
+        document.getElementById('results-status').classList.add('invisible');
+        document.getElementById('results-header').classList.add('invisible');
         console.error(message);
         return;
       }

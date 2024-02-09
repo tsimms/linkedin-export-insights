@@ -218,7 +218,8 @@ const getModelDefinitions = (data) => {
       }
     },
     Connection: {
-      messages: (connection, _, context) => new Promise((resolve) => {
+      messages: (connection, _, context)  => {
+debugger;
         const firstName = connection.first_name;
         const lastName = connection.last_name;
         const data_toFilter = data.filter(item =>
@@ -231,11 +232,11 @@ const getModelDefinitions = (data) => {
           item.direction === 'to' &&
           (item.from.includes(`${firstName} ${lastName}`))
         );
-        resolve(responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date))));
-      }),
-      message_count: async (connection, _, context) => {
+        return (responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date))));
+      },
+      message_count: (connection, _, context) => {
 debugger;
-        const messages = await connection.messages;
+        const messages = context.messages;
         return messages.length;
       }
     },

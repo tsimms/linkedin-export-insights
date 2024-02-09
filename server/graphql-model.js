@@ -224,7 +224,7 @@ const getModelDefinitions = (data) => {
         const data_toFilter = data.filter(item =>
           item.type === 'message' &&
           item.direction === 'from' &&
-          (item.to.split(/,(?[^ ])/).includes(`${firstName} ${lastName}`))
+            (item.to.split(/,(?![ ])/).includes(`${firstName} ${lastName}`))
         );
         const data_fromFilter = data.filter(item =>
           item.type === 'message' &&
@@ -237,7 +237,7 @@ const getModelDefinitions = (data) => {
     Message: {
       connections: (parent, _, context) => {
         const connectionIds = (parent.direction === 'from')
-          ? parent.to.split(/,(?[^ ])/)
+          ? parent.to.split(/,(?![ ])/)
           : [ parent.from ]
         const connectionStore = {};
         const connectionsSet = getCache(context, "connections");

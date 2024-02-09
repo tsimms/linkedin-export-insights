@@ -9,6 +9,7 @@
   <style type="text/css">
     body { font-family: "Real Text Pro", "Helvetica Neue", Arial, sans-serif; color: #222; }
     .hide { display: none; }
+    .invisible { visibility: hidden; }
     hr { margin: 20px 0; }
     #page-container { max-width:920px; margin:0 auto; }
     .float-container { height:40px; }
@@ -80,12 +81,12 @@
         </div>
         <div id="results">
           <div class="spacer-20h"></div>
-          <div id="results-header" class="hide">
+          <div id="results-header" class="invisible">
             <span id="results-duration"></span>
             <span id="results-size"></span>
           </div>
           <textarea id="explore-results"></textarea>
-          <div id="results-status" class="hide">
+          <div id="results-status" class="invisible">
             <span id="results-count"></span>
             <button id="btn-copy">Copy</button>
           </div>

@@ -233,14 +233,11 @@ const getModelDefinitions = (data) => {
         );
          
         const results = responseObject([...data_toFilter, ...data_fromFilter]).sort((a,b) => (new Date(a.date) - new Date(b.date)));
-        context.messages = results;
-        debugger;
+        connection.messages = results
         return results;
       },
       message_count: (connection, _, context) => {
-debugger;
-        const messages = context.messages;
-        return messages.length;
+        return connection.messages.length;
       }
     },
     Message: {

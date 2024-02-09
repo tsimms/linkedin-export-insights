@@ -165,6 +165,7 @@ const launchServer = async (uploadedFile) => {
 window.addEventListener('message', (event) => {
   const { data, origin } = event;
   if (origin === _serverUrl) {
+    console.log(`Received a server response`);
     try {
       const { type, results, timestamp, message } = JSON.parse(data);
       const duration = (new Date()).getTime() - timestamp;
@@ -172,6 +173,7 @@ window.addEventListener('message', (event) => {
       const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
       const resultsElement = document.getElementById('explore-results');
       if (type === 'bridge_response') {
+debugger;
         resultsElement.value = JSON.stringify(results, undefined, 2);
         if (results.data[Object.keys(results.data)[0]].length) {
           document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;
@@ -363,6 +365,7 @@ const processIntrospectionData = (data) => {
 }
 
 const runQuery = (query) => {
+  document.getElementById('explore-results').value = "";
   document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
     url: _serverUrl, 
     method: 'POST',

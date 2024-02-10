@@ -319,12 +319,18 @@ const processIntrospectionData = (data) => {
     const objectType = q.type.ofType.name;
     debugger;
     const fields = _schema.types.find(t => t.name === objectType).fields
-    const fieldText = fields.map(f => (`${f.name}${f.type.ofType === 'LIST' 
-      ? ` {\n${_schema.types.find(f.type.ofType.ofType.ofType.name).fields.map(ff => (
-        `${ff.type.ofType !== 'LIST' ? `${ff.name}\n` : ""}`
-      ))}}\n`
-      : "\n"
-    } `))
+    let fieldText = '';
+    if (fields) {
+      fieldText = fields.map(f => (`${f.name}${f.type.ofType === 'LIST' 
+        ? ` {\n${_schema.types.find(f.type.ofType.ofType.ofType.name).fields.map(ff => (
+          `${ff.type.ofType !== 'LIST' ? `${ff.name}\n` : ""}`
+        ))}}\n`
+        : "\n"
+      } `))
+    } else {
+      // probably a union with possibleTypes
+    }
+    
     _queries.schema[name] = `
     {
       "query":"query ExampleQuery${

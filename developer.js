@@ -307,6 +307,7 @@ const runIntrospection = async () => {
 const processIntrospectionData = (data) => {
   _schema = data?.data?.__schema;
   const queries = _schema?.types?.find(t => t.name === 'Query')?.fields;
+  console.log({ _schema, _queries });
   // populate select
   const schemaQuerySelect = document.getElementById('schema-query-list');
   queries.forEach(q => {
@@ -357,7 +358,6 @@ ${fieldText}
     }    
     `;
   });
-  console.log({ _schema, _queries });
   /*
 {
   "query":"query ExampleQuery($filter: String!) {

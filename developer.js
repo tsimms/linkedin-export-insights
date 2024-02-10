@@ -325,7 +325,7 @@ const processIntrospectionData = (data) => {
           `${ff.type.ofType !== 'LIST' ? `\t\t${ff.name}\n` : ""}`
         ))}\t}\n`
         : "\n"
-      } `))
+      } `)).join("");
     } else {
       // probably a union with possibleTypes
     }
@@ -345,7 +345,7 @@ const processIntrospectionData = (data) => {
           q.args.length ? q.args.map(a => (`${a.name}: $${a.name}`)).join(', ')
             : ""
         }) {
-${fieldText.join("")}
+${fieldText}
         }
       }",
       "variables":{

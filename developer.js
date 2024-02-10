@@ -94,7 +94,7 @@ const launchServer = async (uploadedFile) => {
       `https://timjimsimms.com/linkedinsight/server/data.js`,
       `https://timjimsimms.com/linkedinsight/server/package.json`
     ],
-    debug:false
+    debug:true
   });
   ({ webcontainerInstance } = server);
   _serverUrl = server.serverUrl;

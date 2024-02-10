@@ -317,7 +317,6 @@ const processIntrospectionData = (data) => {
     schemaQuerySelect.appendChild(option);
     // query processing
     const objectType = q.type.ofType.name;
-    debugger;
     const fields = _schema.types.find(t => t.name === objectType).fields
     let fieldText = '';
     if (fields) {
@@ -346,7 +345,7 @@ const processIntrospectionData = (data) => {
           q.args.length ? q.args.map(a => (`${a.name}: $${a.name}`)).join(', ')
             : ""
         }) {
-          ${q.fieldText}
+          ${fieldText}
         }
       }",
       "variables":{

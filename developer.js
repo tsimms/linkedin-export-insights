@@ -300,7 +300,7 @@ const runIntrospection = async () => {
         }
       }
     "}
-  `.replaceAll('\n',"").replaceAll(/[ ]+/g," ");
+  `.replaceAll('\n',"").replaceAll(/[ \t]+/g," ");
   runQuery(query);
 }
 

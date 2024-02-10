@@ -321,10 +321,9 @@ const processIntrospectionData = (data) => {
     const fields = _schema.types.find(t => t.name === objectType).fields
     let fieldText = '';
     if (fields) {
-      debugger;
-      fieldText = fields.map(f => (`\t${f.name}${f.type.ofType === 'LIST' 
+      fieldText = fields.map(f => (`\t${f.name}${f.type.ofType.kind === 'LIST' 
         ? ` {\n${_schema.types.find(tt => tt.name === f.type.ofType.ofType.ofType.name)?.fields
-          .map(ff => (`${ff.type.ofType !== 'LIST' ? `\t\t${ff.name}\n` : ""}`))
+          .map(ff => (`${ff.type.ofType.kind !== 'LIST' ? `\t\t${ff.name}\n` : ""}`))
         }\t}\n`
         : "\n"
       } `)).join("");

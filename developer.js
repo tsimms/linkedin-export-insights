@@ -306,7 +306,7 @@ const runIntrospection = async () => {
 
 const processIntrospectionData = (data) => {
   _schema = data?.data?.__schema;
-  const queries = _schema?.types?.filter(t => t.name === 'Query')[0]?.fields;
+  const queries = _schema?.types?.find(t => t.name === 'Query')?.fields;
   // populate select
   const schemaQuerySelect = document.getElementById('schema-query-list');
   queries.forEach(q => {
@@ -315,6 +315,15 @@ const processIntrospectionData = (data) => {
     option.textContent = name;
     option.value = name;
     schemaQuerySelect.appendChild(option);
+    // query processing
+    const objectType = q.type.ofType.name;
+    const fields = _schema.types.find(t => t.name === objectType).fields
+    const fieldText = fields.map(f => (`${f.name}${f.type.ofType === 'LIST' 
+      ? ` {\n${_schema.types.find(f.type.ofType.ofType.ofType.name).fields.map(ff => (
+        `${ff.type.ofType !== 'LIST' ? `${ff.name}\n` : ""}`
+      ))}}\n`
+      : "\n"
+    } `))
     _queries.schema[name] = `
     {
       "query":"query ExampleQuery${
@@ -330,11 +339,7 @@ const processIntrospectionData = (data) => {
           q.args.length ? q.args.map(a => (`${a.name}: $${a.name}`)).join(', ')
             : ""
         }) {
-          first_name
-          last_name
-          email_address
-          position
-          company
+          ${q.fieldText}
         }
       }",
       "variables":{

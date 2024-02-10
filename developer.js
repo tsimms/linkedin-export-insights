@@ -346,7 +346,7 @@ const processIntrospectionData = (data) => {
     }    
     `;
   });
-  console.log({ _queries });
+  console.log({ _schema, _queries });
   /*
 {
   "query":"query ExampleQuery($filter: String!) {

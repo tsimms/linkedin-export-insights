@@ -391,7 +391,7 @@ const getQuery = () => {
   const query = document.getElementById('explore-query')
     .value
     .replaceAll('\n',"")
-    .replaceAll(/[ ]+/g," ");
+    .replaceAll(/[ \t]+/g," ");
   runQuery(query);
 }
 

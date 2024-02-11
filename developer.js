@@ -129,6 +129,7 @@ const launchServer = async (uploadedFile) => {
     src="${_serverUrl}/inigo"
     ></iframe>
   `;
+  document.getElementById('embedded-sandbox').classList.remove('hide');
 
   /*
   {

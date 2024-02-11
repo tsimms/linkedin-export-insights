@@ -23,7 +23,7 @@
     content: ''; background-color: #ccc; cursor: ns-resize;
     position: absolute; left: 0; height: 4px; width: 100%; 
   }
-  #embedded-sandbox { width: 125%; height: 1000px; transform: scale(0.8); transform-origin: 0 0; }
+  #embedded-sandbox { width: 100%; height: 1000px; transform: scale(1.0); transform-origin: 0 0; }
   #explore-dashboard { height:100%; }
   #explore-dashboard #bridge { height:0; }
   #explore { display:flex; height:100%; }

@@ -307,7 +307,6 @@ const analyticsCalc = (label, dataset) => {
   const current_span = (dataset_now.span / 86400000).toFixed(1);
   const elapsed = (current_span / past_span_avg).toFixed(3);
   const projected = elapsed !== '0.000' ? Math.round((current / elapsed)).toFixed(1) : "0";
-  console.log({ label, current, elapsed, current_span, past_span_avg, projected });
   const projectionAboveAvg = (parseFloat(projected) >= parseFloat(mean)); // yellow
   const currentAboveAvg = (parseFloat(current) >= parseFloat(mean)); // light green
   let goal = 0;

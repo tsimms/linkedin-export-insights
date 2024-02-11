@@ -124,12 +124,14 @@ const launchServer = async (uploadedFile) => {
   `;
   */
 
+  /*
   document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${_serverUrl}/inigo"
     ></iframe>
   `;
   document.getElementById('embedded-sandbox').classList.remove('hide');
+*/
 
   /*
   {

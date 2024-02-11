@@ -321,11 +321,9 @@ const processIntrospectionData = (data) => {
     schemaQuerySelect.appendChild(option);
     // query processing
     const objectType = q.type.ofType.name;
-    console.log({ q, objectType });
     const fields = _schema.types.find(t => t.name === objectType).fields
     let fieldText = '';
     if (fields) {
-      console.log({ fields });
       fieldText = fields.map(f => (`\t${f.name}${f.type.ofType.kind === 'LIST' 
         ? ` {\n${_schema.types.find(tt => tt.name === f.type.ofType.ofType.ofType.name)?.fields
           .map(ff => (`${ff.type.ofType.kind !== 'LIST' ? `\t\t${ff.name}\n` : ""}`)).join("")

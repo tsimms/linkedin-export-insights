@@ -123,13 +123,13 @@ const launchServer = async (uploadedFile) => {
     ></iframe>
   `;
   */
-/*
+
   document.getElementById('embedded-sandbox').innerHTML = `
   <iframe style="width:100%; height:100%"
     src="${_serverUrl}/inigo"
     ></iframe>
   `;
-*/
+
   /*
   {
     "welcomeModal": [],

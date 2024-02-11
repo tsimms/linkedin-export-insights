@@ -119,11 +119,24 @@ const startApolloServer = async () => {
   });
 
   app.use('/inigo', (req, res) => {
+    /*
     setProxyRoute(req, res, {
       route: '/inigo',
       targetHost: 'explorer.inigo.io',
       replacements: []
-    })
+    });
+    */
+    res.send(`
+<html>
+  <head>
+    <base href="https://explorer.inigo.io">
+    <script type="module" crossorigin src="/assets/index-6211fc1a.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-c80688b3.css">
+  </head>
+  <body>
+  </body>
+</html>
+    `)
   });
 
 

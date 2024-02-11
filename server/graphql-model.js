@@ -12,7 +12,6 @@ const getModelDefinitions = (data) => {
       messagesByConversation(from: String, to: String, startDate: String, endDate: String): [Message]
       activitiesByDate(startDate: String, endDate: String): [Activity]
       connectionsByFilter(filter: String!, startDate: String, endDate: String): [Connection]
-      connectionMessages(firstName: String!, lastName: String!): [Message!]!
     }
 
     type Message {
@@ -183,19 +182,6 @@ const getModelDefinitions = (data) => {
             item.position.includes(filter)));
 
         return responseObject(data_keywordFilter);
-      },
-      connectionMessages: (parent, { firstName, lastName }, context, info) => {
-        const data_toFilter = data.filter(item =>
-          item.type === 'message' &&
-          item.direction === 'to' &&
-          (item.to.includes(firstName) && item.to.includes(lastName))
-        );
-        const data_fromFilter = data.filter(item =>
-          item.type === 'message' &&
-          item.direction === 'from' &&
-          (item.from.includes(firstName) && item.from.includes(lastName))
-        );
-        return responseObject([...data_toFilter, ...data_fromFilter]);
       }
     },
     DateTime: DateTimeResolver,

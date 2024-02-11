@@ -37,6 +37,7 @@ const filterKeys = (granularity, data) => {
 
 const setChart = (data) => {
   let labels = [];
+  const dayms = 86400000;
   const { granularity } = _settings.options;
   const ignoreGroupPosts = _settings.options.ignoreGroupPosts === "yes";
 
@@ -65,7 +66,7 @@ const setChart = (data) => {
           .map(x => (data.SentMessages[x] ? { 
             x,
             y:data.SentMessages[x].length,
-            span:(new Date(data.SentMessages[x][0].date) - new Date(data.SentMessages[x][data.SentMessages[x].length-1].date)),
+            span:(new Date(data.SentMessages[x][0].date) - new Date(data.SentMessages[x][data.SentMessages[x].length-1].date) + dayms),
             first:new Date(data.SentMessages[x][0].date),
             last:new Date(data.SentMessages[x][data.SentMessages[x].length-1].date)
           } : { x, y:0, span:0 }))
@@ -77,7 +78,7 @@ const setChart = (data) => {
           .map(x => (data.Connections[x] ? {
             x,
             y:data.Connections[x].length,
-            span:(new Date(data.Connections[x][0].date) - new Date(data.Connections[x][data.Connections[x].length-1].date)),
+            span:(new Date(data.Connections[x][0].date) - new Date(data.Connections[x][data.Connections[x].length-1].date) + dayms),
             first:new Date(data.Connections[x][0].date),
             last:new Date(data.Connections[x][data.Connections[x].length-1].date)
           } : { x, y:0, span:0 }))
@@ -89,7 +90,7 @@ const setChart = (data) => {
           .map(x => (data.Comments[x] ? {
             x,
             y:data.Comments[x].length,
-            span:(new Date(data.Comments[x][0].date) - new Date(data.Comments[x][data.Comments[x].length-1].date)),
+            span:(new Date(data.Comments[x][0].date) - new Date(data.Comments[x][data.Comments[x].length-1].date) + dayms),
             first:new Date(data.Comments[x][0].date),
             last:new Date(data.Comments[x][data.Comments[x].length-1].date)
           } : { x, y:0, span:0 }))
@@ -105,6 +106,7 @@ const setChart = (data) => {
               new Date(data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/)))[0].date)
                 - new Date(data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/)))
                   [data.Shares[x].filter(p => (!ignoreGroupPosts || !p.sharelink.match(/group/))).length-1].date)
+                + dayms
             ) : 0,
             first:new Date(data.Shares[x][0].date),
             last:new Date(data.Shares[x][data.Shares[x].length-1].date)
@@ -117,7 +119,7 @@ const setChart = (data) => {
           .map(x => (data.Reactions[x] ? {
             x,
             y:data.Reactions[x].length-1,
-            span:(new Date(data.Reactions[x][0].date) - new Date(data.Reactions[x][data.Reactions[x].length-1].date)),
+            span:(new Date(data.Reactions[x][0].date) - new Date(data.Reactions[x][data.Reactions[x].length-1].date) + dayms),
             first:new Date(data.Reactions[x][0].date),
             last:new Date(data.Reactions[x][data.Reactions[x].length-1].date),
             meta:{
@@ -134,7 +136,7 @@ const setChart = (data) => {
           .map(x => (data.Votes[x] ? {
             x,
             y:data.Votes[x].length,
-            span:(new Date(data.Votes[x][0].date) - new Date(data.Votes[x][data.Votes[x].length-1].date)),
+            span:(new Date(data.Votes[x][0].date) - new Date(data.Votes[x][data.Votes[x].length-1].date) + dayms),
             first:new Date(data.Votes[x][0].date),
             last:new Date(data.Votes[x][data.Votes[x].length-1].date)
           } : { x, y:0, span:0 }))

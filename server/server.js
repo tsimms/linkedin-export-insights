@@ -134,6 +134,7 @@ const startApolloServer = async () => {
     <link rel="stylesheet" crossorigin href="/assets/index-c80688b3.css">
   </head>
   <body>
+    <div id="root"></div>
   </body>
 </html>
     `)

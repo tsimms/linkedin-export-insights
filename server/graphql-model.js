@@ -237,13 +237,11 @@ const getModelDefinitions = (data) => {
       my_comments: (share, _, context) => {
         const link = share.sharelink;
         const commentsSet = getCache(context, "comments");
-        debugger;
         const results = commentsSet.filter(c => c.link === link);
         share.my_comments = results;
         return results;
       },
       my_comment_count: (share, _, context) => {
-        debugger;
         return share.my_comments.length;
       }
     },

@@ -139,6 +139,11 @@ const getModelDefinitions = (data) => {
           context.cache = cache;
         }
         break;
+      case "comments":
+        if (empty) {
+          const { cache } = setCache(context, type, data.filter(d => d.type === 'comment'), true);
+          context.cache = cache;
+        }
       default:
         if (empty && !context.cache) {
           context.cache = {};

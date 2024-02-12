@@ -75,6 +75,8 @@ const getModelDefinitions = (data) => {
       year: Int!
       month: String!
       week: String!
+      my_comment_count: Int!
+      my_comments: [Comment!]!
     }
 
     type Reaction {
@@ -224,6 +226,17 @@ const getModelDefinitions = (data) => {
       },
       message_count: (connection, _, context) => {
         return connection.messages.length;
+      }
+    },
+    Share: {
+      my_comments: (share, _, context) => {
+        const link = share.sharelink;
+        const commentsSet = getCache(context, "comments");
+        const results = commentsSet.filter(c => c.link === link);
+        share.my_comments = results;
+      },
+      my_comment_count: (share, _, context) => {
+        return share.my_comments.length;
       }
     },
     Message: {

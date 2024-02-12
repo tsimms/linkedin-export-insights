@@ -275,7 +275,7 @@ const getModelDefinitions = (data) => {
         return result;
       },
       my_comment: (reaction, _, context) => {
-        const { link } = reaction;
+        let { link } = reaction;
         link = link.split('?')[0];
         if (reaction.content_type !== 'COMMENT')
           return null;

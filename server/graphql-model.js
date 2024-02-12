@@ -75,8 +75,8 @@ const getModelDefinitions = (data) => {
       year: Int!
       month: String!
       week: String!
-      my_comment_count: Int!
       my_comments: [Comment!]!
+      my_comment_count: Int!
     }
 
     type Reaction {

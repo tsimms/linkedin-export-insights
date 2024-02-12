@@ -88,6 +88,8 @@ const getModelDefinitions = (data) => {
       year: Int!
       month: String!
       week: String!
+      content_type: String!
+      my_content: Share!
     }
 
     type Vote {
@@ -144,6 +146,13 @@ const getModelDefinitions = (data) => {
           const { cache } = setCache(context, type, data.filter(d => d.type === 'comment'), true);
           context.cache = cache;
         }
+        break;
+      case "shares":
+        if (empty) {
+          const { cache } = setCache(context, type, data.filter(d => d.type === 'share'), true);
+          context.cache = cache;
+        }
+        break;
       default:
         if (empty && !context.cache) {
           context.cache = {};
@@ -243,6 +252,33 @@ const getModelDefinitions = (data) => {
       },
       my_comment_count: (share, _, context) => {
         return share.my_comments.length;
+      }
+    },
+    Reaction: {
+      content_type: (reaction, _, context) => {
+        const { link } = reaction;
+        let result = '';
+        if (link.includes('commentUrn')) {
+          result = 'COMMENT'
+        } else {
+          result = 'POST'
+        }
+        reaction.content_type = result;
+        return result;
+      },
+      my_content: (reaction, _, context) => {
+        let { link } = reaction;
+        let cacheSet, key;
+        if (reaction.content_type === 'POST') {
+          link = link.split('?')[0];
+          cacheSet = getCache(context, "shares");
+          key = "sharelink";
+        } else {
+          cacheSet = getCache(context, "comments");
+          key = "link";
+        }
+        const result = cacheSet.find(c => c[key] === link);
+        return result;
       }
     },
     Message: {

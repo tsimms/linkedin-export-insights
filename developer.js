@@ -303,7 +303,7 @@ const runIntrospection = async () => {
         }
       }
     "}
-  `.replaceAll('\n',"").replaceAll(/[ \t]+/g," ");
+  `.replaceAll('\n'," ").replaceAll(/[ \t]+/g," ");
   runQuery(query);
 }
 
@@ -314,6 +314,13 @@ const processIntrospectionData = (data) => {
   // populate select
   const schemaQuerySelect = document.getElementById('schema-query-list');
   queries.forEach(q => {
+    const objectFields = (name) => {
+      const fields = _schema.types
+        .find(type => type.name === name)?.fields
+        .map(field => (`${field.type?.ofType?.kind !== 'LIST' ? `\t\t${field.name}\n` : ""}`))
+        .join("")
+      return fields;
+    };
     const { name } = q;
     const option = document.createElement('option');
     option.textContent = name;
@@ -324,11 +331,12 @@ const processIntrospectionData = (data) => {
     const fields = _schema.types.find(t => t.name === objectType).fields
     let fieldText = '';
     if (fields) {
-      fieldText = fields.map(f => (`\t${f.name}${f.type.ofType.kind === 'LIST' 
-        ? ` {\n${_schema.types.find(tt => tt.name === f.type.ofType.ofType.ofType.name)?.fields
-          .map(ff => (`${ff.type.ofType.kind !== 'LIST' ? `\t\t${ff.name}\n` : ""}`)).join("")
-        }\t}\n`
-        : "\n"
+      fieldText = fields.map(f => (`\t${f.name}${
+        f.type.ofType.kind === 'LIST' 
+          ? ` {\n${ objectFields(f.type.ofType.ofType.ofType.name) }\t}\n`
+         : f.type.kind === 'OBJECT' 
+            ? ` {\n${ objectFields(f.type.name) }\t}\n`
+            :"\n"
       } `)).join("");
     } else {
       // probably a union with possibleTypes
@@ -393,7 +401,7 @@ const runQuery = (query) => {
 const getQuery = () => {
   const query = document.getElementById('explore-query')
     .value
-    .replaceAll('\n',"")
+    .replaceAll('\n'," ")
     .replaceAll(/[ \t]+/g," ");
   runQuery(query);
 }

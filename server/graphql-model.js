@@ -89,7 +89,8 @@ const getModelDefinitions = (data) => {
       month: String!
       week: String!
       content_type: String!
-      my_content: Share!
+      my_post: Share
+      my_comment: Comment
     }
 
     type Vote {
@@ -266,18 +267,20 @@ const getModelDefinitions = (data) => {
         reaction.content_type = result;
         return result;
       },
-      my_content: (reaction, _, context) => {
+      my_post: (reaction, _, context) => {
         let { link } = reaction;
-        let cacheSet, key;
-        if (reaction.content_type === 'POST') {
-          link = link.split('?')[0];
-          cacheSet = getCache(context, "shares");
-          key = "sharelink";
-        } else {
-          cacheSet = getCache(context, "comments");
-          key = "link";
-        }
-        const result = cacheSet.find(c => c[key] === link);
+        link = link.split('?')[0];
+        const sharesSet = getCache(context, "shares");
+        const result = sharesSet.find(c => c.sharelink === link);
+        return result;
+      },
+      my_comment: (reaction, _, context) => {
+        const { link } = reaction;
+        link = link.split('?')[0];
+        if (reaction.content_type !== 'COMMENT')
+          return null;
+        const commentsSet = getCache(context, "comments");
+        const result = commentsSet.find(c => c.link === link);
         return result;
       }
     },

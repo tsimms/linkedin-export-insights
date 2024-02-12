@@ -234,6 +234,7 @@ const getModelDefinitions = (data) => {
         const commentsSet = getCache(context, "comments");
         const results = commentsSet.filter(c => c.link === link);
         share.my_comments = results;
+        return results;
       },
       my_comment_count: (share, _, context) => {
         return share.my_comments.length;

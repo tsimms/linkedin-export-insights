@@ -332,7 +332,7 @@ const processIntrospectionData = (data) => {
     let fieldText = '';
     if (fields) {
       fieldText = fields.map(f => (`\t${f.name}${
-        f.type.ofType.kind === 'LIST' 
+        f.type.ofType?.kind === 'LIST' 
           ? ` {\n${ objectFields(f.type.ofType.ofType.ofType.name) }\t}\n`
          : f.type.kind === 'OBJECT' 
             ? ` {\n${ objectFields(f.type.name) }\t}\n`

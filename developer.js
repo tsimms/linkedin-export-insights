@@ -91,6 +91,7 @@ const launchServer = async (uploadedFile) => {
     staticFiles: [
       `https://timjimsimms.com/linkedinsight/server/server.js`,
       `https://timjimsimms.com/linkedinsight/server/graphql-model.js`,
+      `https://timjimsimms.com/linkedinsight/server/enrichment.js`,
       `https://timjimsimms.com/linkedinsight/server/data.js`,
       `https://timjimsimms.com/linkedinsight/server/package.json`
     ],

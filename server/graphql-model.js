@@ -1,4 +1,5 @@
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
+import  { getPost } from './enrichment.js';
 
 const getModelDefinitions = (data) => {
   const typeDefs = `#graphql
@@ -77,6 +78,11 @@ const getModelDefinitions = (data) => {
       week: String!
       my_comments: [Comment!]!
       my_comment_count: Int!
+      author: String
+      numImpressions: Int
+      numLikes: Int
+      numComments: Int
+      numShares: Int
     }
 
     type Reaction {
@@ -165,6 +171,20 @@ const getModelDefinitions = (data) => {
       return context.cache[type][key]
     else
       return context.cache[type]
+  };
+
+  const getEnrichedPost = async (url) => {
+    const post = await getPost(url);
+    if (post.status === 'queued') {
+      post.post = {
+        author: null,
+        numImpressions: null,
+        numLikes: null,
+        numComments: null,
+        numShares: null
+      }
+    } 
+    return post.post;
   }
 
   const resolvers = {
@@ -253,6 +273,26 @@ const getModelDefinitions = (data) => {
       },
       my_comment_count: (share, _, context) => {
         return share.my_comments.length;
+      },
+      author: async (share, _, context) => {
+        const post = await getEnrichedPost(share.sharelink);
+        return post.author;
+      },
+      numImpressions: async (share, _, context) => {
+        const post = await getEnrichedPost(share.sharelink);
+        return post.numImpressions;
+      },
+      numLikes: async (share, _, context) => {
+        const post = await getEnrichedPost(share.sharelink);
+        return post.numLikes;
+      },
+      numComments: async (share, _, context) => {
+        const post = await getEnrichedPost(share.sharelink);
+        return post.numComments;
+      },
+      numShares: async (share, _, context) => {
+        const post = await getEnrichedPost(share.sharelink);
+        return post.numShares;
       }
     },
     Reaction: {

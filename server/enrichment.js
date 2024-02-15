@@ -50,6 +50,7 @@ const runQuery = async (url) => {
     return;
   }
   _fetchBlock = true;
+  console.log ({ url });
   const fetchUrl = transformUrl(url);
   const res = await fetch(fetchUrl, { headers: { ..._headers } });
   const html = await res.text();
@@ -100,7 +101,7 @@ const launchEnrichment = async () => {
   const enrichmentQueue = getRemainingEnrichment(list, existingData);
 */
   _stop = false;
-  while (_enrichmentQueue.length && !_stop && !_fetchBlock) {
+  while (!_stop) {
     await new Promise(resolve => setTimeout(resolve, _interval));  
     if (_enrichmentQueue.length && !_fetchBlock) {
       const nextUrl = _enrichmentQueue.pop();

@@ -57,7 +57,8 @@ const runQuery = async (url) => {
   let returnData = {};
   const code = document.querySelectorAll('code')
 
-  const data = Array.from(document.querySelectorAll('code'))
+  debugger;
+  const data = Array.from(code)
     .map(e => e.innerHTML.replaceAll('\n',''))
     .map(text => { try { return JSON.parse(text) } catch {return {text}} })
     //.filter(e => !e.request)

@@ -53,7 +53,9 @@ const runQuery = async (url) => {
   _fetchBlock = true;
   console.log ({ url });
   const fetchUrl = transformUrl(url);
-  const res = await fetch(fetchUrl, { headers: { ..._headers } });
+  const headers = { ..._headers };
+  console.log(headers);
+  const res = await fetch(fetchUrl, headers );
   const html = await res.text();
   const { document } = (new JSDOM(html)).window;
   let returnData = {};
@@ -64,7 +66,7 @@ const runQuery = async (url) => {
     .map(text => { try { return JSON.parse(text) } catch {return {text}} })
     //.filter(e => !e.request)
     .find(e => e.included?.length && e.included?.some(d => d.entityUrn.match(/FEED_DETAIL/)))?.included;
-
+debugger;
   if (data) {
     const author = data.find(e => e.$type === "com.linkedin.voyager.feed.render.UpdateV2").actor.name.text;
     const commentary = data.find(e => e.$type === "com.linkedin.voyager.feed.render.UpdateV2").commentary.text.text;

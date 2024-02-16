@@ -83,25 +83,30 @@ const startServer = async (options) => {
   }))
 
 
-  const servers = {};
-  const waitForPorts = () => new Promise(resolve => {
-    webcontainerInstance.on('port', (port, type, url) => {
-      servers[port] = url;
-      log(JSON.stringify({ port, type, url }));
-      if (port === 8008) resolve();
-    })
-  });
+
   webcontainerInstance.on('error', (err) => {
     console.error(err);
-  })
-  const serverUrl = await (() => new Promise((resolve, reject) => {
-    webcontainerInstance.on('server-ready', (port, url) => {
-      log(`Server is ready! URL: ${url}`);
-      resolve(url);
-    });
-  }))();
-  await waitForPorts();
-  const enrichmentUrl = servers['8080'];
+  });
+  const servers = {};
+  const waitForStartups = [
+    new Promise(resolve => {
+      webcontainerInstance.on('port', (port, type, url) => {
+        servers[port] = url;
+        log(JSON.stringify({ port, type, url }));
+        if (port === 8008) resolve({ enrichmentUrl: url });
+      })
+    }),
+    new Promise(resolve => {
+      webcontainerInstance.on('server-ready', (port, url) => {
+        log(`Server is ready! URL: ${url}`);
+        resolve({ serverUrl: url });
+      });
+    })
+  ];
+
+  urls = await Promise.all(waitForStartups);
+  console.log(`got all the Urls: ${urls}`);
+  const { enrichmentUrl, serverUrl } = urls; 
   return { webcontainerInstance, serverUrl, enrichmentUrl };
 };
 

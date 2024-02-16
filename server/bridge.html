@@ -54,6 +54,7 @@
   ws.onerror = (error) => { console.error('WebSocket error:', error); };
 
   ws.onmessage = (event) => {
+    debugger;
     const data = JSON.parse(event.data);
     console.log('Received a proxy fetch message for ' + data.url);
     if (data.action === 'fetch') {

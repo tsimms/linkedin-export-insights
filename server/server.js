@@ -177,7 +177,8 @@ const startApolloServer = async () => {
     const { hostname } = req.query;
     res.setHeader('Content-type', 'text/html');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.send(bridgeFile.replace('%hostname%', hostname));
+    debugger;
+    res.send(bridgeFile.toString().replace('%hostname%', hostname));
   })
 
   app.get('/favicon.ico', (req, res) => {

@@ -17,7 +17,7 @@ jobs:
       - run: npm install
       - run: npm run build --if-present
       - name: Copy server files
-        run: mkdir dist/server ; cp -R server/*.js* dist/server/
+        run: mkdir dist/server ; cp -R server/*.js* server/*.html dist/server/
       - name: Sync files to S3 bucket
         run: |
           aws s3 sync dist s3://linkedinsight/linkedinsight --delete

@@ -93,7 +93,7 @@ const startServer = async (options) => {
       webcontainerInstance.on('port', (port, type, url) => {
         servers[port] = url;
         log(JSON.stringify({ port, type, url }));
-        if (port === 8008) resolve({ enrichmentUrl: url });
+        if (port === 8080) resolve({ enrichmentUrl: url });
       })
     }),
     new Promise(resolve => {

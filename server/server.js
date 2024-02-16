@@ -22,7 +22,7 @@ const loadData = async (filename) => {
   return dataModel;
 };
 
-const proxyQueue = [];
+const bridgeFile = await fs.readFile('bridge.html');
 
 const startApolloServer = async () => {
   const dataModel = await loadData("dataFile.zip");
@@ -177,74 +177,7 @@ const startApolloServer = async () => {
     const { hostname } = req.query;
     res.setHeader('Content-type', 'text/html');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-    res.send(`
-  <script>
-    // receive client request and send to server
-    window.addEventListener('message', async (event) => {
-      const { data, origin } = event;
-      try {
-        console.log('BRIDGE data: ' + data);
-        const { action } = JSON.parse(data);
-        if (action === 'fetch') {
-          await doFetch(data);
-        } else if (action === 'bridge_proxy_response') {
-          sendProxyResponse(data);
-        }
-      } catch (e) {
-        console.log('Expecting action property in ' + data);
-      }
-    });
-
-    const doFetch = async (data) => {
-      try {
-        const { action, url, method, headers, body, timestamp } = JSON.parse(data);
-        console.log({ body });
-        // body is JSON
-        const res = await fetch(url, { method, headers, body });
-        if (res.ok) {
-          // process results from server
-          const results = await res.json();
-          let type = 'bridge_response';
-          if (JSON.parse(body).query.includes('query IntrospectionQuery')) {
-            type = 'bridge_introspection';
-          }
-          console.log('BRIDGE: sending "' + type + '" response from successful query');
-          window.parent.postMessage(JSON.stringify({ type, timestamp, results }), origin);
-        } else {
-          const { errors } = await res.json();
-          const message = 'Error response from endpoint: ' + res.statusText;
-          window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message, results: errors }), origin);
-        }
-      } catch (e) {
-        const message = 'Error sending request to endpoint';
-        console.error(message);
-        window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message }), origin);
-      }
-    }
-
-    const sendProxyResponse = (data) => {
-      const { body } = JSON.parse(data);
-      debugger;
-      ws.send(body);
-    }
-    
-    const ws = new WebSocket('ws://${hostname}:8080');
-    ws.onopen = () => { console.log('WebSocket connection established.'); };
-    ws.onclose = () => { console.log('WebSocket connection closed.'); };
-    ws.onerror = (error) => { console.error('WebSocket error:', error); };
-
-      ws.onmessage = (event) => {
-        console.log('Received a proxy fetch message for ' + data.url);
-        const data = JSON.parse(event.data);
-        if (data.action === 'fetch') {
-          const { url } = data;
-          window.parent.postMessage(JSON.stringify({ type: 'bridge_proxy_request', url }), origin)
-        }
-      })('${hostname}')
-
-  
-  </script>
-    `);
+    res.send(bridgeFile);
   })
 
   app.get('/favicon.ico', (req, res) => {

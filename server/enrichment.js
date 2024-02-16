@@ -159,7 +159,7 @@ const getPost = async (url) => {
 }
 
 (async() => {
-  _enrichmentQueue = enrichmentQueue;
+//  _enrichmentQueue = enrichmentQueue;
   await launchEnrichment();
 })()
 

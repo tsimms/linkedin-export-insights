@@ -175,6 +175,7 @@ const getModelDefinitions = (data) => {
 
   const getEnrichedPost = async (url) => {
     const post = await getPost(url);
+    debugger;
     if (post.status === 'queued') {
       post.post = {
         author: null,

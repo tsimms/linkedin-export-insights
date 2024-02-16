@@ -21,7 +21,7 @@ const hideLoading = () => {
 }
 
 const showExplore = () => new Promise(( resolve ) => {
-  const serverHostname = _serverUrl.split(':')[1].replace('//','');
+  const serverHostname = _serverUrl.split(':')[1].replaceAll('/','');
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
   // set up the client/server comms, which also instantiates ws connection

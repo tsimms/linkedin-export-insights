@@ -96,7 +96,8 @@ const startServer = async (options) => {
       resolve(url);
     });
   }))();
-  return { webcontainerInstance, serverUrl };
+  const enrichmentUrl = servers[8080];
+  return { webcontainerInstance, serverUrl, enrichmentUrl };
 };
 
 

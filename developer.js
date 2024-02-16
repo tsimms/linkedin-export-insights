@@ -2,7 +2,7 @@ import gqlContainer from './gql-container.js';
 import { ApolloSandbox } from '@apollo/sandbox';
 import './developer.css';
 
-let webcontainerInstance, _serverUrl, _schema;
+let webcontainerInstance, _serverUrl, _enrichmentUrl, _schema;
 const _queries = { schema: {}, saved: {} };
 
 
@@ -21,7 +21,7 @@ const hideLoading = () => {
 }
 
 const showExplore = () => new Promise(( resolve ) => {
-  const serverHostname = _serverUrl.split(':')[1].replaceAll('/','');
+  const serverHostname = _enrichmentUrl.split(':')[1].replaceAll('/','');
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
   // set up the client/server comms, which also instantiates ws connection
@@ -103,8 +103,10 @@ const launchServer = async (uploadedFile) => {
   });
   ({ webcontainerInstance } = server);
   _serverUrl = server.serverUrl;
+  _enrichmentUrl = server.enrichmentUrl;
 
   console.log(`Server URL: ${_serverUrl}!`);
+  console.log(`Enrichment URL: ${_enrichmentUrl}!`);
   hideLoading();
   await showExplore();
   runIntrospection();

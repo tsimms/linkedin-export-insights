@@ -7,7 +7,7 @@
       console.log('BRIDGE data: ' + data);
       const { action } = JSON.parse(data);
       if (action === 'fetch') {
-          await doFetch(data);
+          await doFetch(data, origin);
       } else if (action === 'bridge_proxy_response') {
           sendProxyResponse(data);
       }
@@ -16,7 +16,7 @@
       }
   });
 
-  const doFetch = async (data) => {
+  const doFetch = async (data, origin) => {
     try {
       const { action, url, method, headers, body, timestamp } = JSON.parse(data);
       console.log({ body });
@@ -27,7 +27,7 @@
       const results = await res.json();
       let type = 'bridge_response';
       if (JSON.parse(body).query.includes('query IntrospectionQuery')) {
-      type = 'bridge_introspection';
+        type = 'bridge_introspection';
       }
       console.log('BRIDGE: sending "' + type + '" response from successful query');
       window.parent.postMessage(JSON.stringify({ type, timestamp, results }), origin);
@@ -45,7 +45,6 @@
 
   const sendProxyResponse = (data) => {
     const { body } = JSON.parse(data);
-    debugger;
     ws.send(body);
   }
 

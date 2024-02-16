@@ -103,6 +103,7 @@ const startServer = async (options) => {
   ];
 
   const urls = await Promise.all(waitForStartups);
+  debugger;
   console.log(`got all the Urls: ${urls}`);
   const { enrichmentUrl, serverUrl } = urls; 
   return { webcontainerInstance, serverUrl, enrichmentUrl };

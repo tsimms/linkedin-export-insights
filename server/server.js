@@ -177,7 +177,6 @@ const startApolloServer = async () => {
     const { hostname } = req.query;
     res.setHeader('Content-type', 'text/html');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-    debugger;
     res.send(bridgeFile.toString().replace('%hostname%', hostname));
   })
 

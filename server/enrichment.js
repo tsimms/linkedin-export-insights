@@ -9,6 +9,7 @@ let _enrichmentQueue = [];
 
 // Set up websocket to shuttle enrichment proxy fetching from client
 const wss = new WebSocket.Server({ port: 8080 });
+console.log(`running wss server.`);
 const clientProxyFetch = (url) => {
   return new Promise((resolve, reject) => {
     const client = new WebSocket('ws://localhost:8080');    

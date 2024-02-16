@@ -149,6 +149,7 @@ const stopEnrichment = () => {
 }
 
 const getPost = async (url) => {
+  debugger;
   if (_enrichmentData[url])
     return _enrichmentData[url];
   if (!_enrichmentQueue.length) {

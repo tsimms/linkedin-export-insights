@@ -88,7 +88,7 @@ const startServer = async (options) => {
     webcontainerInstance.on('port', (port, type, url) => {
       servers[port] = url;
       log(JSON.stringify({ port, type, url }));
-      if (servers.length === 2) resolve();
+      if (port === 8008) resolve();
     })
   });
   webcontainerInstance.on('error', (err) => {

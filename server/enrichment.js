@@ -108,7 +108,6 @@ const clientProxyFetch = (url) => {
     const message = { action: 'fetch', url };
     _clientConnection.send(JSON.stringify(message));
     _clientConnection.on('message', (message) => {
-      debugger;
       resolve(message);
       _clientConnection.close();
     });
@@ -149,7 +148,6 @@ const stopEnrichment = () => {
 }
 
 const getPost = async (url) => {
-  debugger;
   if (_enrichmentData[url])
     return _enrichmentData[url];
   if (!_enrichmentQueue.length) {

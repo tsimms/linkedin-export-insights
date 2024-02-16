@@ -104,7 +104,6 @@ const startServer = async (options) => {
 
   const urls = (await Promise.all(waitForStartups))
     .reduce((acc, obj) => Object.assign(acc, obj), {})
-  debugger;
   console.log(`got all the Urls: ${urls}`);
   const { enrichmentUrl, serverUrl } = urls; 
   return { webcontainerInstance, serverUrl, enrichmentUrl };

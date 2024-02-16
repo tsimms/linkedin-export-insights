@@ -116,25 +116,19 @@ const clientProxyFetch = (url) => {
   });
 };
 
-_proxyWss.on('connection', (ws) => {
-  console.log('Client connected.');
-  _clientConnection = ws;
-  ws.on('close', () => {
-      console.log('Client disconnected.');
-      _clientConnection = null;
-  });
-});
-
-
-
 
 const launchEnrichment = async () => {
-/*
-  const existingData = getEnrichmentDataFromStorage();
-  const enrichmentQueue = getRemainingEnrichment(list, existingData);
-*/
   _proxyWss = new WebSocket.Server({ port: 8080 });
+  _proxyWss.on('connection', (ws) => {
+    console.log('Client connected.');
+    _clientConnection = ws;
+    ws.on('close', () => {
+        console.log('Client disconnected.');
+        _clientConnection = null;
+    });
+  });
   console.log(`running wss server.`);
+
 
   _stop = false;
   while (!_stop) {

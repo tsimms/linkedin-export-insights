@@ -233,7 +233,8 @@ const startApolloServer = async () => {
 
   await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
   console.log(`🚀 Apollo Server ready at http://localhost:4000`);
-  launchEnrichment();
+  // hmmm, still a race condition...
+  setTimeout(launchEnrichment, 3000);
 };
 
 // Start Apollo Server

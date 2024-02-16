@@ -1,5 +1,5 @@
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
-import  { getPost } from './enrichment.js';
+import  { getPost, launchEnrichment, stopEnrichment } from './enrichment.js';
 
 const getModelDefinitions = (data) => {
   const typeDefs = `#graphql
@@ -360,4 +360,4 @@ const getModelDefinitions = (data) => {
   return { typeDefs, resolvers };
 };
 
-export default getModelDefinitions;
+export { getModelDefinitions, launchEnrichment, stopEnrichment };

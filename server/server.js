@@ -11,7 +11,7 @@ import { promises as fs } from 'fs';
 import zlib from 'zlib';
 import JSZip from 'jszip';
 import { ingest } from './data.js';
-import getModelDefinitions from './graphql-model.js';
+import { getModelDefinitions, launchEnrichment, stopEnrichment } from './graphql-model.js';
 
 let _serverUrl = '';
 
@@ -303,3 +303,4 @@ const startApolloServer = async () => {
 
 // Start Apollo Server
 startApolloServer();
+launchEnrichment();

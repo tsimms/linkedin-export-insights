@@ -6,34 +6,8 @@ let _stop = false;
 let _fetchBlock = false;
 let _enrichmentData = {};
 let _enrichmentQueue = [];
-
-// Set up websocket to shuttle enrichment proxy fetching from client
-const wss = new WebSocket.Server({ port: 8080 });
-console.log(`running wss server.`);
-const clientProxyFetch = (url) => {
-  return new Promise((resolve, reject) => {
-    const client = new WebSocket('ws://localhost:8080');    
-    client.on('open', () => {
-      console.log(`sending ${url} to client to fetch`);
-      client.send(JSON.stringify({ action: 'fetch', url }));
-    });
-    client.on('message', (message) => {
-      debugger;
-      resolve(message);
-      client.close();
-    });
-
-    client.on('error', (error) => { reject(error); });
-  });
-};
-
-wss.on('connection', (ws) => {
-  ws.on('message', (message) => {
-    // Handle messages from the client 
-  });
-});
-
-
+let _proxyWss;
+let _clientConnection = null;
 
 /*
 const getEnrichmentDataFromStorage = () => {
@@ -124,11 +98,44 @@ const runQuery = async (url) => {
   return returnData;
 }
 
+
+const clientProxyFetch = (url) => {
+  return new Promise((resolve, reject) => {
+    if (!_clientConnection) {
+      reject('No client connection available.');
+      return;
+    }
+    const message = { action: 'fetch', url };
+    _clientConnection.send(JSON.stringify(message));
+    _clientConnection.on('message', (message) => {
+      debugger;
+      resolve(message);
+      _clientConnection.close();
+    });
+    _clientConnection.once('error', (error) => { reject(error); });
+  });
+};
+
+_proxyWss.on('connection', (ws) => {
+  console.log('Client connected.');
+  _clientConnection = ws;
+  ws.on('close', () => {
+      console.log('Client disconnected.');
+      _clientConnection = null;
+  });
+});
+
+
+
+
 const launchEnrichment = async () => {
 /*
   const existingData = getEnrichmentDataFromStorage();
   const enrichmentQueue = getRemainingEnrichment(list, existingData);
 */
+  _proxyWss = new WebSocket.Server({ port: 8080 });
+  console.log(`running wss server.`);
+
   _stop = false;
   while (!_stop) {
     await new Promise(resolve => setTimeout(resolve, _interval));  
@@ -160,9 +167,5 @@ const getPost = async (url) => {
   return { status: 'queued' };
 }
 
-(async() => {
-//  _enrichmentQueue = enrichmentQueue;
-  await launchEnrichment();
-})()
 
-export { getPost };
+export { getPost, launchEnrichment, stopEnrichment };

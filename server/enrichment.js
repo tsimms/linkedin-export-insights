@@ -18,6 +18,7 @@ const clientProxyFetch = (url) => {
       client.send(JSON.stringify({ action: 'fetch', url }));
     });
     client.on('message', (message) => {
+      debugger;
       resolve(message);
       client.close();
     });

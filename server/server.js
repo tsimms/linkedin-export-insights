@@ -174,6 +174,7 @@ const startApolloServer = async () => {
   });
 
   app.get('/bridge', (req, res) => {
+    const { hostname } = req.query;
     res.setHeader('Content-type', 'text/html');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     res.send(`
@@ -182,12 +183,12 @@ const startApolloServer = async () => {
     window.addEventListener('message', async (event) => {
       const { data, origin } = event;
       try {
+        console.log('BRIDGE data: ' + data);
         const { action } = JSON.parse(data);
         if (action === 'fetch') {
           await doFetch(data);
-        } else if (action === 'ws') {
-          const { url, headers } = JSON.parse(data);
-          doWSSetup (url, headers);
+        } else if (action === 'bridge_proxy_response') {
+          sendProxyResponse(data);
         }
       } catch (e) {
         console.log('Expecting action property in ' + data);
@@ -220,23 +221,26 @@ const startApolloServer = async () => {
         window.parent.postMessage(JSON.stringify({ type: 'bridge_error', message }), origin);
       }
     }
+
+    const sendProxyResponse = (data) => {
+      const { body } = JSON.parse(data);
+      debugger;
+      ws.send(body);
+    }
     
-    const doWSSetup = (url, headers) => {
-      const ws = new WebSocket(url);
-      ws.onopen = () => { console.log('WebSocket connection established.'); };
-      ws.onclose = () => { console.log('WebSocket connection closed.'); };
-      ws.onerror = (error) => { console.error('WebSocket error:', error); };
-      ws.onmessage = async (event) => {
+    const ws = new WebSocket('ws://${hostname}:8080');
+    ws.onopen = () => { console.log('WebSocket connection established.'); };
+    ws.onclose = () => { console.log('WebSocket connection closed.'); };
+    ws.onerror = (error) => { console.error('WebSocket error:', error); };
+
+      ws.onmessage = (event) => {
         console.log('Received a proxy fetch message for ' + data.url);
         const data = JSON.parse(event.data);
         if (data.action === 'fetch') {
           const { url } = data;
-          const response = await fetch(url, { headers });
-          const html = await response.text();
-          ws.send(html);
+          window.parent.postMessage(JSON.stringify({ type: 'bridge_proxy_request', url }), origin)
         }
-      };  
-    }
+      })('${hostname}')
 
   
   </script>

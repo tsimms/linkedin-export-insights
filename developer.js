@@ -21,6 +21,7 @@ const hideLoading = () => {
 }
 
 const showExplore = () => new Promise(( resolve ) => {
+  const serverHostname = _serverUrl.split(':')[1].replace('//','');
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
   // set up the client/server comms, which also instantiates ws connection
@@ -28,22 +29,8 @@ const showExplore = () => new Promise(( resolve ) => {
   var iframe = document.createElement('iframe');
   iframe.id = 'bridge-frame';
   iframe.onload = resolve;
-  iframe.src = `${_serverUrl}/bridge`;
+  iframe.src = `${_serverUrl}/bridge?hostname=${serverHostname}`;
   document.getElementById('bridge').appendChild(iframe);
-
-  const wsUrl = _serverUrl.replace(/https:/, 'ws:').split(/:[0-9]+$/)[0] + ':8080';
-  const headers = {
-    cookie: 'bcookie="v=2&34a8d04f-d347-493d-821a-e4259365bf12"; bscookie="v=1&202401091826037a8172c2-abe5-4edf-867f-178c3e13bfbdAQGc5Pk1ia2_LQKFzk0b623zLdu1bP6Q"; _gcl_au=1.1.633320568.1704824766; aam_uuid=86963082424392267153885736013401379176; g_state={"i_l":0}; li_rm=AQG3BKIg19KvzAAAAYzve9bGSKIOIqyEekj1mmi16Rb6G6PH3M2TV5LSPx3J-oVYNbQDuc5ivIYsq63DWG6zYuh8ySLxUOkrwQ4E5aabV3QB0HbzDCZefrwO; timezone=America/New_York; li_theme=light; li_theme_set=app; li_sugr=625df826-a160-4b38-8273-be4fa62fdcc4; _guid=d19463ee-2544-423c-be69-2a9580caaebb; JSESSIONID="ajax:6752329053734170832"; liap=true; lang=v=2&lang=en-us; li_alerts=e30=; AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg=1; dfpfpt=4e9472be1eb5443c93db0fbb5fe8be1e; AnalyticsSyncHistory=AQKYGutAHCbsZQAAAY2eniUOjaLgt85HLwsjtEH8ZjSfnYDdhr0x8TJ9oI5cTF9WchqidWGUmfZcEBsPwngeCQ; lms_ads=AQEHvHvFfD7EnwAAAY2eniWYEJ_hjKZRLTAzI7EdoqpBRQwKVrUCN0bnyamJUiGMwNKyKarrQZquXQmyxEhRrmVdyTnixsRX; lms_analytics=AQEHvHvFfD7EnwAAAY2eniWYEJ_hjKZRLTAzI7EdoqpBRQwKVrUCN0bnyamJUiGMwNKyKarrQZquXQmyxEhRrmVdyTnixsRX; li_at=AQEDAQz5GKYFy9mkAAABjThxJfIAAAGNyJwgsE4AM1rcgrsj5o1VUH4HGPRdQlJ5OcXUfzZFJcd17qEJQneX4BQRJFwMGOr8M5V29tgLblaWKUphDCqhgFcwT0zQHvhwzRvTHm4lvBpL-XZ953YVsrE4; sdsc=1%3A1SZM1shxDNbLt36wZwCgPgvN58iw%3D; fptctx2=taBcrIH61PuCVH7eNCyH0K%252fD9DJ44Cptuv0RyrXgXCvm3%252blUFWu3y%252fc369R5shuBSHDuzdQdBTnvAC90kk1gatD92tkPnXO%252b3tdncNu%252fsFad0ju0bm8u%252bDLKoDDKxR%252flG%252bEU0RX%252bW8xdGO021dP67paDgqcCajhYd2LYvcVFVVRnfLWcdms0IfNdesqV87%252f8c5Vx2bPH%252fCUpqPU9ldEvwenz5boyo4pmzpJE80rnPEMZlOk%252foHao7BqmhikcFXetuM%252f1j1Hqg2GtptHoWbAgNTHMGfnl%252bbDrOqIZNk3%252fAMHpkLYqs0alXQPUgBdOt%252by7fN%252b5%252fw52Kylwt1rIFqAMgdYt2Tx47IY5HGXMZDQkWCU%253d; AMCV_14215E3D5995C57C0A495C55%40AdobeOrg=-637568504%7CMCIDTS%7C19769%7CMCMID%7C86740224657215136163829123382067700387%7CMCAAMLH-1708617775%7C7%7CMCAAMB-1708617775%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1708020175s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C-2116355723; UserMatchHistory=AQI7_2AD1Y5HLwAAAY2txj3yoX1MxdYbwk1XmK-gTkjBlQRihPJgNJMicYK6PXKH8zC5UHglt1BByZFCBSUGirD_F98UGRY4LdM7T7KF5h4JDv1V4rMBqcW56a1RK-p331BePzxmb5gnjYApXp78H29mV8sqZ0LDf7WsSH1KUMMsXMgywOM-vQKE0M-LCEAWuanW3VaPOPSLgmSO-XkYv6SiYIxIgmDC8hjELmD7B9j54jO6r26POKkVKnF7M8sU7gBVE-AZmxkNyLVV9s5eUHahsp55dyCnsODWTZ5-bhARdqAgUx3Ped1mXucOgX2MMxDIPzQ; lidc="b=TB66:s=T:r=T:a=T:p=T:g=4627:u=2109:x=1:i=1708030616:t=1708117016:v=2:sig=AQHk0B4h3NJyrfHarNimfmgn7RqxNxjP"; __cf_bm=Hy4.J9h_UpLzRXdBlUlGKpXFxuy3ECynQbNp0tbvFRE-1708034456-1.0-AVaw5jkZJxh9hFaWLe63792S7QDGWwP+QImi6QZLuh2ll3Fg/h7n+BFQTNaAKH7lBQzbDDn39xC/kPsZXpeH33Y='
-  }
-  document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
-    action: 'ws',
-    url: wsUrl, 
-    method: 'POST',
-    headers,
-    timestamp: (new Date()).getTime(),
-  }), _serverUrl);
-
-
 });
 
 const developerFrameUx = () => {
@@ -181,18 +168,36 @@ const launchServer = async (uploadedFile) => {
 //  window.open(_serverUrl, '_blank');
 }
 
+// Setup comms with bridge to server, for enrichment client proxy
+
+const enrichmentProxy = async (url) => {
+  const headers = {
+    cookie: 'bcookie="v=2&34a8d04f-d347-493d-821a-e4259365bf12"; bscookie="v=1&202401091826037a8172c2-abe5-4edf-867f-178c3e13bfbdAQGc5Pk1ia2_LQKFzk0b623zLdu1bP6Q"; _gcl_au=1.1.633320568.1704824766; aam_uuid=86963082424392267153885736013401379176; g_state={"i_l":0}; li_rm=AQG3BKIg19KvzAAAAYzve9bGSKIOIqyEekj1mmi16Rb6G6PH3M2TV5LSPx3J-oVYNbQDuc5ivIYsq63DWG6zYuh8ySLxUOkrwQ4E5aabV3QB0HbzDCZefrwO; timezone=America/New_York; li_theme=light; li_theme_set=app; li_sugr=625df826-a160-4b38-8273-be4fa62fdcc4; _guid=d19463ee-2544-423c-be69-2a9580caaebb; JSESSIONID="ajax:6752329053734170832"; liap=true; lang=v=2&lang=en-us; li_alerts=e30=; AMCVS_14215E3D5995C57C0A495C55%40AdobeOrg=1; dfpfpt=4e9472be1eb5443c93db0fbb5fe8be1e; AnalyticsSyncHistory=AQKYGutAHCbsZQAAAY2eniUOjaLgt85HLwsjtEH8ZjSfnYDdhr0x8TJ9oI5cTF9WchqidWGUmfZcEBsPwngeCQ; lms_ads=AQEHvHvFfD7EnwAAAY2eniWYEJ_hjKZRLTAzI7EdoqpBRQwKVrUCN0bnyamJUiGMwNKyKarrQZquXQmyxEhRrmVdyTnixsRX; lms_analytics=AQEHvHvFfD7EnwAAAY2eniWYEJ_hjKZRLTAzI7EdoqpBRQwKVrUCN0bnyamJUiGMwNKyKarrQZquXQmyxEhRrmVdyTnixsRX; li_at=AQEDAQz5GKYFy9mkAAABjThxJfIAAAGNyJwgsE4AM1rcgrsj5o1VUH4HGPRdQlJ5OcXUfzZFJcd17qEJQneX4BQRJFwMGOr8M5V29tgLblaWKUphDCqhgFcwT0zQHvhwzRvTHm4lvBpL-XZ953YVsrE4; sdsc=1%3A1SZM1shxDNbLt36wZwCgPgvN58iw%3D; fptctx2=taBcrIH61PuCVH7eNCyH0K%252fD9DJ44Cptuv0RyrXgXCvm3%252blUFWu3y%252fc369R5shuBSHDuzdQdBTnvAC90kk1gatD92tkPnXO%252b3tdncNu%252fsFad0ju0bm8u%252bDLKoDDKxR%252flG%252bEU0RX%252bW8xdGO021dP67paDgqcCajhYd2LYvcVFVVRnfLWcdms0IfNdesqV87%252f8c5Vx2bPH%252fCUpqPU9ldEvwenz5boyo4pmzpJE80rnPEMZlOk%252foHao7BqmhikcFXetuM%252f1j1Hqg2GtptHoWbAgNTHMGfnl%252bbDrOqIZNk3%252fAMHpkLYqs0alXQPUgBdOt%252by7fN%252b5%252fw52Kylwt1rIFqAMgdYt2Tx47IY5HGXMZDQkWCU%253d; AMCV_14215E3D5995C57C0A495C55%40AdobeOrg=-637568504%7CMCIDTS%7C19769%7CMCMID%7C86740224657215136163829123382067700387%7CMCAAMLH-1708617775%7C7%7CMCAAMB-1708617775%7C6G1ynYcLPuiQxYZrsz_pkqfLG9yMXBpb2zX5dvJdYQJzPXImdj0y%7CMCOPTOUT-1708020175s%7CNONE%7CvVersion%7C5.1.1%7CMCCIDH%7C-2116355723; UserMatchHistory=AQI7_2AD1Y5HLwAAAY2txj3yoX1MxdYbwk1XmK-gTkjBlQRihPJgNJMicYK6PXKH8zC5UHglt1BByZFCBSUGirD_F98UGRY4LdM7T7KF5h4JDv1V4rMBqcW56a1RK-p331BePzxmb5gnjYApXp78H29mV8sqZ0LDf7WsSH1KUMMsXMgywOM-vQKE0M-LCEAWuanW3VaPOPSLgmSO-XkYv6SiYIxIgmDC8hjELmD7B9j54jO6r26POKkVKnF7M8sU7gBVE-AZmxkNyLVV9s5eUHahsp55dyCnsODWTZ5-bhARdqAgUx3Ped1mXucOgX2MMxDIPzQ; lidc="b=TB66:s=T:r=T:a=T:p=T:g=4627:u=2109:x=1:i=1708030616:t=1708117016:v=2:sig=AQHk0B4h3NJyrfHarNimfmgn7RqxNxjP"; __cf_bm=Hy4.J9h_UpLzRXdBlUlGKpXFxuy3ECynQbNp0tbvFRE-1708034456-1.0-AVaw5jkZJxh9hFaWLe63792S7QDGWwP+QImi6QZLuh2ll3Fg/h7n+BFQTNaAKH7lBQzbDDn39xC/kPsZXpeH33Y='
+  };
+  const response = await fetch(url, { headers });
+  const html = await response.text();
+  return html;
+}
+
 // Query response message handler
-window.addEventListener('message', (event) => {
+window.addEventListener('message', async (event) => {
   const { data, origin } = event;
   if (origin === _serverUrl) {
-    console.log(`Received a server response`);
+    console.log(`Received a server message`);
     try {
-      const { type, results, timestamp, message } = JSON.parse(data);
-      const duration = (new Date()).getTime() - timestamp;
-      const size = new TextEncoder().encode(JSON.stringify(results)).length;
-      const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
+      const { type, results, timestamp, message, url } = JSON.parse(data);
       const resultsElement = document.getElementById('explore-results');
-      if (type === 'bridge_response') {
+      const duration = (new Date()).getTime() - timestamp;
+      if (type === 'bridge_proxy_request') {
+        const html = await enrichmentProxy(url);
+        document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+          type: 'bridge_proxy_response',
+          body: html,
+          timestamp: (new Date()).getTime(),
+        }), _serverUrl);      
+      } else if (type === 'bridge_response') {
+        const size = new TextEncoder().encode(JSON.stringify(results)).length;
+        const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
         resultsElement.value = JSON.stringify(results, undefined, 2);
         if (results.data[Object.keys(results.data)[0]].length) {
           document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;

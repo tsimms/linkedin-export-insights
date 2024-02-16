@@ -302,5 +302,5 @@ const startApolloServer = async () => {
 };
 
 // Start Apollo Server
-startApolloServer();
+await startApolloServer();
 launchEnrichment();

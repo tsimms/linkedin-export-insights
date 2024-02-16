@@ -82,11 +82,15 @@ const startServer = async (options) => {
     }
   }))
 
+
   const servers = {};
-  webcontainerInstance.on('port', (port, type, url) => {
-    servers[port] = url;
-    log(JSON.stringify({ port, type, url }));
-  })
+  const waitForPorts = () => new Promise(resolve => {
+    webcontainerInstance.on('port', (port, type, url) => {
+      servers[port] = url;
+      log(JSON.stringify({ port, type, url }));
+      if (servers.length === 2) resolve();
+    })
+  });
   webcontainerInstance.on('error', (err) => {
     console.error(err);
   })
@@ -96,6 +100,7 @@ const startServer = async (options) => {
       resolve(url);
     });
   }))();
+  await waitForPorts();
   const enrichmentUrl = servers['8080'];
   return { webcontainerInstance, serverUrl, enrichmentUrl };
 };

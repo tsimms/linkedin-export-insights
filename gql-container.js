@@ -96,7 +96,7 @@ const startServer = async (options) => {
       resolve(url);
     });
   }))();
-  const enrichmentUrl = servers[8080];
+  const enrichmentUrl = servers['8080'];
   return { webcontainerInstance, serverUrl, enrichmentUrl };
 };
 

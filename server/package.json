@@ -8,7 +8,8 @@
     "graphql-scalars": "^1.22.4",
     "http-proxy": "^1.18.1",
     "jsdom": "^24.0.0",
-    "jszip": "^3.10.1"
+    "jszip": "^3.10.1",
+    "ws": "^8.16.0"
   },
   "scripts": {
     "server": "node server.js"

@@ -23,6 +23,8 @@ const hideLoading = () => {
 const showExplore = () => new Promise(( resolve ) => {
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
+  // set up the client/server comms, which also instantiates ws connection
+  // TODO: set up handler for caching enrichment proxy results
   var iframe = document.createElement('iframe');
   iframe.id = 'bridge-frame';
   iframe.onload = resolve;
@@ -389,6 +391,7 @@ ${fieldText}
 const runQuery = (query) => {
   document.getElementById('explore-results').value = "";
   document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+    action: 'fetch',
     url: _serverUrl, 
     method: 'POST',
     headers: {

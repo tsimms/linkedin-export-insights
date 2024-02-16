@@ -185,9 +185,10 @@ const enrichmentProxy = async (url) => {
 // Query response message handler
 window.addEventListener('message', async (event) => {
   const { data, origin } = event;
+  debugger;
+
   if (origin === _serverUrl) {
     console.log(`Received a server message: ${JSON.stringify(Array.from(event))}`);
-    debugger;
     try {
       const { type, results, timestamp, message, url } = JSON.parse(data);
       const resultsElement = document.getElementById('explore-results');

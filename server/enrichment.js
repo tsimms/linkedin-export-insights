@@ -106,9 +106,8 @@ const clientProxyFetch = (url) => new Promise((resolve, reject) => {
   _clientConnection.send(JSON.stringify(message));
   _clientConnection.on('message', (message) => {
     const body = message.toString();
-    console.log(`back at the server with this message.. ${body.length}`);
+    console.log(`clientProxyFetch():: response for ${url} of length ${body.length}`);
     resolve(body);
-    // _clientConnection.close();
   });
   _clientConnection.once('error', (error) => { reject(error); });
 });
@@ -145,14 +144,16 @@ const stopEnrichment = () => {
 }
 
 const getPost = async (url) => {
-  debugger
   if (_enrichmentData[url])
     return _enrichmentData[url];
   if (!_enrichmentQueue.length) {
     // get instant request data
     const post = await runQuery(url);
-    _enrichmentData[url] = post;
-    return post;
+    if (post) {
+      _enrichmentData[url] = post;
+      return post;  
+    }
+    // otherwise, might have gotten in there realizing we need to queue instead.
   }
   if (! _enrichmentQueue.includes(url))
     _enrichmentQueue.push(url);

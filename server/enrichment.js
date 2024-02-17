@@ -110,7 +110,7 @@ const clientProxyFetch = (url) => {
     _clientConnection.on('message', (message) => {
       console.log(`back at the server with htis message: JSON.strngify(${message})`);
       resolve(message);
-      _clientConnection.close();
+      // _clientConnection.close();
     });
     _clientConnection.once('error', (error) => { reject(error); });
   });

@@ -60,7 +60,6 @@ const runQuery = async (url) => {
   const { document } = (new JSDOM(html)).window;
   let returnData = {};
   const code = document.querySelectorAll('code')
-  debugger;
   const data = Array.from(code)
     .map(e => e.innerHTML.replaceAll('\n',''))
     .map(text => { try { return JSON.parse(text) } catch {return {text}} })
@@ -150,6 +149,7 @@ const getPost = async (url) => {
   if (!_enrichmentQueue.length) {
     // get instant request data
     const post = await runQuery(url);
+    _enrichmentData[url] = post;
     return post;
   }
   if (! _enrichmentQueue.includes(url))

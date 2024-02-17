@@ -105,8 +105,9 @@ const clientProxyFetch = (url) => new Promise((resolve, reject) => {
   const message = { action: 'fetch', url };
   _clientConnection.send(JSON.stringify(message));
   _clientConnection.on('message', (message) => {
-    console.log(`back at the server with htis message..`);
-    resolve(message.toString());
+    const body = message.toString();
+    console.log(`back at the server with this message.. ${body.length}`);
+    resolve(body);
     // _clientConnection.close();
   });
   _clientConnection.once('error', (error) => { reject(error); });
@@ -144,6 +145,7 @@ const stopEnrichment = () => {
 }
 
 const getPost = async (url) => {
+  debugger
   if (_enrichmentData[url])
     return _enrichmentData[url];
   if (!_enrichmentQueue.length) {

@@ -57,11 +57,10 @@ const runQuery = async (url) => {
   const html = await res.text();
 */
   const html = await clientProxyFetch(fetchUrl);
-  debugger;
   const { document } = (new JSDOM(html)).window;
   let returnData = {};
   const code = document.querySelectorAll('code')
-
+  debugger;
   const data = Array.from(code)
     .map(e => e.innerHTML.replaceAll('\n',''))
     .map(text => { try { return JSON.parse(text) } catch {return {text}} })
@@ -107,7 +106,6 @@ const clientProxyFetch = (url) => new Promise((resolve, reject) => {
   const message = { action: 'fetch', url };
   _clientConnection.send(JSON.stringify(message));
   _clientConnection.on('message', (message) => {
-    debugger;
     console.log(`back at the server with htis message..`);
     resolve(message.toString());
     // _clientConnection.close();

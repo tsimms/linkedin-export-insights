@@ -63,7 +63,7 @@
       const { url } = data;
       const message = JSON.stringify({ type: 'bridge_proxy_request', url });
       console.log(`sending ${ message }`);
-      parentFrame.postMessage(message);
+      parentFrame.postMessage(message, '*');
     }
   }
 </script>

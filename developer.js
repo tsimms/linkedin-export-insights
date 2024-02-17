@@ -184,50 +184,52 @@ const enrichmentProxy = async (url) => {
 
 // Query response message handler
 window.addEventListener('message', async (event) => {
-  console.log('>>>>>> in addEventListener()')
   const { data, origin } = event;
-  console.log (JSON.stringify({ data, origin, _serverUrl }, 2));
+  let incomingData;
+  try {
+    incomingData = JSON.parse(data);
+  } catch (e) {
+    return;
+  }
+  const { type, results, timestamp, message, url } = incomingData;
+
   if (type.startsWith('bridge_')) {
   //if (origin === _serverUrl) {
     console.log(`>>>> in processing for ${data}.`);
-    try {
-      const { type, results, timestamp, message, url } = JSON.parse(data);
-      const resultsElement = document.getElementById('explore-results');
-      const duration = (new Date()).getTime() - timestamp;
-      if (type === 'bridge_proxy_request') {
-        const html = await enrichmentProxy(url);
-        document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
-          type: 'bridge_proxy_response',
-          body: html,
-          timestamp: (new Date()).getTime(),
-        }), _serverUrl);      
-      } else if (type === 'bridge_response') {
-        const size = new TextEncoder().encode(JSON.stringify(results)).length;
-        const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
-        resultsElement.value = JSON.stringify(results, undefined, 2);
-        if (results.data[Object.keys(results.data)[0]].length) {
-          document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;
-          document.getElementById('results-size').innerHTML = sizeText;
-          document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
-          document.getElementById('results-header').classList.remove('invisible');
-          document.getElementById('results-status').classList.remove('invisible');
-        } else {
-          document.getElementById('results-header').classList.add('invisible');
-          document.getElementById('results-status').classList.add('invisible');
-        }
-        return;
-      } else if (type === 'bridge_introspection') {
-        processIntrospectionData(results);
-        return;
-      } else if (type === 'bridge_error') {
-        resultsElement.value = JSON.stringify(results, undefined, 2);
-        document.getElementById('results-status').classList.add('invisible');
+
+    const resultsElement = document.getElementById('explore-results');
+    const duration = (new Date()).getTime() - timestamp;
+    if (type === 'bridge_proxy_request') {
+      const html = await enrichmentProxy(url);
+      document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
+        type: 'bridge_proxy_response',
+        body: html,
+        timestamp: (new Date()).getTime(),
+      }), _serverUrl);      
+    } else if (type === 'bridge_response') {
+      const size = new TextEncoder().encode(JSON.stringify(results)).length;
+      const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;
+      resultsElement.value = JSON.stringify(results, undefined, 2);
+      if (results.data[Object.keys(results.data)[0]].length) {
+        document.getElementById('results-duration').innerHTML = `Elapsed query time: ${duration}ms`;
+        document.getElementById('results-size').innerHTML = sizeText;
+        document.getElementById('results-count').innerHTML = `Results count: ${results.data[Object.keys(results.data)[0]].length}`;
+        document.getElementById('results-header').classList.remove('invisible');
+        document.getElementById('results-status').classList.remove('invisible');
+      } else {
         document.getElementById('results-header').classList.add('invisible');
-        console.error(message);
-        return;
+        document.getElementById('results-status').classList.add('invisible');
       }
-    } catch (e) {
-      console.error(`Caught error on response: ${e.message}`);
+      return;
+    } else if (type === 'bridge_introspection') {
+      processIntrospectionData(results);
+      return;
+    } else if (type === 'bridge_error') {
+      resultsElement.value = JSON.stringify(results, undefined, 2);
+      document.getElementById('results-status').classList.add('invisible');
+      document.getElementById('results-header').classList.add('invisible');
+      console.error(message);
+      return;
     }
     console.error('something went wrong on response');
   }

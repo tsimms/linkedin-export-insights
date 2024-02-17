@@ -180,7 +180,7 @@ const enrichmentProxy = async (url) => {
       'X-LIID': 'abc123'
     },
     method: 'GET',
-    credentials: 'include'
+    mode: 'cors'
   };
   const response = await fetch(url, options);
   const html = await response.text();

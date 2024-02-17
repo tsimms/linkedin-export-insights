@@ -194,9 +194,6 @@ window.addEventListener('message', async (event) => {
   const { type, results, timestamp, message, url } = incomingData;
 
   if (type.startsWith('bridge_')) {
-  //if (origin === _serverUrl) {
-    console.log(`>>>> in processing for ${data}.`);
-
     const resultsElement = document.getElementById('explore-results');
     const duration = (new Date()).getTime() - timestamp;
     if (type === 'bridge_proxy_request') {

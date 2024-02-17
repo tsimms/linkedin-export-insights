@@ -108,6 +108,7 @@ const clientProxyFetch = (url) => {
     const message = { action: 'fetch', url };
     _clientConnection.send(JSON.stringify(message));
     _clientConnection.on('message', (message) => {
+      debugger;
       console.log(`back at the server with htis message: JSON.strngify(${message})`);
       resolve(message);
       // _clientConnection.close();

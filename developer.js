@@ -99,7 +99,7 @@ const launchServer = async (uploadedFile) => {
       `https://timjimsimms.com/linkedinsight/server/data.js`,
       `https://timjimsimms.com/linkedinsight/server/package.json`
     ],
-    debug:true
+    debug:false
   });
   ({ webcontainerInstance } = server);
   _serverUrl = server.serverUrl;
@@ -184,10 +184,11 @@ const enrichmentProxy = async (url) => {
 
 // Query response message handler
 window.addEventListener('message', async (event) => {
+  console.log('>>>>>> in addEventListener()')
   const { data, origin } = event;
   console.log (JSON.stringify({ data, origin, _serverUrl }, 2));
   if (origin === _serverUrl) {
-    console.log(`in processing.`);
+    console.log(`>>>> in processing for ${origin}.`);
     debugger;
     try {
       const { type, results, timestamp, message, url } = JSON.parse(data);

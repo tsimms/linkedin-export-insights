@@ -2,8 +2,8 @@
 <script>
   // receive client request and send to server
   window.addEventListener('message', async (event) => {
-      const { data, origin } = event;
-      try {
+    const { data, origin } = event;
+    try {
       console.log('BRIDGE data: ' + data);
       const { action } = JSON.parse(data);
       if (action === 'fetch') {
@@ -11,9 +11,9 @@
       } else if (action === 'bridge_proxy_response') {
           sendProxyResponse(data);
       }
-      } catch (e) {
+    } catch (e) {
       console.log('Expecting action property in ' + data);
-      }
+    }
   });
 
   const doFetch = async (data, origin) => {
@@ -54,7 +54,6 @@
   ws.onerror = (error) => { console.error('WebSocket error:', error); };
 
   ws.onmessage = (event) => {
-    debugger;
     const data = JSON.parse(event.data);
     console.log('Received a proxy fetch message for ' + data.url);
     if (data.action === 'fetch') {

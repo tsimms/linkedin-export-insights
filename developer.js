@@ -187,9 +187,9 @@ window.addEventListener('message', async (event) => {
   console.log('>>>>>> in addEventListener()')
   const { data, origin } = event;
   console.log (JSON.stringify({ data, origin, _serverUrl }, 2));
-  if (origin === _serverUrl) {
-    console.log(`>>>> in processing for ${origin}.`);
-    debugger;
+  if (type.startsWith('bridge_')) {
+  //if (origin === _serverUrl) {
+    console.log(`>>>> in processing for ${data}.`);
     try {
       const { type, results, timestamp, message, url } = JSON.parse(data);
       const resultsElement = document.getElementById('explore-results');

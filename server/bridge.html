@@ -7,12 +7,13 @@
   window.addEventListener('message', async (event) => {
     const { data, origin } = event;
     try {
-      console.log('BRIDGE data: ' + data);
+      //console.log('BRIDGE data: ' + data);
       const { action } = JSON.parse(data);
       if (action === 'fetch') {
-          await doFetch(data, origin);
+        await doFetch(data, origin);
       } else if (action === 'bridge_proxy_response') {
-          sendProxyResponse(data);
+        console.log(`sending bridge_proxy_response to server`);
+        sendProxyResponse(data);
       }
     } catch (e) {
       console.log('Expecting action property in ' + data);
@@ -62,7 +63,7 @@
     if (data.action === 'fetch') {
       const { url } = data;
       const message = JSON.stringify({ type: 'bridge_proxy_request', url });
-      console.log(`sending ${ message }`);
+      // console.log(`sending ${ message }`);
       parentFrame.postMessage(message, '*');
     }
   }

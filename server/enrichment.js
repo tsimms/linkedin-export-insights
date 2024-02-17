@@ -99,24 +99,21 @@ const runQuery = async (url) => {
 }
 
 
-const clientProxyFetch = (url) => {
-  return new Promise((resolve, reject) => {
-    if (!_clientConnection) {
-      reject('No client connection available.');
-      return;
-    }
-    const message = { action: 'fetch', url };
-    _clientConnection.send(JSON.stringify(message));
-    _clientConnection.on('message', (message) => {
-      debugger;
-      console.log(`back at the server with htis message: JSON.strngify(${message})`);
-      resolve(message);
-      // _clientConnection.close();
-    });
-    _clientConnection.once('error', (error) => { reject(error); });
+const clientProxyFetch = (url) => new Promise((resolve, reject) => {
+  if (!_clientConnection) {
+    reject('No client connection available.');
+    return;
+  }
+  const message = { action: 'fetch', url };
+  _clientConnection.send(JSON.stringify(message));
+  _clientConnection.on('message', (message) => {
+    debugger;
+    console.log(`back at the server with htis message..`);
+    resolve(message.toString());
+    // _clientConnection.close();
   });
-};
-
+  _clientConnection.once('error', (error) => { reject(error); });
+});
 
 const launchEnrichment = async () => {
   _proxyWss = new WebSocket.Server({ port: 8080 });

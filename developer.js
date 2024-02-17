@@ -201,11 +201,13 @@ window.addEventListener('message', async (event) => {
     const duration = (new Date()).getTime() - timestamp;
     if (type === 'bridge_proxy_request') {
       const html = await enrichmentProxy(url);
-      document.getElementById('bridge-frame').contentWindow.postMessage(JSON.stringify({
-        type: 'bridge_proxy_response',
+      const message = JSON.stringify({
+        action: 'bridge_proxy_response',
         body: html,
         timestamp: (new Date()).getTime(),
-      }), _serverUrl);      
+      });
+      document.getElementById('bridge-frame').contentWindow.postMessage(message, _serverUrl);
+      return;
     } else if (type === 'bridge_response') {
       const size = new TextEncoder().encode(JSON.stringify(results)).length;
       const sizeText = (size < 1024) ? `${size} B` : `${(Math.round(size / 1024 * 10) / 10).toFixed(1)} KB`;

@@ -56,7 +56,13 @@ const runQuery = async (url) => {
   const res = await fetch(fetchUrl, { headers: { ..._headers } });
   const html = await res.text();
 */
-  const html = await clientProxyFetch(fetchUrl);
+  let html = null;
+  try {
+    html = await clientProxyFetch(fetchUrl);
+  } catch(e) {
+    console.error(e.message);
+    _enrichmentQueue.push(url);
+  }
   const { document } = (new JSDOM(html)).window;
   let returnData = {};
   const code = document.querySelectorAll('code')

@@ -48,7 +48,6 @@
   }
 
   const sendProxyResponse = (data) => {
-    debugger;
     const { body } = JSON.parse(data);
     ws.send(body);
   }

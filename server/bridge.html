@@ -58,7 +58,7 @@
     console.log('Received a proxy fetch message for ' + data.url);
     if (data.action === 'fetch') {
       const { url } = data;
-      window.parent.postMessage(JSON.stringify({ type: 'bridge_proxy_request', url }), origin)
+      window.parent.postMessage(JSON.stringify({ type: 'bridge_proxy_request', url }))
     }
   }
 </script>

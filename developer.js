@@ -1,5 +1,6 @@
 import gqlContainer from './gql-container.js';
 import { ApolloSandbox } from '@apollo/sandbox';
+import { ClientProxy } from './client-proxy.js';
 import './developer.css';
 
 let webcontainerInstance, _serverUrl, _enrichmentUrl, _schema;
@@ -25,7 +26,6 @@ const showExplore = () => new Promise(( resolve ) => {
   const explore = document.getElementById('explore-dashboard');
   explore.classList.remove('hide');
   // set up the client/server comms, which also instantiates ws connection
-  // TODO: set up handler for caching enrichment proxy results
   var iframe = document.createElement('iframe');
   iframe.id = 'bridge-frame';
   iframe.onload = resolve;
@@ -171,13 +171,7 @@ const launchServer = async (uploadedFile) => {
 //  window.open(_serverUrl, '_blank');
 }
 
-// Setup comms with bridge to server, for enrichment client proxy
 
-const enrichmentProxy = async (url) => {
-  const response = await fetch(url);
-  const html = await response.text();
-  return html;
-}
 
 // Query response message handler
 window.addEventListener('message', async (event) => {
@@ -194,7 +188,7 @@ window.addEventListener('message', async (event) => {
     const resultsElement = document.getElementById('explore-results');
     const duration = (new Date()).getTime() - timestamp;
     if (type === 'bridge_proxy_request') {
-      const html = await enrichmentProxy(url);
+      const html = await ClientProxy.fetch(url);
       const message = JSON.stringify({
         action: 'bridge_proxy_response',
         body: html,

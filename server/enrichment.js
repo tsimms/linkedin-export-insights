@@ -39,9 +39,7 @@ const enrichmentQueue = [
 ];
   
 const transformUrl = (url) => {
-  const newUrl = url
-    .replace('www.linkedin.com', 'timjimsimms.com')
-    .split('?')[0]
+  const newUrl = url.split('?')[0]
   return newUrl;
 }
 

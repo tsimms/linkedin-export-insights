@@ -13,6 +13,12 @@ const getModelDefinitions = (data) => {
       messagesByConversation(from: String, to: String, startDate: String, endDate: String): [Message]
       activitiesByDate(startDate: String, endDate: String): [Activity]
       connectionsByFilter(filter: String!, startDate: String, endDate: String): [Connection]
+      messages (startDate: String, endDate: String): [Message]
+      connections (startDate: String, endDate: String): [Connection]
+      comments (startDate: String, endDate: String): [Comment]
+      shares (startDate: String, endDate: String): [Share]
+      reactions (startDate: String, endDate: String): [Reaction]
+      votes (startDate: String, endDate: String): [Vote]
     }
 
     type Message {
@@ -219,6 +225,36 @@ const getModelDefinitions = (data) => {
             item.position.includes(filter)));
 
         return responseObject(data_keywordFilter);
+      },
+      messages: (parent, { startDate, endDate }, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(d => d.type === 'message');
+        return responseObject(data_typeFilter);
+      },
+      connections: (parent, {}, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(d => d.type === 'connection');
+        return responseObject(data_typeFilter);
+      },
+      comments: (parent, {}, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(d => d.type === 'comment');
+        return responseObject(data_typeFilter);
+      },
+      shares: (parent, {}, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(d => d.type === 'share');
+        return responseObject(data_typeFilter);
+      },
+      reactions: (parent, {}, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(d => d.type === 'reaction');
+        return responseObject(data_typeFilter);
+      },
+      votes: (parent, {}, context, info) => {
+        const data_dateFilter = dateFilter(data, startDate, endDate);
+        const data_typeFilter = data_dateFilter.filter(d => d.type === 'vote');
+        return responseObject(data_typeFilter);
       }
     },
     DateTime: DateTimeResolver,

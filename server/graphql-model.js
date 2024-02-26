@@ -231,27 +231,27 @@ const getModelDefinitions = (data) => {
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'message');
         return responseObject(data_typeFilter);
       },
-      connections: (parent, {}, context, info) => {
+      connections: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'connection');
         return responseObject(data_typeFilter);
       },
-      comments: (parent, {}, context, info) => {
+      comments: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'comment');
         return responseObject(data_typeFilter);
       },
-      shares: (parent, {}, context, info) => {
+      shares: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'share');
         return responseObject(data_typeFilter);
       },
-      reactions: (parent, {}, context, info) => {
+      reactions: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'reaction');
         return responseObject(data_typeFilter);
       },
-      votes: (parent, {}, context, info) => {
+      votes: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'vote');
         return responseObject(data_typeFilter);

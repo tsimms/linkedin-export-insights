@@ -68,7 +68,7 @@ const getModelDefinitions = (data) => {
       year: Int!
       month: String!
       week: String!
-      post: [Post]
+      post: Post
     }
 
     type Post {

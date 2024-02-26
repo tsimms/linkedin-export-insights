@@ -44,6 +44,10 @@ const transformUrl = (url) => {
 }
 
 const runQuery = async (url) => {
+  if (!url) {
+    console.error(`Caught an empty url arg in runQuery()`);
+    return;
+  }
   if (_fetchBlock) {
     _enrichmentQueue.push(url);
     return;

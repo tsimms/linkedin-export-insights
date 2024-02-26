@@ -16,7 +16,7 @@ const getModelDefinitions = (data) => {
       messages (startDate: String, endDate: String): [Message]
       connections (startDate: String, endDate: String): [Connection]
       comments (startDate: String, endDate: String): [Comment]
-      shares (startDate: String, endDate: String): [Share]
+      posts (startDate: String, endDate: String): [Post]
       reactions (startDate: String, endDate: String): [Reaction]
       votes (startDate: String, endDate: String): [Vote]
     }
@@ -68,9 +68,10 @@ const getModelDefinitions = (data) => {
       year: Int!
       month: String!
       week: String!
+      post: [Post]
     }
 
-    type Share {
+    type Post {
       id: ID!
       date: DateTime!
       sharelink: String!
@@ -101,7 +102,7 @@ const getModelDefinitions = (data) => {
       month: String!
       week: String!
       content_type: String!
-      my_post: Share
+      my_post: Post
       my_comment: Comment
     }
 
@@ -116,7 +117,7 @@ const getModelDefinitions = (data) => {
       week: String!
     }
 
-    union Activity = Message | Connection | Comment | Share | Reaction | Vote
+    union Activity = Message | Connection | Comment | Post | Reaction | Vote
     `;
 
   const dateFilter = (data, start, end) => {
@@ -160,7 +161,7 @@ const getModelDefinitions = (data) => {
           context.cache = cache;
         }
         break;
-      case "shares":
+      case "posts":
         if (empty) {
           const { cache } = setCache(context, type, data.filter(d => d.type === 'share'), true);
           context.cache = cache;
@@ -241,7 +242,7 @@ const getModelDefinitions = (data) => {
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'comment');
         return responseObject(data_typeFilter);
       },
-      shares: (parent, { startDate, endDate }, context, info) => {
+      posts: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);
         const data_typeFilter = data_dateFilter.filter(d => d.type === 'share');
         return responseObject(data_typeFilter);
@@ -267,7 +268,7 @@ const getModelDefinitions = (data) => {
         } else if (obj.type === 'comment') {
           return 'Comment';
         } else if (obj.type === 'share') {
-          return 'Share';
+          return 'Post';
         } else if (obj.type === 'reaction') {
           return 'Reaction';
         } else if (obj.type === 'vote') {
@@ -299,36 +300,47 @@ const getModelDefinitions = (data) => {
         return connection.messages.length;
       }
     },
-    Share: {
-      my_comments: (share, _, context) => {
-        const link = share.sharelink;
+    Post: {
+      my_comments: (post, _, context) => {
+        const link = post.sharelink;
         const commentsSet = getCache(context, "comments");
         const results = commentsSet.filter(c => c.link === link);
-        share.my_comments = results;
+        post.my_comments = results;
         return results;
       },
-      my_comment_count: (share, _, context) => {
-        return share.my_comments.length;
+      my_comment_count: (post, _, context) => {
+        return post.my_comments.length;
       },
-      author: async (share, _, context) => {
-        const post = await getEnrichedPost(share.sharelink);
+      author: async (post, _, context) => {
+        const post = await getEnrichedPost(post.sharelink);
         return post.author;
       },
-      numImpressions: async (share, _, context) => {
-        const post = await getEnrichedPost(share.sharelink);
+      numImpressions: async (post, _, context) => {
+        const post = await getEnrichedPost(post.sharelink);
         return post.numImpressions;
       },
-      numLikes: async (share, _, context) => {
-        const post = await getEnrichedPost(share.sharelink);
+      numLikes: async (post, _, context) => {
+        const post = await getEnrichedPost(post.sharelink);
         return post.numLikes;
       },
-      numComments: async (share, _, context) => {
-        const post = await getEnrichedPost(share.sharelink);
+      numComments: async (post, _, context) => {
+        const post = await getEnrichedPost(post.sharelink);
         return post.numComments;
       },
-      numShares: async (share, _, context) => {
-        const post = await getEnrichedPost(share.sharelink);
+      numShares: async (post, _, context) => {
+        const post = await getEnrichedPost(post.sharelink);
         return post.numShares;
+      }
+    },
+    Comment: {
+      post: async (comment, _, context) => {
+        const { link } = comment;
+        const postsSet = getCache(context, "posts");
+        let result = postsSet.find(c => c.sharelink === link);
+        if (! result) {
+          result = await getEnrichedPost(link);
+        }
+        return result;
       }
     },
     Reaction: {
@@ -346,8 +358,8 @@ const getModelDefinitions = (data) => {
       my_post: (reaction, _, context) => {
         let { link } = reaction;
         link = link.split('?')[0];
-        const sharesSet = getCache(context, "shares");
-        const result = sharesSet.find(c => c.sharelink === link);
+        const postsSet = getCache(context, "posts");
+        const result = postsSet.find(c => c.sharelink === link);
         return result;
       },
       my_comment: (reaction, _, context) => {

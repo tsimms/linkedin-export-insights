@@ -73,16 +73,16 @@ const getModelDefinitions = (data) => {
 
     type Post {
       id: ID!
-      date: DateTime!
-      sharelink: String!
-      sharecommentary: String!
+      date: DateTime
+      link: String!
+      commentary: String!
       sharedurl: String!
-      mediaurl: String!
-      visibility: String!
+      mediaurl: String
+      visibility: String
       type: String!
-      year: Int!
-      month: String!
-      week: String!
+      year: Int
+      month: String
+      week: String
       my_comments: [Comment!]!
       my_comment_count: Int!
       author: String
@@ -301,6 +301,8 @@ const getModelDefinitions = (data) => {
       }
     },
     Post: {
+      link: (post, _, context) => (post.sharelink),
+      commentary: (post, _, context) => (post.sharecommentary),
       my_comments: (post, _, context) => {
         const link = post.sharelink;
         const commentsSet = getCache(context, "comments");

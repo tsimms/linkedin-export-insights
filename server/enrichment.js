@@ -9,20 +9,6 @@ let _enrichmentQueue = [];
 let _proxyWss;
 let _clientConnection = null;
 
-/*
-const getEnrichmentDataFromStorage = () => {
-  let data = localStorage.getItem('posts');
-  if (! data) {
-    data = {};
-    localStorage.setItem('posts', data);
-  }
-  return data;
-}
-
-const setEnrichmentDataToStorage = (data) => {
-  localStorage.setItem('posts', data)
-}
-*/
 
 const getRemainingEnrichment = (list, data) => {
   const remaining = list.filter(e => Object.keys(data).includes(e));

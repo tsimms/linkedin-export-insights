@@ -312,24 +312,24 @@ const getModelDefinitions = (data) => {
         return post.my_comments.length;
       },
       author: async (post, _, context) => {
-        const post = await getEnrichedPost(post.sharelink);
-        return post.author;
+        const epost = await getEnrichedPost(post.sharelink);
+        return epost.author;
       },
       numImpressions: async (post, _, context) => {
-        const post = await getEnrichedPost(post.sharelink);
-        return post.numImpressions;
+        const epost = await getEnrichedPost(post.sharelink);
+        return epost.numImpressions;
       },
       numLikes: async (post, _, context) => {
-        const post = await getEnrichedPost(post.sharelink);
-        return post.numLikes;
+        const epost = await getEnrichedPost(post.sharelink);
+        return epost.numLikes;
       },
       numComments: async (post, _, context) => {
-        const post = await getEnrichedPost(post.sharelink);
-        return post.numComments;
+        const epost = await getEnrichedPost(post.sharelink);
+        return epost.numComments;
       },
       numShares: async (post, _, context) => {
-        const post = await getEnrichedPost(post.sharelink);
-        return post.numShares;
+        const epost = await getEnrichedPost(post.sharelink);
+        return epost.numShares;
       }
     },
     Comment: {

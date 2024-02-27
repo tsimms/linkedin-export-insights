@@ -233,19 +233,22 @@ const getModelDefinitions = (data) => {
         return responseObject(data_typeFilter);
       },
       connections: (parent, { startDate, endDate }, context, info) => {
-        const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_typeFilter = data_dateFilter.filter(d => d.type === 'connection');
-        return responseObject(data_typeFilter);
+        const d = getCache(context, 'connections');
+        const data_dateFilter = dateFilter(d, startDate, endDate);
+        //const data_typeFilter = data_dateFilter.filter(d => d.type === 'connection');
+        return responseObject(data_dateFilter);
       },
       comments: (parent, { startDate, endDate }, context, info) => {
-        const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_typeFilter = data_dateFilter.filter(d => d.type === 'comment');
-        return responseObject(data_typeFilter);
+        const d = getCache(context, 'comments');
+        const data_dateFilter = dateFilter(d, startDate, endDate);
+        //const data_typeFilter = data_dateFilter.filter(d => d.type === 'comment');
+        return responseObject(data_dateFilter);
       },
       posts: (parent, { startDate, endDate }, context, info) => {
-        const data_dateFilter = dateFilter(data, startDate, endDate);
-        const data_typeFilter = data_dateFilter.filter(d => d.type === 'share');
-        return responseObject(data_typeFilter);
+        const d = getCache(context, 'posts')
+        const data_dateFilter = dateFilter(d, startDate, endDate);
+        // const data_typeFilter = data_dateFilter.filter(d => d.type === 'share');
+        return responseObject(data_dateFilter);
       },
       reactions: (parent, { startDate, endDate }, context, info) => {
         const data_dateFilter = dateFilter(data, startDate, endDate);

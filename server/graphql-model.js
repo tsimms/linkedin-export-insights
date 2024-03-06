@@ -1,5 +1,5 @@
 import { DateTimeResolver, DateTimeTypeDefinition } from 'graphql-scalars';
-import  { getPost, launchEnrichment, stopEnrichment } from './enrichment.js';
+import  { getEnrichData, launchEnrichment, stopEnrichment } from './enrichment.js';
 
 const getModelDefinitions = (data) => {
   const typeDefs = `#graphql
@@ -180,8 +180,8 @@ const getModelDefinitions = (data) => {
       return context.cache[type]
   };
 
-  const getEnrichedPost = async (url) => {
-    const post = await getPost(url);
+  const getEnrichedPost = async (url, isOthersPost) => {
+    const post = await getEnrichData(url, isOthersPost ? "othersPost" : "postMetrics" );
     if (post.status === 'queued') {
       post.post = {
         author: null,
@@ -190,7 +190,10 @@ const getModelDefinitions = (data) => {
         numComments: null,
         numShares: null
       }
-    } 
+      if (isOthersPost) {
+        post.post = { ...post.post, sharelink: url }
+      }
+    }
     return post.post;
   }
 
@@ -235,19 +238,16 @@ const getModelDefinitions = (data) => {
       connections: (parent, { startDate, endDate }, context, info) => {
         const d = getCache(context, 'connections');
         const data_dateFilter = dateFilter(d, startDate, endDate);
-        //const data_typeFilter = data_dateFilter.filter(d => d.type === 'connection');
         return responseObject(data_dateFilter);
       },
       comments: (parent, { startDate, endDate }, context, info) => {
         const d = getCache(context, 'comments');
         const data_dateFilter = dateFilter(d, startDate, endDate);
-        //const data_typeFilter = data_dateFilter.filter(d => d.type === 'comment');
         return responseObject(data_dateFilter);
       },
       posts: (parent, { startDate, endDate }, context, info) => {
         const d = getCache(context, 'posts')
         const data_dateFilter = dateFilter(d, startDate, endDate);
-        // const data_typeFilter = data_dateFilter.filter(d => d.type === 'share');
         return responseObject(data_dateFilter);
       },
       reactions: (parent, { startDate, endDate }, context, info) => {
@@ -343,7 +343,11 @@ const getModelDefinitions = (data) => {
         const postsSet = getCache(context, "posts");
         let result = postsSet.find(c => c.sharelink === link);
         if (! result) {
-          result = await getEnrichedPost(link);
+          // if there's no match on the post, it means the post was authored by someone else
+          // fetch that post (if it hasn't already been fetched)
+          // TO-DO: we should probably add these posts to the data model, but I'm not yet sure
+          //   how we'll need to use the data
+          result = await getEnrichedPost(link, true);
         }
         return result;
       }

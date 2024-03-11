@@ -28,7 +28,8 @@ const ClientProxy = {
     setCache(url, html);
     return html;
   },
-  setCookie: file => {
+  setCookie: async file => {
+    const text = await file.text();
     debugger;
     console.log(`needing to process these har file contents: ${JSON.stringify(file)}`)
   }

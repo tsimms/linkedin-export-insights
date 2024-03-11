@@ -172,7 +172,7 @@ const launchServer = async (uploadedFile) => {
 }
 
 const initClientProxy = file => {
-  ClientProxy.setCookie(file);
+  ClientProxy.setCookie(file); // async call
 }
 
 

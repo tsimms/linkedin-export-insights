@@ -30,8 +30,10 @@ const ClientProxy = {
   },
   setCookie: async file => {
     const text = await file.text();
+    const data = JSON.parse(text);
+    const { cookies } = data.log.entries.filter(r => r.request.url.match(/linkedin/))[0].request;
+    console.log(`cookies: ${JSON.stringify(cookies)}`);
     debugger;
-    console.log(`needing to process these har file contents: ${JSON.stringify(text)}`)
   }
 }
 

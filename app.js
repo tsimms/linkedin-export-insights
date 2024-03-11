@@ -232,8 +232,8 @@ const onFileSelected = async () => {
 const onHarFileSelected = async () => {
   const file = harFile.files;
   if (file.length) {
-    harFile = files[0];
-    initClientProxy(harFile);
+    const harFileContents = file[0];
+    initClientProxy(harFileContents);
   }
 }
 

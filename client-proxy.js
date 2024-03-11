@@ -29,7 +29,8 @@ const ClientProxy = {
     return html;
   },
   setCookie: file => {
-    console.log(`needing to process these har file contents: ${file}`)
+    debugger;
+    console.log(`needing to process these har file contents: ${JSON.stringify(file)}`)
   }
 }
 

@@ -230,7 +230,7 @@ const onFileSelected = async () => {
 };
 
 const onHarFileSelected = async () => {
-  const file = harFileInput.files;
+  const file = harFile.files;
   if (file.length) {
     harFile = files[0];
     initClientProxy(harFile);

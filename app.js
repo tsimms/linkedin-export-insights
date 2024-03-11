@@ -1,5 +1,5 @@
 import { ingest } from './server/data.js';
-import { launchServer } from './developer.js';
+import { launchServer, initClientProxy } from './developer.js';
 import JSZip from 'jszip';
 import './app.css';
 
@@ -229,6 +229,14 @@ const onFileSelected = async () => {
   }
 };
 
+const onHarFileSelected = async () => {
+  const file = harFileInput.files;
+  if (file.length) {
+    harFile = files[0];
+    initClientProxy(harFile);
+  }
+}
+
 const uxOptions = () => {
   const granularity = document.getElementById('granularity').value;
   const ignoreGroupPosts = document.getElementById('ignoreGroupPosts').value;
@@ -289,6 +297,7 @@ const setUx = () => {
   document.getElementById('granularity').addEventListener('change', uxOptions);
   document.getElementById('ignoreGroupPosts').addEventListener('change', uxOptions);
   document.getElementById('filesInput').addEventListener('change', onFileSelected);
+  document.getElementById('harFile').addEventListener('change', onHarFileSelected);
   document.getElementById('form-toggle').addEventListener('click', toggleSettings);
   document.getElementById('developerMode').addEventListener('change', toggleDeveloperMode);
   toggleDeveloperMode();

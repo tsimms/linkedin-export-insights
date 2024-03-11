@@ -27,6 +27,9 @@ const ClientProxy = {
     const html = await response.text();
     setCache(url, html);
     return html;
+  },
+  setCookie: file => {
+    console.log(`needing to process these har file contents: ${file}`)
   }
 }
 

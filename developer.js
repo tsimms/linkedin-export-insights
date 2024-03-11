@@ -171,6 +171,9 @@ const launchServer = async (uploadedFile) => {
 //  window.open(_serverUrl, '_blank');
 }
 
+const initClientProxy = file => {
+  ClientProxy.setCookie(file);
+}
 
 
 // Query response message handler
@@ -438,4 +441,4 @@ const getQuery = () => {
     developerFrameUx();
 })()
 
-export { launchServer };
+export { launchServer, initClientProxy };

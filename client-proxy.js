@@ -17,7 +17,7 @@ const openDatabase = () => {
 
     request.onupgradeneeded = function(event) {
       const db = event.target.result;
-      const objectStore = db.createObjectStore("cache", { keyPath: "url" });
+      db.createObjectStore("cache", { keyPath: "url" });
     };
   });
 };
@@ -50,7 +50,7 @@ const setCache = async (url, data) => {
     const objectStore = transaction.objectStore("cache");
     const request = objectStore.put({ url: url, data: data });
 
-    request.onsuccess = function(event) {
+    request.onsuccess = function() {
       resolve();
     };
 

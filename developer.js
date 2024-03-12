@@ -1,5 +1,5 @@
 import gqlContainer from './gql-container.js';
-import { ApolloSandbox } from '@apollo/sandbox';
+//import { ApolloSandbox } from '@apollo/sandbox';
 import { ClientProxy } from './client-proxy.js';
 import './developer.css';
 
@@ -79,7 +79,7 @@ const developerFrameUx = () => {
     const queryText = _queries.schema[selectedValue];
     if (queryText) {
       document.getElementById('explore-query').value = queryText;
-    };
+    }
   });
 }
 
@@ -178,7 +178,7 @@ const initClientProxy = file => {
 
 // Query response message handler
 window.addEventListener('message', async (event) => {
-  const { data, origin } = event;
+  const { data } = event;
   let incomingData;
   try {
     incomingData = JSON.parse(data);

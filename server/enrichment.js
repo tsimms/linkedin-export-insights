@@ -147,13 +147,7 @@ const launchEnrichment = async () => {
 
   _stop = false;
   while (!_stop) {
-    debugger;
-    await new Promise(resolve => {
-      if (!_cacheDelay) {
-        return resolve();
-      }
-      setTimeout(resolve, _interval);
-    });
+    await new Promise(resolve => setTimeout(resolve, (_cacheDelay ? _interval: 50)));
     if (_enrichmentQueue.length && !_fetchBlock) {
       const { url, type } = _enrichmentQueue.pop();
       if (!Object.keys(_enrichmentData).includes(url)) {

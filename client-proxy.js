@@ -78,7 +78,7 @@ const ClientProxy = {
     const response = await fetch(fetchUrl);
     const html = await response.text();
     await setCache(url, html);
-    return { body: html, cacheHit: false, url };
+    return { body: html, cacheHit: false };
   },
   setCookie: async file => {
     const text = await file.text();

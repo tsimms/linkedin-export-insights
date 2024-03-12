@@ -21,8 +21,6 @@
   });
 
   const doFetch = async (data, origin) => {
-    console.log('in doFetch();');
-    debugger;
     try {
       const { action, url, method, headers, body, timestamp } = JSON.parse(data);
       console.log({ body });

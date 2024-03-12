@@ -1,31 +1,83 @@
-
 // Setup comms with bridge to server, for enrichment client proxy
 
+// Open IndexedDB database
+const openDatabase = () => {
+  return new Promise((resolve, reject) => {
+    const request = window.indexedDB.open("cachedData", 1);
+
+    request.onerror = function(event) {
+      console.error("IndexedDB error:", event.target.errorCode);
+      reject(event.target.errorCode);
+    };
+
+    request.onsuccess = function(event) {
+      const db = event.target.result;
+      resolve(db);
+    };
+
+    request.onupgradeneeded = function(event) {
+      const db = event.target.result;
+      const objectStore = db.createObjectStore("cache", { keyPath: "url" });
+    };
+  });
+};
+
+// Check cache in IndexedDB
+const checkCache = async (url) => {
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["cache"], "readonly");
+    const objectStore = transaction.objectStore("cache");
+    const request = objectStore.get(url);
+
+    request.onsuccess = function(event) {
+      const result = event.target.result;
+      resolve(result ? result.data : null);
+    };
+
+    request.onerror = function(event) {
+      console.error("Error checking cache:", event.target.errorCode);
+      reject(event.target.errorCode);
+    };
+  });
+};
+
+// Store data in IndexedDB cache
+const setCache = async (url, data) => {
+  const db = await openDatabase();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction(["cache"], "readwrite");
+    const objectStore = transaction.objectStore("cache");
+    const request = objectStore.put({ url: url, data: data });
+
+    request.onsuccess = function(event) {
+      resolve();
+    };
+
+    request.onerror = function(event) {
+      console.error("Error setting cache:", event.target.errorCode);
+      reject(event.target.errorCode);
+    };
+  });
+};
+
+// Setup proxy URL function
 const proxyUrl = (url) => {
-  const newUrl = url
-    .replace('www.linkedin.com', 'timjimsimms.com')
+  const newUrl = url.replace('www.linkedin.com', 'timjimsimms.com');
   return newUrl;
-}
+};
 
-const checkCache = (url) => {
-  const result = localStorage.getItem(`cache.${url}`);
-  return result;
-}
-
-const setCache = (url, data) => {
-  localStorage.setItem(`cache.${url}`, data);
-}
-
+// ClientProxy object for fetching data and setting cookies
 const ClientProxy = {
   fetch: async (url) => {
-    const cached = checkCache(url);
+    const cached = await checkCache(url);
     if (cached) {
       return cached;
     }
     const fetchUrl = proxyUrl(url);
     const response = await fetch(fetchUrl);
     const html = await response.text();
-    setCache(url, html);
+    await setCache(url, html);
     return html;
   },
   setCookie: async file => {
@@ -33,8 +85,7 @@ const ClientProxy = {
     const data = JSON.parse(text);
     const { cookies } = data.log.entries.filter(r => r.request.url.match(/linkedin/))[0].request;
     console.log(`cookies: ${JSON.stringify(cookies)}`);
-    debugger;
   }
-}
+};
 
 export { ClientProxy };

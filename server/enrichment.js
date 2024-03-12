@@ -126,7 +126,6 @@ const clientProxyFetch = (url) => new Promise((resolve, reject) => {
   _clientConnection.send(JSON.stringify(message));
   _clientConnection.on('message', (message) => {
     const { body, delay, url } = JSON.parse(message.toString());
-    debugger;
     _cacheDelay = delay;
     console.log(`clientProxyFetch():: response for ${url} of length ${body.length}`);
     resolve(body);
@@ -148,13 +147,12 @@ const launchEnrichment = async () => {
 
   _stop = false;
   while (!_stop) {
-    await new Promise(resolve => setTimeout(resolve, _interval));
-/*
-    if (_cacheDelay) {
-      await new Promise(resolve => setTimeout(resolve, _interval));
-      _cacheDelay = false;
-    }
-*/
+    await new Promise(resolve => {
+      if (!_cacheDelay) {
+        return resolve();
+      }
+      setTimeout(resolve, _interval);
+    });
     if (_enrichmentQueue.length && !_fetchBlock) {
       const { url, type } = _enrichmentQueue.pop();
       if (!Object.keys(_enrichmentData).includes(url)) {

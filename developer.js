@@ -231,8 +231,6 @@ window.addEventListener('message', async (event) => {
 });
 
 const runIntrospection = async () => {
-  console.log('in runIntrospection();');
-  debugger;
   const query = `
     {"query":"
       query IntrospectionQuery {

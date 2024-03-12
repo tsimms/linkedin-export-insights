@@ -72,13 +72,13 @@ const ClientProxy = {
   fetch: async (url) => {
     const cached = await checkCache(url);
     if (cached) {
-      return { body: cached, cacheHit: true };
+      return { body: cached, cacheHit: true, url };
     }
     const fetchUrl = proxyUrl(url);
     const response = await fetch(fetchUrl);
     const html = await response.text();
     await setCache(url, html);
-    return { body: html, cacheHit: false };
+    return { body: html, cacheHit: false, url };
   },
   setCookie: async file => {
     const text = await file.text();

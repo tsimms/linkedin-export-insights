@@ -48,8 +48,9 @@
   }
 
   const sendProxyResponse = (data) => {
-    const { body } = JSON.parse(data);
-    ws.send(body);
+    const { body, cacheHit, url } = JSON.parse(data);
+    const delay = (cacheHit === false);
+    ws.send(JSON.stringify({ body, delay, url }));
   }
 
   const ws = new WebSocket('ws://%hostname%');

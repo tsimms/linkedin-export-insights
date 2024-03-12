@@ -147,6 +147,7 @@ const launchEnrichment = async () => {
 
   _stop = false;
   while (!_stop) {
+    debugger;
     await new Promise(resolve => {
       if (!_cacheDelay) {
         return resolve();

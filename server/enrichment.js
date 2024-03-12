@@ -39,7 +39,7 @@ const runQuery = async (url, type) => {
     return;
   }
   if (_fetchBlock) {
-    _enrichmentQueue.push(url);
+    _enrichmentQueue.push({ url, type });
     return;
   }
   _fetchBlock = true;
@@ -49,7 +49,7 @@ const runQuery = async (url, type) => {
     html = await clientProxyFetch(fetchUrl);
   } catch (e) {
     console.error(e.message);
-    _enrichmentQueue.push(url);
+    _enrichmentQueue.push({ url, type });
     return;
   }
   const { document } = (new JSDOM(html)).window;
@@ -177,7 +177,7 @@ const getEnrichData = async (url, type) => {
     }
     // otherwise, might have gotten in there realizing we need to queue instead.
   }
-  if (!_enrichmentQueue.includes(url))
+  if (!_enrichmentQueue.some(e => e.url === url))
     _enrichmentQueue.push({ url, type });
   return { status: 'queued' };
 }

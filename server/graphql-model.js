@@ -181,6 +181,7 @@ const getModelDefinitions = (data) => {
   };
 
   const getEnrichedPost = async (url, isOthersPost) => {
+    debugger;
     const post = await getEnrichData(url, isOthersPost ? "othersPost" : "postMetrics" );
     if (post.status === 'queued') {
       post.post = {

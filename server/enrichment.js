@@ -127,7 +127,7 @@ const clientProxyFetch = (url) => new Promise((resolve, reject) => {
   _clientConnection.on('message', (message) => {
     const { body, delay, url } = JSON.parse(message.toString());
     _cacheDelay = delay;
-    console.log(`clientProxyFetch():: response for ${url} of length ${body.length}`);
+    // console.log(`clientProxyFetch():: response for ${url} of length ${body.length}`);
     resolve(body);
   });
   _clientConnection.once('error', (error) => { reject(error); });

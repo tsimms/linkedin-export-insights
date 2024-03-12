@@ -191,10 +191,11 @@ window.addEventListener('message', async (event) => {
     const resultsElement = document.getElementById('explore-results');
     const duration = (new Date()).getTime() - timestamp;
     if (type === 'bridge_proxy_request') {
-      const html = await ClientProxy.fetch(url);
+      const { body, cacheHit } = await ClientProxy.fetch(url);
       const message = JSON.stringify({
         action: 'bridge_proxy_response',
-        body: html,
+        body,
+        cacheHit,
         timestamp: (new Date()).getTime(),
       });
       document.getElementById('bridge-frame').contentWindow.postMessage(message, _serverUrl);

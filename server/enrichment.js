@@ -125,6 +125,7 @@ const clientProxyFetch = (url) => new Promise((resolve, reject) => {
   _clientConnection.send(JSON.stringify(message));
   _clientConnection.on('message', (message) => {
     const body = message.toString();
+    debugger;
     console.log(`clientProxyFetch():: response for ${url} of length ${body.length}`);
     resolve(body);
   });

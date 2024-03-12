@@ -21,6 +21,8 @@
   });
 
   const doFetch = async (data, origin) => {
+    console.log('in doFetch();');
+    debugger;
     try {
       const { action, url, method, headers, body, timestamp } = JSON.parse(data);
       console.log({ body });
@@ -48,11 +50,9 @@
   }
 
   const sendProxyResponse = (data) => {
-    /*
     const { body, cacheHit, url } = JSON.parse(data);
     const delay = (cacheHit === false);
     ws.send(JSON.stringify({ body, delay, url }));
-    */
   }
 
   const ws = new WebSocket('ws://%hostname%');

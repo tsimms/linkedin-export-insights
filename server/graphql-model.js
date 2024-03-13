@@ -102,7 +102,7 @@ const getModelDefinitions = (data) => {
       month: String!
       week: String!
       content_type: String!
-      my_post: Post
+      post: Post
       my_comment: Comment
     }
 
@@ -364,11 +364,14 @@ const getModelDefinitions = (data) => {
         reaction.content_type = result;
         return result;
       },
-      my_post: (reaction, _, context) => {
+      post: async (reaction, _, context) => {
         let { link } = reaction;
         link = link.split('?')[0];
         const postsSet = getCache(context, "posts");
         const result = postsSet.find(c => c.sharelink === link);
+        if (! result) {
+          result = await getEnrichedPost(link, true);
+        }
         return result;
       },
       my_comment: (reaction, _, context) => {

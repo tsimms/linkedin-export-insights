@@ -73,7 +73,7 @@ const ClientProxy = {
   fetch: async (url) => {
     const cached = await checkCache(url);
     if (cached) {
-      return { body: cached, cacheHit: true, url };
+      return { body: cached, cacheHit: true };
     }
     const fetchUrl = proxyUrl(url);
     const response = await fetch(fetchUrl);

@@ -48,7 +48,8 @@ const setCache = async (url, data) => {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction(["cache"], "readwrite");
     const objectStore = transaction.objectStore("cache");
-    const request = objectStore.put({ url: url, data: data });
+    const updated = (new Date()).toISOString;
+    const request = objectStore.put({ url, data, updated });
 
     request.onsuccess = function() {
       resolve();

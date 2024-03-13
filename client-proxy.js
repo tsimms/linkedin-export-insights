@@ -84,6 +84,8 @@ const ClientProxy = {
     const text = await file.text();
     const data = JSON.parse(text);
     const { cookies } = data.log.entries.filter(r => r.request.url.match(/linkedin/))[0].request;
+    cookies.forEach(c => document.cookie = `${c.name}=${c.value}`);
+    console.log('Set cookies.');
     console.log(`cookies: ${JSON.stringify(cookies)}`);
   }
 };

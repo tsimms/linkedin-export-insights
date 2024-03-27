@@ -2,12 +2,13 @@
 <script>
 
   const parentFrame = window.parent;
+  let CONNECTED = false;
 
   // receive client request and send to server
   window.addEventListener('message', async (event) => {
     const { data, origin } = event;
     try {
-      //console.log('BRIDGE data: ' + data);
+      console.log('BRIDGE data: ' + data);
       const { action } = JSON.parse(data);
       if (action === 'fetch') {
         await doFetch(data, origin);
@@ -54,8 +55,14 @@
   }
 
   const ws = new WebSocket('ws://%hostname%');
-  ws.onopen = () => { console.log('WebSocket connection established.'); };
-  ws.onclose = () => { console.log('WebSocket connection closed.'); };
+  ws.onopen = () => {
+    CONNECTED = true;
+    console.log('WebSocket connection established.')
+  };
+  ws.onclose = () => {
+    console.log('WebSocket connection closed.');
+    CONNECTED = false;
+  };
   ws.onerror = (error) => { console.error('WebSocket error:', error); };
 
   ws.onmessage = (event) => {

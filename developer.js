@@ -27,8 +27,9 @@ const showExplore = () => new Promise(( resolve ) => {
   explore.classList.remove('hide');
   // set up the client/server comms, which also instantiates ws connection
   var iframe = document.createElement('iframe');
+
   iframe.id = 'bridge-frame';
-  iframe.onload = resolve;
+  iframe.addEventListener('load', resolve);
   iframe.src = `${_serverUrl}/bridge?hostname=${serverHostname}`;
   document.getElementById('bridge').appendChild(iframe);
 });

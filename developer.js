@@ -110,7 +110,7 @@ const launchServer = async (uploadedFile) => {
   console.log(`Enrichment URL: ${_enrichmentUrl}!`);
   hideLoading();
   await showExplore();
-  runIntrospection();
+  setTimeout(runIntrospection, 2000);
 
 /*
   // the reason this doesn't work is because the /sandbox/explorer endpoint doesn't include a

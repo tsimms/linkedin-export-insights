@@ -330,7 +330,7 @@ const runIntrospection = () => {
       }
     "}
   `.replaceAll('\n'," ").replaceAll(/[ \t]+/g," ");
-  consolee.log('running introspection query');
+  console.log('running introspection query');
   runQuery(query);
 }
 
@@ -424,6 +424,7 @@ const runQuery = (query) => {
     timestamp: (new Date()).getTime(),
     body: query
   }), _serverUrl);
+  console.log('sent introspection query');
 }
 
 const getQuery = () => {

@@ -217,6 +217,7 @@ window.addEventListener('message', async (event) => {
       }
       return;
     } else if (type === 'bridge_introspection') {
+      console.log('received introspection response from bridge');
       processIntrospectionData(results);
       return;
     } else if (type === 'bridge_error') {
@@ -230,7 +231,7 @@ window.addEventListener('message', async (event) => {
   }
 });
 
-const runIntrospection = async () => {
+const runIntrospection = () => {
   const query = `
     {"query":"
       query IntrospectionQuery {
@@ -329,6 +330,7 @@ const runIntrospection = async () => {
       }
     "}
   `.replaceAll('\n'," ").replaceAll(/[ \t]+/g," ");
+  consolee.log('running introspection query');
   runQuery(query);
 }
 
